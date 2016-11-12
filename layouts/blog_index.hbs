@@ -1,0 +1,19 @@
+{{> header pageBlog="true"}}
+
+{{#each collections.recentPosts }}
+<article class="blog-post">
+  <h2 class="blog-post-title"><a href="/{{path}}">{{ title }}</a></h2>
+  <div class="blog-post-meta">
+    {{formatDate date  day="numeric" month="long" year="numeric" }}
+  {{#if xpost}}
+  | cross-posted on <a href="{{xpost.link}}">{{xpost.name}}</a>
+  {{/if}}
+  </div>
+
+  {{{ original_contents }}}
+</article>
+{{/each}}
+
+<div class="blog-post-meta">/more in the <a href="/blog/archive">archive</a></div>
+
+{{> footer }}

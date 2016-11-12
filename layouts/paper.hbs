@@ -1,0 +1,25 @@
+{{> header pagePapers="true"}}
+
+<h1>{{title}}</h1>
+
+<div class="paper-authors">
+by
+{{#each authors}}
+<a href="{{link}}">{{name}}</a>{{#unless @last}}, {{/unless}}
+{{/each}}
+</div>
+
+<h2>Abstract</h2>
+
+{{{contents}}}
+
+{{#each published}}
+<div>
+<strong>{{name}}</strong>:
+  {{#each files}}
+    <a href="{{link}}">{{name}}</a>{{#unless @last}} | {{/unless}}
+  {{/each}}
+</div>
+{{/each}}
+
+{{> footer }}
