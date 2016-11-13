@@ -2,9 +2,11 @@
 let Metalsmith  = require('metalsmith');
 let collections = require('metalsmith-collections');
 let layouts     = require('metalsmith-layouts');
-let markdown    = require('metalsmith-markdown');
+let markdown    = require('metalsmith-markdown-remarkable');
 let permalinks  = require('metalsmith-permalinks');
 let assets      = require('metalsmith-assets');
+let dates       = require('metalsmith-jekyll-dates');
+let prism       = require('prismjs');
 
 
 Metalsmith(__dirname)
@@ -12,8 +14,6 @@ Metalsmith(__dirname)
     sitename: 'Disnetdev',
     siteurl: 'http://disnetdev.com/',
     description: 'Personal site of Tim Disney',
-    generatorname: 'Metalsmith',
-    generatorurl: 'http://metalsmith.io/'
   })
   .source('./source')
   .destination('./public')
@@ -23,12 +23,22 @@ Metalsmith(__dirname)
     destination: './static'
   }))
   .use(collections({
-    posts: 'posts/*.md'
+    posts: 'blog/*.md'
   }))
-  .use(markdown())
+  .use(markdown('full', {
+    highlight (code) {
+      return prism.highlight(code, prism.languages.javascript);
+    }
+  }))
+  .use(dates())
   .use(permalinks({
-    relative: false
+    relative: false,
+    linksets: [{
+      match: { collection: 'posts' },
+      pattern: 'blog/:date/:title'
+    }]
   }))
+  // .use(console.log)
   .use(layouts({
     engine: 'handlebars',
     partials: 'partials'
