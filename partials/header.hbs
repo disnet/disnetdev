@@ -30,10 +30,10 @@
     <div class="blog-masthead">
       <div class="container">
         <nav class="blog-nav">
-          <a class="blog-nav-item active" href="#">about</a>
-          <a class="blog-nav-item" href="#">blog</a>
-          <a class="blog-nav-item" href="#">projects</a>
-          <a class="blog-nav-item" href="#">papers</a>
+          <a class="blog-nav-item {{#if pageAbout}}active{{/if}}" href="/">about</a>
+          <a class="blog-nav-item {{#if pageBlog}}active{{/if}}" href="/blog">blog</a>
+          <a class="blog-nav-item {{#if pageProjects}}active{{/if}}" href="/projects">projects</a>
+          <a class="blog-nav-item {{#if pagePapers}}active{{/if}}" href="/papers">papers</a>
         </nav>
       </div>
     </div>

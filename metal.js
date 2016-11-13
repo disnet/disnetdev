@@ -7,7 +7,11 @@ let permalinks  = require('metalsmith-permalinks');
 let assets      = require('metalsmith-assets');
 let dates       = require('metalsmith-jekyll-dates');
 let prism       = require('prismjs');
+let Handlebars  = require('handlebars');
+let HandlebarsIntl = require('handlebars-intl');
 
+
+HandlebarsIntl.registerWith(Handlebars);
 
 Metalsmith(__dirname)
   .metadata({
@@ -23,11 +27,15 @@ Metalsmith(__dirname)
     destination: './static'
   }))
   .use(collections({
-    posts: 'blog/*.md'
+    posts: 'blog/*.md',
+    recentPosts: {
+      pattern: 'blog/*.md',
+      limit: 5
+    }
   }))
   .use(markdown('full', {
-    highlight (code) {
-      return prism.highlight(code, prism.languages.javascript);
+    highlight (code, lang) {
+      return prism.highlight(code, prism.languages[lang]);
     }
   }))
   .use(dates())
@@ -38,11 +46,21 @@ Metalsmith(__dirname)
       pattern: 'blog/:date/:title'
     }]
   }))
-  // .use(console.log)
+  .use(function(files) {
+    Object.keys(files).forEach(file => {
+      let f = files[file];
+      if (f.collection && f.collection.some(coll => coll === 'posts')) {
+        f.original_contents = f.contents;
+      }
+    });
+  })
   .use(layouts({
     engine: 'handlebars',
     partials: 'partials'
   }))
+  .use(function() {
+    debugger;
+  })
   .build(function(err) {
     if (err) throw err;
   });

@@ -1,10 +1,13 @@
 {{> header pageBlog="true"}}
 
+{{#each collections.recentPosts }}
 <article class="blog-post">
   <h2 class="blog-post-title"><a href="/{{path}}">{{ title }}</a></h2>
   <p class="blog-post-meta">{{formatDate date  day="numeric" month="long" year="numeric" }}</p>
 
-  {{{ contents }}}
+  {{{ original_contents }}}
 </article>
+{{/each}}
+
 
 {{> footer }}
