@@ -1,0 +1,131 @@
+body {
+    font-family: 'Petrona', serif;
+    font-size: large;
+}
+
+pre {
+    padding: 4px;
+    background-color: lightgray;
+}
+
+
+h1 {
+    font-family: 'Petrona', serif;
+    font-weight: 400;
+    font-size: 48px;
+}
+
+h2 {
+    font-family: 'Signika', sans-serif;
+    font-weight: 400;
+}
+
+h3 {
+    font-family: 'Signika', sans-serif;
+    font-weight: 400;
+}
+
+
+p {
+    text-align: justify;
+}
+
+a:visited {
+    background: #FFFFFF none repeat scroll 0 0;
+    color: #111111;
+}
+a, a:link {
+    color: #000000;
+}
+a:hover {
+    background: #000000 none repeat scroll 0 0;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+a.normal:hover {
+    background: transparent none repeat scroll 0 0;
+    color: #000000;
+    text-decoration: none;
+}
+
+
+
+.main {
+    margin: 0 auto;
+    width: 600px;
+}
+
+
+article.paper hgroup h1 {
+    margin-bottom: 0;
+
+    font-family: 'Signika', sans-serif;
+    font-weight: 400;
+}
+article.paper hgroup h2 {
+    font-family: 'Signika', sans-serif;
+    font-weight: 400;
+
+    margin-top: 0;
+    padding-left: 20px;
+    font-size: large;
+}
+article .pub-links {
+    font-family: 'Signika', sans-serif;
+}
+
+div.content {
+    font-size: 15pt;
+}
+
+.content {
+    width: 600px;
+    margin-top: 50px;
+}
+
+.footer {
+    background: none repeat scroll 0 0 #292929;
+    font-size: small;
+    color: #C3C3C3;
+    padding: 4px;
+    margin:0;
+    text-transform: uppercase;
+    font-weight:bold;
+    margin-top: 30px;
+}
+
+.postmetadata {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  border-bottom: 1px dashed lightgray;
+  padding-bottom: 10px;
+  font-size:medium;
+  text-align: right;
+  color: gray;
+}
+
+.post {
+    margin-bottom: 50px;
+}
+
+code {
+    font-size: 12pt;
+}
+
+nav {
+    margin-top: -20px;
+    text-align: center;
+}
+nav ul {
+    display:inline;
+    padding: 0;
+}
+nav li.first {
+    margin-left: 0;
+}
+nav li {
+    display: inline;
+    font-family: 'Muli', sans-serif;
+    margin-left: 20px;
+}
