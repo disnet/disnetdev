@@ -1,6 +1,4 @@
 ---
-title: blog
+title: Blog Index
 layout: blog_index.hbs
 ---
-
-blogs!
