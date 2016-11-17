@@ -42,12 +42,24 @@ h6, .h6 {
 }
 
 /* Nav links */
+.blog-nav-logo {
+  position: relative;
+  display: inline-block;
+  padding: 8px;
+  padding-left: 0;
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /*color: #cdddeb;*/
+  color: #fff;
+  /*font-size: 110%;*/
+}
 .blog-nav-item {
   position: relative;
   display: inline-block;
-  padding: 10px;
+  padding: 8px;
   font-weight: 500;
   color: #cdddeb;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .blog-nav-item:hover,
 .blog-nav-item:focus {
@@ -163,9 +175,10 @@ h6, .h6 {
  */
 
 .blog-footer {
+  margin-top: 20px;
   padding: 10px 0;
   color: #999;
-  text-align: center;
+  text-align: right;
   background-color: #f9f9f9;
   border-top: 1px solid #e5e5e5;
 }

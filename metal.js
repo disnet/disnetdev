@@ -7,6 +7,7 @@ let permalinks  = require('metalsmith-permalinks');
 let assets      = require('metalsmith-assets');
 let dates       = require('metalsmith-jekyll-dates');
 let prism       = require('prismjs');
+// let typo        = require('metalsmith-typography');
 let Handlebars  = require('handlebars');
 let HandlebarsIntl = require('handlebars-intl');
 
@@ -26,19 +27,34 @@ Metalsmith(__dirname)
     source: './static',
     destination: './static'
   }))
+  .use(dates())
+  .use(function() {
+    debugger;
+  })
   .use(collections({
-    posts: 'blog/*.md',
+    posts: '_posts/*.md',
+    sortBy: 'date',
+    reverse: true,
     recentPosts: {
-      pattern: 'blog/*.md',
+      pattern: '_posts/*.md',
+      sortBy: 'date',
+      reverse: true,
       limit: 5
     }
   }))
   .use(markdown('full', {
+    html: true,
     highlight (code, lang) {
-      return prism.highlight(code, prism.languages[lang]);
+      return require('highlight.js').highlight(lang, code).value;
+      // if (prism.languages[lang]) {
+      //   return prism.highlight(code, prism.languages[lang]);
+      // }
+      // return prism.highlight(code);
     }
   }))
-  .use(dates())
+  .use(function() {
+    debugger;
+  })
   .use(permalinks({
     relative: false,
     linksets: [{
