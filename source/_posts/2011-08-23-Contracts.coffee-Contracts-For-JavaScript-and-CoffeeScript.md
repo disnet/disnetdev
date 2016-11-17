@@ -55,10 +55,8 @@ So what does it all look like?
 
 Here's some CoffeeScript code with contracts:
 
-```
-id :: (Num) -> Num
-id = (x) -> x
-```
+    id :: (Num) -> Num
+    id = (x) -> x
 
 And the JavaScript translation:
 
@@ -90,31 +88,25 @@ Pretty nifty right?
 
 We can also have contracts on objects:
 
-```
-person ::
-    name: Str
-    age: Num
-person =
-    name: "Bertrand Meyer"
-    age: 42
-```
+    person ::
+        name: Str
+        age: Num
+    person =
+        name: "Bertrand Meyer"
+        age: 42
 
 And arrays:
 
-```
-loc :: [...Num]
-loc = [99332, 23452, 123, 2, 5000]
-```
+    loc :: [...Num]
+    loc = [99332, 23452, 123, 2, 5000]
 
 And various combinations thereof:
 
-```
-average :: ({name: Str, age: Num}, [...Num]) -> Str
-average = (person, loc) ->
-    sum = loc.reduce (s1, s2) -> s1 + s2
-    "#{person.name} wrote on average
-    #{sum / loc.length} lines of code."
-```
+    average :: ({name: Str, age: Num}, [...Num]) -> Str
+    average = (person, loc) ->
+        sum = loc.reduce (s1, s2) -> s1 + s2
+        "#{person.name} wrote on average
+        #{sum / loc.length} lines of code."
 
 You can find documentation, install instructions, and a bunch more
 examples for contracts.coffee at its
