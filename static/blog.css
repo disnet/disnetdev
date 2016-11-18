@@ -14,10 +14,27 @@ h4, .h4,
 h5, .h5,
 h6, .h6 {
   margin-top: 0;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+  font-family: Georgia, "Times New Roman", Times, serif;
   font-weight: normal;
   color: #333;
 }
+a, a:link {
+  color: #000000;
+  text-decoration: underline;
+}
+
+a:hover {
+  background: #000000 none repeat scroll 0 0;
+  text-decoration: none;
+  color: #FFFFFF;
+}
+
+
+/*a:visited {
+  background: #FFFFFF none repeat scroll 0 0;
+  color: #111111;
+}*/
 
 
 /*
@@ -36,42 +53,46 @@ h6, .h6 {
  */
 
 .blog-masthead {
-  background-color: #428bca;
-  -webkit-box-shadow: inset 0 -5px 5px rgba(0,0,0,.16);
-  box-shadow: inset 0 -5px 5px rgba(0, 0, 0, 0.16);
+  margin-top: 20px;
+  text-align: center;
+  /* background-color: #428bca; */
+  /*-webkit-box-shadow: inset 0 -5px 5px rgba(0,0,0,.16);*/
+  /* box-shadow: inset 0 -5px 5px rgba(0, 0, 0, 0.16); */
 }
 
 /* Nav links */
 .blog-nav-logo {
   position: relative;
   display: inline-block;
-  padding: 8px;
-  padding-left: 0;
-  font-weight: bold;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /*padding: 8px;
+  padding-left: 0;*/
+  /*font-weight: bold;*/
   /*color: #cdddeb;*/
-  color: #fff;
+  /* color: #fff; */
   /*font-size: 110%;*/
 }
 .blog-nav-item {
   position: relative;
   display: inline-block;
-  padding: 8px;
+  margin: 8px;
+  margin-top: 0;
   font-weight: 500;
-  color: #cdddeb;
+  /* color: #cdddeb; */
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 .blog-nav-item:hover,
 .blog-nav-item:focus {
-  color: #fff;
+  /*color: #fff;*/
   text-decoration: none;
 }
 
 /* Active state gets a caret at the bottom */
 .blog-nav .active {
-  color: #fff;
+  /* color: #fff; */
+  /*font-weight: bold;*/
+  text-decoration: none;
 }
-.blog-nav .active:after {
+/*.blog-nav .active:after {
   position: absolute;
   bottom: 0;
   left: 50%;
@@ -83,7 +104,7 @@ h6, .h6 {
   border-right: 5px solid transparent;
   border-bottom: 5px solid;
   border-left: 5px solid transparent;
-}
+}*/
 
 
 /*
