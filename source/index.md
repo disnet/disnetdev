@@ -29,7 +29,7 @@ If you'd like to talk to me, I'm [@disnet](https://twitter.com/disnet) on twitte
 I'm [@disnet](https://github.com/disnet) on GitHub.
 
 - [Sweet.js](http://sweetjs.org): hygienic macros for JavaScript.
-- [Contracts.coffee](http://disnetdev.com/contracts.coffee/): higher-order contracts for CoffeeScript. No longer maintained but it was fun experiment.
+- [Contracts.coffee](http://disnet.github.io/contracts.coffee/): higher-order contracts for CoffeeScript. No longer maintained but it was fun experiment.
 
 ## Some papers I wrote
 
