@@ -9,7 +9,7 @@ In my last [post][sweetintro] I gave a little overview of [sweet.js][sweetjs] th
 
 First, let's take a look at compilers 101:
 
-<img src="/static/images/parser_pipeline.png" alt="Parser Pipeline" width="600px"/>
+<img src="/static/images/parser_pipeline.png" alt="Parser Pipeline" width="100%" height="109px"/>
 
 The traditional way you build a compiler front end is to first write a lexer and a parser. Code (a string) is fed to the lexer which produces an array of tokens which gets fed to the parser which produces an Abstract Syntax Tree (AST).
 
@@ -133,7 +133,7 @@ $body -> {
 
 Great! Now our pipeline looks something like:
 
-<img src="/static/images/pipeline_plus_read.png" alt="Pipeline With Read" width="600px"/>
+<img src="/static/images/pipeline_plus_read.png" alt="Pipeline With Read" width="100%" height="87px"/>
 
 ## The Devil in the Details
 

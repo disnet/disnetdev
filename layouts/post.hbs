@@ -2,13 +2,16 @@
 
 <article class="blog-post">
   <h2 class="blog-post-title"><a href="/{{path}}">{{ title }}</a></h2>
-  {{#if date}}
-  <p class="blog-post-meta">{{formatDate date  day="numeric" month="long" year="numeric" }}</p>
+  <div class="blog-post-meta">
+    {{formatDate date  day="numeric" month="long" year="numeric" }}
+  {{#if xpost}}
+  | cross-posted on <a href="{{xpost.link}}">{{xpost.name}}</a>
   {{/if}}
+  </div>
 
   {{{ contents }}}
 
-  comments? yell at me on <a href="https://twitter.com/disnet">twitter</a>
+  <span class="blog-post-meta">/comments on <a href="https://twitter.com/disnet">twitter</a></span>
 </article>
 
 {{> footer }}

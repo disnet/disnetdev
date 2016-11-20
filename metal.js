@@ -32,9 +32,11 @@ Metalsmith(__dirname)
     debugger;
   })
   .use(collections({
-    posts: '_posts/*.md',
-    sortBy: 'date',
-    reverse: true,
+    posts: {
+      pattern: '_posts/*.md',
+      sortBy: 'date',
+      reverse: true,
+    },
     recentPosts: {
       pattern: '_posts/*.md',
       sortBy: 'date',
