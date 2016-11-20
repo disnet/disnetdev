@@ -1,0 +1,14 @@
+{{> header pageBlog="true"}}
+
+<ul>
+{{#each collections.posts }}
+  <li><a href="/{{path}}">{{title}}</a> &mdash;
+    {{#if date}}
+    {{formatDate date  day="numeric" month="long" year="numeric" }}
+    {{/if}}
+  </li>
+{{/each}}
+</ul>
+
+
+{{> footer }}
