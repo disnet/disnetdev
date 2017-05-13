@@ -1,1 +1,3 @@
 /contracts.coffee http://disnet.github.io/contracts.coffee/
+http://disnetdev.com/*  https://www.disnetdev.com/:splat
+https://disnetdev.com/* https://www.disnetdev.com/:splat
