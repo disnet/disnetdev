@@ -1,0 +1,28 @@
+baseURL = "http://example.org/"
+languageCode = "en-us"
+title = "My New Hugo Site"
+theme = "light"
+
+pygmentsstyle       = "bw"
+pygmentscodefences  = true
+
+# [permalinks]
+#  blog = "/blog/:year/:month/:day/:title"
+
+[params]
+  sitename = "Tim Disney"
+
+[[menu.main]]
+  identifier = "about"
+  name = "about"
+  url = "/"
+
+[[menu.main]]
+  identifier = "blog"
+  name = "blog"
+  url = "/blog"
+
+[[menu.main]]
+  identifier = "papers"
+  name = "papers"
+  url = "/papers"
