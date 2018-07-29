@@ -2,6 +2,7 @@
 layout: paper.hbs
 subtitle: A Comparison of Texture Models for Automatic Liver Segmentation
 title: A Comparison of Texture Models for Automatic Liver Segmentation
+date: 2007-01-01
 published_year: 2007
 published_how:
   - name: SPIE Medical Imaging 2007

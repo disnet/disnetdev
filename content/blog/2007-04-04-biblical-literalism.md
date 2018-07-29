@@ -4,6 +4,8 @@ layout: post.hbs
 title: Biblical Literalism
 wordpress_url: 'http://disnetdev.com/blog/?p=5'
 date: 2007-04-04T00:00:00.000Z
+categories: 
+  - test
 aliases:
   - /blog/2007/04/04/biblical-literalism
 ---

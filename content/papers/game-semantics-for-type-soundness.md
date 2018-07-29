@@ -2,6 +2,7 @@
 layout: paper.hbs
 subtitle: Game Semantics for Type Soundness
 title: Game Semantics for Type Soundness
+date: 2015-01-01
 published_year: 2015
 published_how:
   - name: LICS 2015

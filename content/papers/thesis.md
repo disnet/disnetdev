@@ -2,6 +2,7 @@
 layout: paper.hbs
 subtitle: Hygienic Macros for JavaScript
 title: Hygienic Macros for JavaScript
+date: 2015-01-01
 published_year: 2015
 published_how:
   - name: Thesis 2015

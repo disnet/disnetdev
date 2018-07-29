@@ -1,0 +1,22 @@
+{{ partial "header.html" . }}
+
+<main>
+    <article>
+        <header>
+            <h1>{{.Title}}</h1>
+        </header>
+    </article>
+
+    {{ range (.Paginator 50).Pages }}
+        <article class="micro">
+            {{ .Content }}
+            <a class="micro-date" href="{{.Permalink}}">
+                {{.Date.Format "January 2, 2006"}}
+            </a>
+        </article>
+    {{ end }}
+</main>
+
+{{ template "_internal/pagination.html" . }}
+
+{{ partial "footer.html" . }}

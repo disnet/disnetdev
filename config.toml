@@ -1,13 +1,10 @@
 baseURL = "https://www.disnetdev.com/"
 languageCode = "en-us"
-title = "My New Hugo Site"
+title = "disnetdev"
 theme = "light"
 
 pygmentsstyle       = "bw"
 pygmentscodefences  = true
-
-# [permalinks]
-#  blog = "/blog/:year/:month/:day/:title"
 
 [params]
   sitename = "Tim Disney"
@@ -21,6 +18,11 @@ pygmentscodefences  = true
   identifier = "blog"
   name = "blog"
   url = "/blog"
+
+[[menu.main]]
+  identifier = "micro"
+  name = "micro"
+  url = "/micro"
 
 [[menu.main]]
   identifier = "papers"

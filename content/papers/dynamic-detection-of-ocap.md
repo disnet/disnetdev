@@ -2,6 +2,7 @@
 layout: paper.hbs
 subtitle: Dynamic Detection of Object Capability Violations Through Model Checking
 title: Dynamic Detection of Object Capability Violations Through Model Checking
+date: 2014-01-01
 published_year: 2014
 published_how:
   - name: DLS 2014

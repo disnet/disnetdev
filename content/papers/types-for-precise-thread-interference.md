@@ -2,6 +2,7 @@
 layout: paper.hbs
 subtitle: Types for Precise Thread Interference
 title: Types for Precise Thread Interference
+date: 2011-01-01
 published_year: 2011
 published_how:
   - name: FOOL (2011)

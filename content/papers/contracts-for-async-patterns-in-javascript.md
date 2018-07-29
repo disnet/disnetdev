@@ -2,6 +2,7 @@
 layout: paper.hbs
 subtitle: Contracts for Async Patterns in JavaScript
 title: Contracts for Async Patterns in JavaScript
+date: 2015-01-01
 published_year: 2015
 published_how:
   - name: STOP 2015

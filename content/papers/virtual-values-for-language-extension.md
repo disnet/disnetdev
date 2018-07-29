@@ -2,6 +2,7 @@
 layout: paper.hbs
 subtitle: Virtual Values for Language Extension
 title: Virtual Values for Language Extension
+date: 2011-01-01
 published_year: 2011
 published_how:
   - name: OOPSLA (2011)

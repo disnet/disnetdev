@@ -2,6 +2,7 @@
 layout: paper.hbs
 subtitle: Temporal Higher-Order Contracts
 title: Temporal Higher-Order Contracts
+date: 2011-01-01
 published_year: 2011
 published_how:
   - name: ICFP (2011)

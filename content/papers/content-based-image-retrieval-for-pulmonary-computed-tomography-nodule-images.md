@@ -2,6 +2,7 @@
 layout: paper.hbs
 subtitle: Content-Based Image Retrieval for Pulmonary Computed Tomography Nodule Images
 title: Content-Based Image Retrieval for Pulmonary Computed Tomography Nodule Images
+date: 2007-01-01
 published_year: 2007
 published_how:
   - name: SPIE Medical Imaging 2007

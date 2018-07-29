@@ -2,6 +2,7 @@
 layout: paper.hbs
 subtitle: A Lookup and Reference Tool for Pulmonary Computed Tomography Nodules
 title: A Lookup and Reference Tool for Pulmonary Computed Tomography Nodules
+date: 2007-01-01
 published_year: 2007
 published_how:
   - name: SIIM 2007
