@@ -1,25 +1,25 @@
 {{ partial "header.html" . }}
 
 <main>
-    <article>
-        <header>
-            <h1>{{.Title}}</h1>
-        </header>
-    </article>
-    <ul>
+  <article>
+    <header>
+      <h1>{{.Title}}</h1>
+    </header>
+  </article>
+  <ul>
 
     {{ range .Pages }}
-        <li>
-            <a href="{{.Permalink}}">
-              {{ if isset .Params "published_year" }}
-                {{.Title}} ({{ .Params.published_year }})
-              {{ else }}
-                {{.Date.Format "2006-01-02"}} | {{.Title}}
-              {{ end }}
-            </a>
-        </li>
+    <li>
+      <a href="{{.RelPermalink}}">
+        {{ if isset .Params "published_year" }}
+        {{.Title}} ({{ .Params.published_year }})
+        {{ else }}
+        {{.Date.Format "2006-01-02"}} | {{.Title}}
+        {{ end }}
+      </a>
+    </li>
     {{ end }}
-    </ul>
+  </ul>
 </main>
 
 {{ partial "footer.html" . }}
