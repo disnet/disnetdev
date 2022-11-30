@@ -59,7 +59,7 @@ There is also a haskell
 [example](http://donsbot.wordpress.com/2009/03/16/visualising-the-haskell-universe/)
 of visualizing the types from all the packages on Hackage.
 
-![Hackage Universe](http://donsbot.files.wordpress.com/2009/03/haskell_universe.jpg?w=600&h=300)
+![Hackage Universe](https://donsbot.files.wordpress.com/2009/03/haskell_universe.jpg?w=600&h=300)
 
 Unfortunately as far as I know there's not much help for
 dynamic languages like JavaScript. The best us JS coders have for
@@ -67,7 +67,7 @@ visualization is something like the Firebug DOM exploration
 window.
 
 <img width="600" alt="firebug DOM window"
-src="http://getfirebug.com/perch/resources/dom.gif" />
+src="https://getfirebug.com/perch/resources/dom.gif" />
 
 Useful and great in a pinch but kinda boring and hard to get a
 sense of the relationships between objects.
@@ -94,4 +94,4 @@ More details on the design and rational can be found in the
 [report](/papers/jsvis_report.pdf) if you're interested.
 
 You can also find all the code over at the [github project
-page](http://github.com/disnet/jsvis).
+page](https://github.com/disnet/jsvis).
