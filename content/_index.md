@@ -8,8 +8,9 @@ introduction: |
 
   If you'd like to talk to me:
 
+  - I'm [@disnet@mastodon.social](https://mastodon.social/@disnet) on Mastodon
   - I'm [@disnet](https://twitter.com/disnet) on twitter 
-  - I'm `tim@disnet.me` on email.
+  - I'm `tim@disnet.me` on email
 ---
 
 ## Some stuff I made
