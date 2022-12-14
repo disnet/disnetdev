@@ -28,3 +28,8 @@ pygmentscodefences  = true
   identifier = "papers"
   name = "papers"
   url = "/papers"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true

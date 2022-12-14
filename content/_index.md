@@ -8,8 +8,8 @@ introduction: |
 
   If you'd like to talk to me:
 
-  - I'm [@disnet@mastodon.social](https://mastodon.social/@disnet) on Mastodon
-  - I'm [@disnet](https://twitter.com/disnet) on twitter 
+  - I'm <a rel="me" href="https://mastodon.social/@disnet">@disnet@mastodon.social</a> on Mastodon
+  - I'm [@disnet](https://twitter.com/disnet) on twitter
   - I'm `tim@disnet.me` on email
 ---
 
