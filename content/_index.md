@@ -1,5 +1,5 @@
 ---
-title: "Disnetdev"
+title: 'Disnetdev'
 profile: /static/images/avatar.jpg
 introduction: |
   I'm Tim Disney. I write code and things.
@@ -10,7 +10,7 @@ introduction: |
 
   - I'm <a rel="me" href="https://mastodon.social/@disnet">@disnet@mastodon.social</a> on Mastodon
   - I'm [@disnet](https://twitter.com/disnet) on twitter
-  - I'm `tim@disnet.me` on email
+  - I'm `tim@disnetdev.com` on email
 ---
 
 ## Some stuff I made
