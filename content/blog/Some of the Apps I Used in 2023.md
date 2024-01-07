@@ -3,6 +3,7 @@ id: 96d986bd-71f4-4f97-819e-7dab54f70ce2
 type: blog draft
 url: https://posts.disnetdev.com/2023/12/26/some-of-the.html
 share: "true"
+title: Some of the Apps I used in 2023
 ---
 
 - Browser: [Arc](https://arc.net/) (it's soooo good, love the clever rethinking of tabs)
