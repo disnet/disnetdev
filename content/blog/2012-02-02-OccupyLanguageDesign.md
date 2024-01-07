@@ -1,7 +1,6 @@
 ---
-layout: post.hbs
 title: Occupying Language Design at POPL
-date: 2012-02-02T00:00:00.000Z
+date: 2012-02-02
 aliases:
   - /blog/2012/02/02/OccupyLanguageDesign
 ---

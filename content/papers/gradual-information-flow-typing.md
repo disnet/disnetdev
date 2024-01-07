@@ -1,5 +1,4 @@
 ---
-layout: paper.hbs
 subtitle: Gradual Information Flow Typing
 title: Gradual Information Flow Typing
 date: 2011-01-01

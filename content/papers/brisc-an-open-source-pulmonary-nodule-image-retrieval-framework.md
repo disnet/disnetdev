@@ -1,5 +1,4 @@
 ---
-layout: paper.hbs
 subtitle: BRISC - An Open Source Pulmonary Nodule Image Retrieval Framework
 title: BRISC - An Open Source Pulmonary Nodule Image Retrieval Framework
 date: 2007-01-01

@@ -1,0 +1,97 @@
+---
+layout: layouts/home.njk
+eleventyNavigation:
+  key: Home
+  order: 1
+numberOfLatestPostsToShow: 3
+---
+
+<div class="with-sidebar">
+	<div>
+		<p>
+			I'm Tim Disney and I make code and things.
+			Programming languages and the web are my favorite things.
+		</p>
+
+		<p>
+			Currently leading a team at
+			<a href="https://f5.com">F5</a> making the web safer by fighting bots.
+		</p>
+
+		<ul>
+			<li>
+				I'm <a rel="me" href="https://mastodon.social/disnet">@disnet@mastodon.social</a> on mastodon
+			</li>
+			<li>
+				I'm <a rel="me" href="https://github.com/disnet">@disnet</a> on Github
+			</li>
+			<li>
+				I'm <a href="mailto:tim@disnetdev.com">tim@disnetdev.com</a> on email
+			</li>
+			<li>
+				I was <a href="https://twitter.com/disnet">@disnet</a> on Twitter but some jerk broke it and I've moved on
+			</li>
+		</ul>
+	</div>
+
+	<div class="center-flex">
+		<img src="/img/avatar.jpg" width="250" height="250" alt="Tim Disney" >
+	</div>
+</div>
+
+
+
+{% set postsCount = collections.posts | length %}
+{% set latestPostsCount = postsCount | min(numberOfLatestPostsToShow) %}
+<h1>Posts I wrote</h1>
+
+{% set postslist = collections.posts | head(-1 * numberOfLatestPostsToShow) %}
+{% set postslistCounter = postsCount %}
+{% include "postslist.njk" %}
+
+{% set morePosts = postsCount - numberOfLatestPostsToShow %}
+{% if morePosts > 0 %}
+<p>{{ morePosts }} more post{% if morePosts != 1 %}s{% endif %} can be found in <a href="/blog/">the archive</a>.</p>
+{% endif %}
+
+<h1>Stuff I made</h1>
+<ul>
+	<li>
+		<a href="https://sweetjs.org">Sweet.js</a>: hygienic macros for JavaScript. 
+	</li>
+	<li>
+		<a href="http://disnet.github.io/contracts.coffee/">Contracts.coffee</a>: higher-order contracts for CoffeeScript.
+	</li>
+</ul>
+
+<h1>Papers I wrote</h1>
+<ul>
+	<li>
+		<a href="/papers/thesis">Hygienic Macros for JavaScript</a>: my doctoral dissertation showing how to adapt a hygienic macros system to JavaScript.
+	</li>
+	<li>
+	<a href="/papers/virtual-values-for-language-extension/">Virtual Values for Language Extension</a> (OOPSLA 2011): a generalization and formalization of existing meta-object systems with a particular application for JavaScript.
+	</li>
+	<li>
+		<a href="/papers/temporal-higher-order-contracts/">Temporal Higher-Order Contracts</a> (ICFP 2011): bringing temporal assertions to higher-order contracts.
+	</li>
+</ul>
+
+{% css %}
+.with-sidebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+}
+
+.with-sidebar > :last-child {
+  flex-grow: 1;
+}
+
+.with-sidebar > :first-child {
+  flex-basis: 0;
+  flex-grow: 999;
+  min-inline-size: 50%;
+}
+
+{% endcss %}

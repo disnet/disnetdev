@@ -1,7 +1,6 @@
 ---
 title: "Announcing ParserLang"
-layout: post.hbs
-date: 2019-06-30T13:40:19-07:00
+date: 2019-06-30
 ---
 
 I'm excited to announce a new project I've been working on called [ParserLang](https://github.com/disnet/parser-lang)!

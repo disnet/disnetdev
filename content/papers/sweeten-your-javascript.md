@@ -1,5 +1,4 @@
 ---
-layout: paper.hbs
 subtitle: Sweeten Your JavaScript - Hygienic Macros for ES5
 title: Sweeten Your JavaScript - Hygienic Macros for ES5
 date: 2014-01-01

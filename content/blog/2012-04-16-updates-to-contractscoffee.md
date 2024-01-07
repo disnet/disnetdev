@@ -1,7 +1,6 @@
 ---
 title: Updates to contracts.coffee
-layout: post.hbs
-date: 2012-04-16T00:00:00.000Z
+date: 2012-04-16
 aliases:
   - /blog/2012/04/16/updates-to-contractscoffee
 ---

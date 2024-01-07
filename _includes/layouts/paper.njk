@@ -1,0 +1,42 @@
+---
+layout: layouts/base.njk
+---
+<h1>{{ title }}</h1>
+
+<ul class="post-metadata">
+	<li>
+    <time datetime="{{ published_year }}">{{ published_year }}</time>
+  </li>
+  <li>
+    ·
+  </li>
+  {%- for author in authors %}
+  <li>
+    <a href="{{ author.link }}" class="post-author">{{ author.name }}</a>
+  </li>
+  {%- endfor %}
+</ul>
+
+{{ content | safe }}
+
+<ul class="published_links">
+{%- for pub in published_how %}
+  <li>
+    <span class="pub_name">{{ pub.name }}</span>
+    {%- for file in pub.files %}
+    <a href="{{ file.link }}" class="published_link">{{ file.name }}</a>
+    {%- endfor %}
+  </li>
+{%- endfor %}
+</ul>
+
+{% css %}
+.published_links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+} 
+.pub_name {
+  font-weight: bold;
+}
+{% endcss %}

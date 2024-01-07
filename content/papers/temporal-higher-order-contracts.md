@@ -1,5 +1,4 @@
 ---
-layout: paper.hbs
 subtitle: Temporal Higher-Order Contracts
 title: Temporal Higher-Order Contracts
 date: 2011-01-01
