@@ -1,7 +1,6 @@
 ---
 title: Performance of contracts.coffee
-layout: post.hbs
-date: 2011-09-27T00:00:00.000Z
+date: 2011-09-27
 aliases:
   - /blog/2011/09/27/Performance-of-contracts.coffee
 ---

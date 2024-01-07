@@ -1,5 +1,4 @@
 ---
-layout: paper.hbs
 subtitle: Types for Precise Thread Interference
 title: Types for Precise Thread Interference
 date: 2011-01-01

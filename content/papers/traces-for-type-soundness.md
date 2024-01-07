@@ -1,5 +1,4 @@
 ---
-layout: paper.hbs
 subtitle: Traces for Type Soundness
 title: Traces for Type Soundness
 date: 2014-01-01

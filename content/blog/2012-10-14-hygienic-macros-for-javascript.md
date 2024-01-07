@@ -1,7 +1,6 @@
 ---
 title: Hygienic Macros for JavaScript
-layout: post.hbs
-date: 2012-10-14T00:00:00.000Z
+date: 2012-10-14
 aliases:
   - /blog/2012/10/14/hygienic-macros-for-javascript
 ---

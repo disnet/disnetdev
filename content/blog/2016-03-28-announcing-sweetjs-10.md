@@ -1,10 +1,6 @@
 ---
 title: Announcing Sweet.js 1.0
-layout: post.hbs
-xpost:
-  link: 'https://medium.com/@disnet/announcing-sweet-js-1-0-e7f4f3e15594'
-  name: medium
-date: 2016-03-28T00:00:00.000Z
+date: 2016-03-28
 aliases:
   - /blog/2016/03/28/announcing-sweetjs-10
 ---

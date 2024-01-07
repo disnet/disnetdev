@@ -1,5 +1,4 @@
 ---
-layout: paper.hbs
 subtitle: Game Semantics for Type Soundness
 title: Game Semantics for Type Soundness
 date: 2015-01-01

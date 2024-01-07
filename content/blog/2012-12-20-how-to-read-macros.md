@@ -1,7 +1,6 @@
 ---
 title: How to read macros
-layout: post.hbs
-date: 2012-12-20T00:00:00.000Z
+date: 2012-12-20
 aliases:
   - /blog/2012/12/20/how-to-read-macros
 ---

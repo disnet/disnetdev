@@ -1,6 +1,6 @@
 ---
 title: 'Using Obsidian with Readwise, dataview, and periodic notes'
-date: 2023-07-09T12:09:01-07:00
+date: 2023-07-09
 ---
 
 This is a writeup of how I use [Obsidian](https://obsidian.md/) to organize my personal knowledge base (PKB).
@@ -60,14 +60,16 @@ The final section is the Readwise highlights from the week. I use [Readwise Read
 
 Enter the [dataview](https://github.com/blacksmithgu/obsidian-dataview) plugin:
 
+{% raw %}
 ```
 list
-from "Readwise"
-where
+ from "Readwise"
+ where
   file.ctime > date("{{date:YYYY-MM-DD}}")
   and file.ctime < date("{{date:YYYY-MM-DD}}") + dur(7 day)
 sort file.ctime
 ```
+{% endraw %}
 
 That query pulls back a list of all the Readwise notes created during the week. At the end of the week I look over them and create any [evergreen notes](https://notes.andymatuschak.org/Evergreen_notes) that might make sense.
 

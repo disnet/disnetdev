@@ -1,7 +1,6 @@
 ---
 title: Contracts.coffee - Contracts for JavaScript and CoffeeScript
-layout: post.hbs
-date: 2011-08-23T00:00:00.000Z
+date: 2011-08-23
 aliases:
   - /blog/2011/08/23/Contracts.coffee-Contracts-For-JavaScript-and-CoffeeScript
 ---

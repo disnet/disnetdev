@@ -1,7 +1,6 @@
 ---
-layout: post.hbs
 title: Contracts.coffee Works In Node.js!
-date: 2011-09-20T00:00:00.000Z
+date: 2011-09-20
 aliases:
   - /blog/2011/09/20/Contracts.coffee-Works-In-Node.js
 ---

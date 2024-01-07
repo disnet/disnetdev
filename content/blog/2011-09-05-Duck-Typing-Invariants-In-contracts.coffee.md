@@ -1,7 +1,6 @@
 ---
-layout: post.hbs
 title: Duck-Typing Invariants In contracts.coffee
-date: 2011-09-05T00:00:00.000Z
+date: 2011-09-05
 aliases:
   - /blog/2011/09/05/Duck-Typing-Invariants-In-contracts.coffee
 ---

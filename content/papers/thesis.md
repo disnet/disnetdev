@@ -1,5 +1,4 @@
 ---
-layout: paper.hbs
 subtitle: Hygienic Macros for JavaScript
 title: Hygienic Macros for JavaScript
 date: 2015-01-01

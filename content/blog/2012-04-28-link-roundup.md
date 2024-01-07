@@ -1,7 +1,6 @@
 ---
 title: Link Roundup
-layout: post.hbs
-date: 2012-04-28T00:00:00.000Z
+date: 2012-04-28
 aliases:
   - /blog/2012/04/28/link-roundup
 ---

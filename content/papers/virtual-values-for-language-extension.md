@@ -1,5 +1,4 @@
 ---
-layout: paper.hbs
 subtitle: Virtual Values for Language Extension
 title: Virtual Values for Language Extension
 date: 2011-01-01

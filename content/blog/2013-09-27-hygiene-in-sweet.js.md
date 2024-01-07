@@ -1,7 +1,6 @@
 ---
 title: Hygiene in sweetjs
-layout: post.hbs
-date: 2013-09-27T00:00:00.000Z
+date: 2013-09-27
 aliases:
   - /blog/2013/09/27/hygiene-in-sweet.js
 ---
