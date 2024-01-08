@@ -24,7 +24,7 @@ that I wanted to convert to internal links:
 
 Previously to do this I'd either reach for something like a [vim macro](https://vim.fandom.com/wiki/Macros) or write a little regex. Realistically for most cases the activation energy would be too much and I'd just not do the reformatting at all.
 
-But with a LLM (in this case I used the [TextGen](https://text-gen.com/) plugin) you can just show an example and tell the [[LLM|LLM]] to do it and it just works. The prompt was something like
+But with a LLM (in this case I used the [TextGen](https://text-gen.com/) plugin) you can just show an example and tell the LLM to do it and it just works. The prompt was something like
 
 ```
 - [Note1](app://obsidian.md/path/to/Note1)
