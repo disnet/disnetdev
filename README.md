@@ -4,14 +4,9 @@ My personal website
 
 ## Building
 
-Depends on hugo:
+Uses Eleventy:
 
 ```bash
-brew install hugo
-```
-
-Build with:
-
-```bash
-hugo
+npm i
+npm run build
 ```
