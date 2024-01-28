@@ -1,7 +1,7 @@
 ---
 type: blog draft
 title: "Division of Labor: How Palworld's Mechanics Hooked Me"
-date: " 2024-01-28"
+date: 2024-01-28
 posted: false
 share: "true"
 ---
