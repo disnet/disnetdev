@@ -1,0 +1,11 @@
+---
+layout: layouts/base.njk
+---
+{%- css %}{% include "public/css/prism.css" %}{% endcss %}
+{%- css %}{% include "public/css/prism-diff.css" %}{%- endcss %}
+
+{{ content | safe }}
+
+<ul class="post-metadata">
+	<li>Posted on <a href="{{ post.url }}"><time datetime="{{ page.date | htmlDateString }}">{{ page.date | readableDate('DDD') }}</time></a></li>
+</ul>
