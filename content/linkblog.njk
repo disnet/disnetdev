@@ -6,7 +6,7 @@ eleventyNavigation:
 ---
 
 <div class="linkblog-container">
-    {% for post in collections.links %}
+    {% for post in collections.links | reverse %}
         <article class="linkblog">
             {{ post.content | safe }}
 
