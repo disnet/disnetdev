@@ -43,6 +43,8 @@
     --s3: calc(var(--s2) * var(--ratio));
     --s4: calc(var(--s3) * var(--ratio));
     --s5: calc(var(--s4) * var(--ratio));
+
+    font-size: calc(1rem + 0.2vw);
 }
 
 @media (prefers-color-scheme: dark) {
