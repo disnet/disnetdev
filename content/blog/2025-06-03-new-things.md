@@ -1,6 +1,7 @@
 ---
 title: New Things
 date: 2025-06-03
+description:  Big changes happening in my life. After almost a decade, today was my last day working at Shape Security / F5.
 ---
 
 Big changes happening in my life. After almost a decade, today was my last day working at Shape Security / F5.
