@@ -1,3 +1,11 @@
+---
+tags:
+  - posts
+layout: layouts/post.njk
+date: 2025-01-16
+title: We're Getting the Social Media Crisis Wrong
+---
+
 [We're Getting the Social Media Crisis Wrong](https://www.programmablemutter.com/p/were-getting-the-social-media-crisis)
 
 It's not about misinformation, it's about groups with collective misunderstandings:

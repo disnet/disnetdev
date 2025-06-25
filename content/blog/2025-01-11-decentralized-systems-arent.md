@@ -1,3 +1,11 @@
+---
+tags:
+  - posts
+layout: layouts/post.njk
+date: 2025-01-11
+title: Decentralized Systems Aren't
+---
+
 [Decentralized Systems Aren't](https://blog.dshr.org/2024/04/decentralized-systems-arent.html)
 
 Centralized systems will always layer on top of decentralized systems unless you figure out how to fix the underlying economic problem of increasing returns to scale.
