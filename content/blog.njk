@@ -3,8 +3,25 @@ layout: layouts/home.njk
 eleventyNavigation:
   key: Blog
   order: 2
+pagination:
+  data: collections.posts
+  size: 7
+  reverse: true
+  alias: posts
+permalink: "blog/{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 }}/{% endif %}index.html"
 ---
+
 <h1>Archive</h1>
 
-{% set postslist = collections.posts %}
-{% include "postslist.njk" %}
+{% for post in posts %}
+  <article>
+    <h2><a href="{{ post.url }}">{{ post.data.title }}</a></h2>
+    <time datetime="{{ post.date | htmlDateString }}">{{ post.date | readableDate }}</time>
+    {{ post.content | safe }}
+  </article>
+{% endfor %}
+
+<nav>
+  {% if pagination.previousPageHref %}<a href="{{ pagination.previousPageHref }}">Previous</a>{% endif %}
+  {% if pagination.nextPageHref %}<a href="{{ pagination.nextPageHref }}">Next</a>{% endif %}
+</nav>
