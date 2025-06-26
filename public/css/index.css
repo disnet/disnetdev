@@ -371,3 +371,13 @@ footer {
     border-top: 1px solid var(--color-gray-20);
     color: var(--color-gray-50);
 }
+
+footer a[href] {
+    color: var(--color-gray-50);
+    text-decoration: underline;
+}
+
+footer a[href]:visited {
+    color: var(--color-gray-50);
+    text-decoration: underline;
+}
