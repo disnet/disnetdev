@@ -3,6 +3,7 @@ tags:
   - posts
 layout: layouts/post.njk
 date: 2025-02-13
+title: Zed Edit Prediction Feature
 ---
 
 [Zed now predicts your next edit with Zeta, our new open model](https://zed.dev/blog/edit-prediction). Played around with Zed's edit prediction feature today and it worked surprisly well.
