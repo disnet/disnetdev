@@ -41,7 +41,7 @@ numberOfLatestPostsToShow: 3
 {% set latestPostsCount = postsCount | min(numberOfLatestPostsToShow) %}
 <h1>Posts I wrote</h1>
 
-{% set postslist = collections.posts | head(-1 * numberOfLatestPostsToShow) %}
+{% set postslist = collections.posts | head(-1 * numberOfLatestPostsToShow) | rejectattr("data.title", "undefined") %}
 {% set postslistCounter = postsCount %}
 {% include "postslist.njk" %}
 

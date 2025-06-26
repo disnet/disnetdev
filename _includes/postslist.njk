@@ -5,6 +5,7 @@
 		<time class="postlist-date" datetime="{{ post.date | htmlDateString }}">
 			{%- if post.data.published_year %}{{ post.data.published_year }}{% else %}{{ post.date | readableDate("LLL yyyy") }}{% endif %}
 		</time>
+		<p>{{ post.data.description | truncate(200) | safe }}</p>
 	</li>
 {% endfor %}
 </ul>
