@@ -323,6 +323,33 @@ h2 + .header-anchor {
     align-items: center;
 }
 
-article.linkblog {
-    border-bottom: 1px solid #ccc;
+.post-date-link {
+    font-size: 0.9em;
+    text-align: left;
+    display: block;
+    margin-top: 0.5em;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--color-gray-20);
+    margin: 2em 0;
+}
+
+.pagination-nav {
+    margin-top: 2em;
+    text-align: right;
+}
+
+.pagination-nav a {
+    display: inline-block;
+    padding: 0.5em 1em;
+    border: 1px solid var(--color-gray-50);
+    border-radius: 5px;
+    margin-left: 1em;
+    text-decoration: none;
+}
+
+.pagination-nav a:hover {
+    background-color: var(--color-gray-20);
 }

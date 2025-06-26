@@ -49,6 +49,19 @@ export default function (eleventyConfig) {
     );
   });
 
+  eleventyConfig.addFilter("ordinalDate", (dateObj) => {
+    const day = DateTime.fromJSDate(dateObj).day;
+    let suffix = "th";
+    if (day === 1 || day === 21 || day === 31) {
+      suffix = "st";
+    } else if (day === 2 || day === 22) {
+      suffix = "nd";
+    } else if (day === 3 || day === 23) {
+      suffix = "rd";
+    }
+    return DateTime.fromJSDate(dateObj).toFormat(`LLLL d'${suffix}', yyyy`);
+  });
+
   eleventyConfig.addFilter("htmlDateString", (dateObj) => {
     // dateObj input: https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#valid-date-string
     return DateTime.fromJSDate(dateObj, { zone: "utc" }).toFormat("yyyy-LL-dd");

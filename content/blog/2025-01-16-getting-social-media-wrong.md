@@ -6,9 +6,7 @@ date: 2025-01-16
 title: We're Getting the Social Media Crisis Wrong
 ---
 
-[We're Getting the Social Media Crisis Wrong](https://www.programmablemutter.com/p/were-getting-the-social-media-crisis)
-
-It's not about misinformation, it's about groups with collective misunderstandings:
+[We're Getting the Social Media Crisis Wrong](https://www.programmablemutter.com/p/were-getting-the-social-media-crisis). It's not about misinformation, it's about groups with collective misunderstandings:
 
 > The fundamental problem, as I see it, is not that social media misinforms individuals about what is true or untrue but that it creates publics with malformed collective understandings.
 
