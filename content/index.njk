@@ -32,7 +32,7 @@ numberOfLatestPostsToShow: 3
 		</ul>
 	</div>
 
-	
+
 </div>
 
 
@@ -47,7 +47,7 @@ numberOfLatestPostsToShow: 3
 
 {% set morePosts = postsCount - numberOfLatestPostsToShow %}
 {% if morePosts > 0 %}
-<p>{{ morePosts }} more post{% if morePosts != 1 %}s{% endif %} can be found in <a href="/blog/">the archive</a>.</p>
+<p>and <a href="/blog/">{{ morePosts }} more</a></p>
 {% endif %}
 
 <h1>Stuff I made</h1>

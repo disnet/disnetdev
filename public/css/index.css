@@ -1,9 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&display=swap");
 
 /* Defaults */
 :root {
-    --font-family: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
-    --font-family-monospace: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+    --font-family:
+        "IBM Plex Mono", ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
+        Consolas, "DejaVu Sans Mono", monospace;
+    --font-family-monospace:
+        "IBM Plex Mono", ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
+        Consolas, "DejaVu Sans Mono", monospace;
 }
 
 /* Theme colors */
@@ -225,7 +229,6 @@ header {
     flex-wrap: wrap;
     align-items: baseline;
     margin-bottom: 1em;
-    border-bottom: 1px solid var(--color-gray-20);
     padding-bottom: 1em;
 }
 .postlist-date,
@@ -330,6 +333,11 @@ h2 + .header-anchor {
     margin-top: 0.5em;
 }
 
+.post-date {
+    font-size: 0.9em;
+    color: var(--color-gray-50);
+}
+
 hr {
     border: none;
     border-top: 1px solid var(--color-gray-20);
@@ -355,10 +363,11 @@ hr {
 }
 
 footer {
+    display: flex;
     font-size: 0.8em;
-    text-align: left;
     padding: 1em 0;
     margin-top: 2em;
+    justify-content: center;
     border-top: 1px solid var(--color-gray-20);
     color: var(--color-gray-50);
 }

@@ -8,7 +8,7 @@ permalink: "blog/{{ date | htmlDateString }}-{{ title | slugify }}/"
 <h1>{{ title }}</h1>
 
 <ul class="post-metadata">
-	<li><time datetime="{{ page.date | htmlDateString }}">{{ page.date | readableDate }}</time></li>
+	<li><time class="post-date" datetime="{{ page.date | htmlDateString }}">{{ page.date | ordinalDate }}</time></li>
 	{%- for tag in tags | filterTagList %}
 	{%- set tagUrl %}/tags/{{ tag | slugify }}/{% endset %}
 	<li><a href="{{ tagUrl }}" class="post-tag">{{ tag }}</a>{%- if not loop.last %}, {% endif %}</li>
@@ -16,5 +16,3 @@ permalink: "blog/{{ date | htmlDateString }}-{{ title | slugify }}/"
 </ul>
 
 {{ content | safe }}
-
-

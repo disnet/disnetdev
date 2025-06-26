@@ -3,7 +3,7 @@ tags:
   - posts
 layout: layouts/post.njk
 date: 2025-01-25
-title: Hypermedia Controls: From Feral to Formal
+title: Hypermedia Controls - From Feral to Formal
 
 ---
 
