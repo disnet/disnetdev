@@ -356,7 +356,7 @@ hr {
 
 footer {
     font-size: 0.8em;
-    text-align: center;
+    text-align: left;
     padding: 1em 0;
     margin-top: 2em;
     border-top: 1px solid var(--color-gray-20);
