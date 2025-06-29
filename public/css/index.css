@@ -129,6 +129,14 @@ a[href]:active {
     text-decoration: underline;
 }
 
+blockquote {
+    border-left: 2px solid var(--color-gray-50);
+    padding-left: 1rem;
+    margin-left: 0;
+    font-style: italic;
+    color: var(--text-color);
+}
+
 main {
     padding: 1rem;
 }
