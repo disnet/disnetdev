@@ -1,12 +1,10 @@
 ---
 title: The Note-Taking Trap - Why AI Could Save (or Destroy) How We Think
-date: 2025-06-29
-description: Introduces Flint Note.
+date: 2025-06-30
+description: An exploration of the fundamental problems with current note-taking systems and AI approaches that either lock users into rigid structures or make them dependent on black-box intelligence. Argues for a third path through Flint Note - an MCP-based system that uses AI to augment rather than replace human thinking, while keeping all data as portable markdown files. Demonstrates how agent instructions and semantic note types create intelligent, adaptive workflows without vendor lock-in, positioning this approach as the future of knowledge work.
 ---
 
-# The Note-Taking Trap: Why AI Could Save (or Destroy) How We Think
-
-I'm obsessed with note-taking systems. I've been obsessed with them for most of my computer-using life, trying to find the perfect note-taking system. Evernote, Notion, Roam, Obsidian—each promised to be my "external brain". I spent hours building out workflows to help me think and act on the things that mattered to me. But inevitably I would hit the same wall when my system became unmanageable and I had to start over from scratch.
+I'm obsessed with note-taking systems. I've been obsessed with them for most of my computer-using life. Evernote, Notion, Roam, Obsidian—each promised to be my "external brain". I spent hours building out workflows to help me think and act on the things that mattered to me. But inevitably I would hit the same wall when my system became unmanageable and I had to start over from scratch.
 
 Here's the problem: your thinking changes. Your projects shift. Your interests expand. But most note-taking systems lock you into structures that become prisons over time. Maybe you organize by project phases—"Research", "Planning", "Execution", "Review". Then you start working on iterative projects that don't follow linear phases, and your structure crumbles.
 
@@ -84,21 +82,21 @@ Let's start by defining our note types:
 >
 > **📅 Daily (Journal & Reflection)**
 >
-> • **Purpose**: Daily journal entries for reflection, planning, and personal growth
-> • **Features**: Mood tracking, energy levels, gratitude lists, key insights, and tomorrow's focus
-> • **Agent Behavior**: Structures entries with morning intentions, daily events, and evening reflection while identifying patterns and celebrating progress
+> - **Purpose**: Daily journal entries for reflection, planning, and personal growth
+> - **Features**: Mood tracking, energy levels, gratitude lists, key insights, and tomorrow's focus
+> - **Agent Behavior**: Structures entries with morning intentions, daily events, and evening reflection while identifying patterns and celebrating progress
 >
 > **✅ Todo (Task Management)**
 >
-> • **Purpose**: Task management with priority, deadlines, and progress monitoring
-> • **Features**: Priority levels, categories, completion tracking, due dates, and project connections
-> • **Agent Behavior**: Formats tasks as checkboxes, organizes by priority, identifies dependencies, and suggests productivity improvements
+> - **Purpose**: Task management with priority, deadlines, and progress monitoring
+> - **Features**: Priority levels, categories, completion tracking, due dates, and project connections
+> - **Agent Behavior**: Formats tasks as checkboxes, organizes by priority, identifies dependencies, and suggests productivity improvements
 >
 > **📚 Reading (Books & Articles)**
 >
-> • **Purpose**: Reading notes for books, articles, and other materials with insights and connections
-> • **Features**: Author tracking, reading status, ratings, key takeaways, and topic organization
-> • **Agent Behavior**: Structures notes with summaries and key ideas, identifies connections to other materials, and encourages critical thinking
+> - **Purpose**: Reading notes for books, articles, and other materials with insights and connections
+> - **Features**: Author tracking, reading status, ratings, key takeaways, and topic organization
+> - **Agent Behavior**: Structures notes with summaries and key ideas, identifies connections to other materials, and encourages critical thinking
 >
 > Your vault is now ready for comprehensive knowledge management! You can start creating notes of any of these types. Just say something like:
 >
@@ -124,14 +122,16 @@ growth tracking
   intentions, daily events, evening reflection
 - Extract and highlight key insights, lessons learned,
   and personal growth moments
-- Identify patterns in mood, energy, productivity, and relationships
+- Identify patterns in mood, energy, productivity,
+  and relationships
 - Suggest connections to previous daily entries when
   similar themes emerge
 - Encourage reflection questions: What went well? What
   could be improved? What am I grateful for?
 - Track recurring themes and suggest deeper exploration
   through follow-up questions
-- Notice and celebrate small wins and progress toward personal goals
+- Notice and celebrate small wins and progress toward
+  personal goals
 - When appropriate, suggest creating separate notes for
   significant insights or ideas that emerge
 
@@ -148,7 +148,8 @@ Expected frontmatter or metadata fields for this note type:
 - `key_events`: Significant events or moments from the
   day (optional, array)
 - `insights`: Key insights or lessons learned (optional, array)
-- `tomorrow_focus`: Main focus or intention for tomorrow (optional)
+- `tomorrow_focus`: Main focus or intention for
+   tomorrow (optional)
 ```
 
 Since the description is just a plain text markdown file, you can have the agent update it or edit it yourself with a text editor.
@@ -165,12 +166,12 @@ Now let's see the system in action:
 >
 > ## Your Daily Note Structure
 >
-> **Morning Intentions** (Space to set your focus for the day)
-> **Daily Events** (Capture key moments, interactions, and accomplishments)
-> **Evening Reflection** (Process how the day went with guided questions)
-> **Gratitude Section** (Practice appreciation)
-> **Key Insights & Lessons** (Extract learning and growth moments)
-> **Tomorrow's Focus** (Set intention for the next day)
+> - **Morning Intentions** (Space to set your focus for the day)
+> - **Daily Events** (Capture key moments, interactions, and accomplishments)
+> - **Evening Reflection** (Process how the day went with guided questions)
+> - **Gratitude Section** (Practice appreciation)
+> - **Key Insights & Lessons** (Extract learning and growth moments)
+> - **Tomorrow's Focus** (Set intention for the next day)
 >
 > The note is ready for you to fill in! As you use it, I'll help you:
 >
