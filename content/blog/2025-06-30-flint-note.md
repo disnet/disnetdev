@@ -63,7 +63,7 @@ my-notes/
 ├── todos/
 │   └── _description.md
 └── reading/
-│   └── _description.md
+    └── _description.md
 ```
 
 The magic happens when you define what each note type means and how the AI should behave when working with it.
