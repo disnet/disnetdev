@@ -7,11 +7,5 @@ module.exports = {
 		name: "Tim Disney",
 		email: "tim@disnetdev.com",
 		url: "https://disnetdev.com/"
-	},
-	openGraph: {
-		image: "https://disnetdev.com/img/avatar.jpg",
-		imageAlt: "Tim Disney's avatar",
-		imageWidth: 250,
-		imageHeight: 250
 	}
 }
