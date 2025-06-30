@@ -51,8 +51,9 @@ export default function (eleventyConfig) {
     );
   });
 
-  eleventyConfig.addFilter("ordinalDate", (dateObj) => {
-    const day = DateTime.fromJSDate(dateObj).day;
+  eleventyConfig.addFilter("ordinalDate", (dateObj, zone) => {
+    const dt = DateTime.fromJSDate(dateObj, { zone: zone || "utc" });
+    const day = dt.day;
     let suffix = "th";
     if (day === 1 || day === 21 || day === 31) {
       suffix = "st";
@@ -61,7 +62,7 @@ export default function (eleventyConfig) {
     } else if (day === 3 || day === 23) {
       suffix = "rd";
     }
-    return DateTime.fromJSDate(dateObj).toFormat(`LLLL d'${suffix}', yyyy`);
+    return dt.toFormat(`LLLL d'${suffix}', yyyy`);
   });
 
   eleventyConfig.addFilter("htmlDateString", (dateObj) => {
