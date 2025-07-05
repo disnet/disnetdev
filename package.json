@@ -27,5 +27,10 @@
     "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
     "luxon": "^3.3.0",
     "markdown-it-anchor": "^9.2.0"
+  },
+  "dependencies": {
+    "glob": "^11.0.3",
+    "gray-matter": "^4.0.3",
+    "node-html-to-image": "^5.0.0"
   }
 }

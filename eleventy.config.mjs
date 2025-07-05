@@ -8,6 +8,7 @@ import pluginNavigation from "@11ty/eleventy-navigation";
 import { EleventyHtmlBasePlugin } from "@11ty/eleventy";
 
 import pluginDrafts from "./eleventy.config.drafts.js";
+import pluginOgImage from "./eleventy.config.og-image.js";
 // const pluginImages = require("./eleventy.config.images.js");
 
 export default function (eleventyConfig) {
@@ -26,6 +27,7 @@ export default function (eleventyConfig) {
 
   // App plugins
   eleventyConfig.addPlugin(pluginDrafts);
+  eleventyConfig.addPlugin(pluginOgImage);
   // eleventyConfig.addPlugin(pluginImages);
 
   // Official plugins

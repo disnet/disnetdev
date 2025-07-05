@@ -8,10 +8,11 @@
   {%- set ogDescription = metadata.description -%}
 {%- endif -%}
 {%- set ogUrl = (metadata.url + page.url) | replace("//", "/") | replace("http:/", "http://") | replace("https:/", "https://") -%}
-{%- set ogImage = image or metadata.openGraph.image -%}
+{%- set generatedImage = page.fileSlug | getOgImage -%}
+{%- set ogImage = (metadata.url + (image or generatedImage or metadata.openGraph.image)) | replace("//", "/") | replace("http:/", "http://") | replace("https:/", "https://") -%}
 {%- set ogImageAlt = imageAlt or metadata.openGraph.imageAlt -%}
-{%- set ogImageWidth = imageWidth or metadata.openGraph.imageWidth -%}
-{%- set ogImageHeight = imageHeight or metadata.openGraph.imageHeight -%}
+{%- set ogImageWidth = imageWidth or metadata.openGraph.imageWidth or 1200 -%}
+{%- set ogImageHeight = imageHeight or metadata.openGraph.imageHeight or 630 -%}
 {%- set ogType = "website" -%}
 {%- if tags and "posts" in tags -%}
   {%- set ogType = "article" -%}
