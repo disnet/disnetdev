@@ -56,7 +56,7 @@ Flint then made a "todo" note that looks like this:
 - [ ]
 ```
 
-Now I can easily check off (e.g. `- [x] + Finish quarterly report draft` ) multiple items and then ask Flint to sync the note and it will update each todo note as completed and refresh the today note.
+Now I can easily check off (e.g. change `[ ]` to `[x]`) multiple items and then ask Flint to sync the note and it will update each todo note as completed and refresh the today note.
 
 A day's interaction could look something like this:
 
