@@ -4,6 +4,8 @@ date: 2025-06-30
 description: An exploration of the fundamental problems with current note-taking systems and AI approaches that either lock users into rigid structures or make them dependent on black-box intelligence. Argues for a third path through Flint Note - an MCP-based system that uses AI to augment rather than replace human thinking, while keeping all data as portable markdown files. Demonstrates how agent instructions and semantic note types create intelligent, adaptive workflows without vendor lock-in, positioning this approach as the future of knowledge work.
 ---
 
+**Update, October 2025**: This post introduced an initial experiment with using MCP for note-taking that has morphed into something [bigger](https://www.flintnote.com). Check out [this post](https://www.disnetdev.com/blog/2025-10-10-introducing-flint/) for more details.
+
 I'm obsessed with note-taking systems. I've been obsessed with them for most of my computer-using life. Evernote, Notion, Roam, Obsidian—each promised to be my "external brain". I spent hours building out workflows to help me think and act on the things that mattered to me. But inevitably I would hit the same wall when my system became unmanageable and I had to start over from scratch.
 
 Here's the problem: your thinking changes. Your projects shift. Your interests expand. But most note-taking systems lock you into structures that become prisons over time. Maybe you organize by project phases—"Research", "Planning", "Execution", "Review". Then you start working on iterative projects that don't follow linear phases, and your structure crumbles.
