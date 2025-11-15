@@ -1,7 +1,7 @@
 ---
 title: Introducing Flint
 date: 2025-10-10
-desc: Introducing Flint, my new note-taking/thinking-system project.
+description: Introducing Flint, my new note-taking/thinking-system project.
 ---
 
 [Flint](https://www.flintnote.com/) is a new note-taking/thinking-system I’m working on that fixes a lot of the frustrations I’ve had with traditional note-taking apps (or at lest it *will try* to fix those frustrations 😅)
