@@ -30,7 +30,7 @@
     "markdown-it-anchor": "^9.2.0"
   },
   "dependencies": {
-    "glob": "^11.0.3",
+    "glob": "^11.1.0",
     "gray-matter": "^4.0.3",
     "node-html-to-image": "^5.0.0"
   }
