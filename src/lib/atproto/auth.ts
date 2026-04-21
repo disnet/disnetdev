@@ -4,7 +4,7 @@ import {
   type NodeSavedSession,
   type NodeSavedState
 } from '@atproto/oauth-client-node';
-import { getSiteUrl } from '$lib/config';
+import { DRAFT_COLLECTION_NSID, getSiteUrl } from '$lib/config';
 
 const stateStoreMap = new Map<string, NodeSavedState>();
 const sessionStoreMap = new Map<string, NodeSavedSession>();
@@ -56,7 +56,12 @@ function buildClientId(siteUrl: string, scope: string) {
 
 function createClient() {
   const siteUrl = getSiteUrl();
-  const scope = 'atproto';
+  const scope = [
+    'atproto',
+    `repo:${DRAFT_COLLECTION_NSID}`,
+    'repo:site.standard.document',
+    'repo:site.standard.publication'
+  ].join(' ');
 
   return new NodeOAuthClient({
     clientMetadata: {

@@ -38,7 +38,7 @@ export type PublishedDocument = {
 };
 
 export type DraftRecord = {
-  $type: 'dev.disnet.blog.draft';
+  $type: string;
   title: string;
   slug: string;
   description?: string;

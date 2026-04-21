@@ -1,3 +1,4 @@
+import { DRAFT_COLLECTION_NSID } from '$lib/config';
 import { z } from 'zod';
 
 const blobRefSchema = z.object({
@@ -41,7 +42,7 @@ export const publishedDocumentSchema = z.object({
 });
 
 export const draftRecordSchema = z.object({
-  $type: z.literal('dev.disnet.blog.draft'),
+  $type: z.literal(DRAFT_COLLECTION_NSID),
   title: z.string().min(1),
   slug: z.string().min(1).regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   description: z.string().optional(),
