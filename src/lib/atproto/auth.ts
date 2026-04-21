@@ -39,17 +39,33 @@ const sessionStore = {
 
 let client: NodeOAuthClient | undefined;
 
+function buildClientId(siteUrl: string, scope: string) {
+  const url = new URL(siteUrl);
+  const isLocalDev =
+    url.protocol === 'http:' && (url.hostname === 'localhost' || url.hostname === '127.0.0.1');
+
+  if (!isLocalDev) {
+    return `${siteUrl}/client-metadata.json`;
+  }
+
+  const params = new URLSearchParams();
+  params.append('redirect_uri', `${siteUrl}/auth/callback`);
+  params.append('scope', scope);
+  return `http://localhost?${params.toString()}`;
+}
+
 function createClient() {
   const siteUrl = getSiteUrl();
+  const scope = 'atproto';
 
   return new NodeOAuthClient({
     clientMetadata: {
-      client_id: `${siteUrl}/client-metadata.json`,
+      client_id: buildClientId(siteUrl, scope),
       client_name: 'disnetdev',
       client_uri: siteUrl,
       redirect_uris: [`${siteUrl}/auth/callback`],
       grant_types: ['authorization_code', 'refresh_token'],
-      scope: 'atproto',
+      scope,
       response_types: ['code'],
       application_type: 'web',
       token_endpoint_auth_method: 'none',
