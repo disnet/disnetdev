@@ -1,5 +1,7 @@
+import { createPublishedDocument, publishedPathExists } from '$lib/atproto/documents';
 import { deleteDraft, getDraft, updateDraft } from '$lib/atproto/drafts';
 import { DRAFT_COLLECTION_NSID } from '$lib/config';
+import { markdownToPlaintext } from '$lib/markdown/plaintext';
 import { stringifyTags, validateDraftFormData } from '$lib/server/draft-form';
 import { requireAuthor } from '$lib/server/session';
 import { error, fail, redirect } from '@sveltejs/kit';
@@ -64,6 +66,95 @@ export const actions: Actions = {
       success: true,
       message: 'Draft saved.',
       values: result.values
+    };
+  },
+
+  publish: async (event) => {
+    const session = requireAuthor(event);
+    const existing = await getDraft(event.params.rkey);
+    if (!existing) {
+      throw error(404, 'Draft not found');
+    }
+
+    if (existing.record.sourceDocumentRkey) {
+      return fail(400, {
+        action: 'publish',
+        values: {
+          title: existing.record.title,
+          slug: existing.record.slug,
+          description: existing.record.description ?? '',
+          tags: stringifyTags(existing.record.tags),
+          markdown: existing.record.markdown
+        },
+        errors: {
+          title: undefined,
+          slug: 'This draft has already been published.',
+          description: undefined,
+          tags: undefined,
+          markdown: undefined
+        }
+      });
+    }
+
+    const path = `/blog/${existing.record.slug}`;
+    if (await publishedPathExists(path)) {
+      return fail(400, {
+        action: 'publish',
+        values: {
+          title: existing.record.title,
+          slug: existing.record.slug,
+          description: existing.record.description ?? '',
+          tags: stringifyTags(existing.record.tags),
+          markdown: existing.record.markdown
+        },
+        errors: {
+          title: undefined,
+          slug: `A published post already exists at ${path}.`,
+          description: undefined,
+          tags: undefined,
+          markdown: undefined
+        }
+      });
+    }
+
+    const now = new Date().toISOString();
+    const published = await createPublishedDocument(session.did, {
+      $type: 'site.standard.document',
+      site: '',
+      title: existing.record.title,
+      publishedAt: now,
+      path,
+      ...(existing.record.description ? { description: existing.record.description } : {}),
+      ...(existing.record.tags?.length ? { tags: existing.record.tags } : {}),
+      content: {
+        $type: 'dev.disnet.blog.content.markdown',
+        markdown: existing.record.markdown,
+        sourceFormat: 'markdown'
+      },
+      textContent: markdownToPlaintext(existing.record.markdown),
+      updatedAt: now
+    });
+
+    await updateDraft(session.did, event.params.rkey, {
+      ...existing.record,
+      $type: DRAFT_COLLECTION_NSID,
+      sourceDocumentRkey: published.uri.split('/').at(-1),
+      updatedAt: now
+    });
+
+    return {
+      success: true,
+      action: 'publish',
+      message: 'Draft published.',
+      publishedUrl: path,
+      publishedRkey: published.uri.split('/').at(-1),
+      values: {
+        title: existing.record.title,
+        slug: existing.record.slug,
+        description: existing.record.description ?? '',
+        tags: stringifyTags(existing.record.tags),
+        markdown: existing.record.markdown
+      }
     };
   },
 

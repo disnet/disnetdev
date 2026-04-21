@@ -1,15 +1,25 @@
+import { restoreOAuthAgent } from '$lib/atproto/auth';
 import { parseAtUri, xrpc } from '$lib/atproto/client';
 import { publishedDocumentSchema } from '$lib/atproto/schema';
 import { getPdsUrlForDid } from '$lib/atproto/service';
 import { getSlugFromPath, normalizePath } from '$lib/atproto/utils';
 import { renderMarkdown } from '$lib/markdown/render';
-import { getCache, setCache } from '$lib/server/cache';
+import { deleteCache, getCache, invalidateCache, setCache } from '$lib/server/cache';
 import { getPublication } from './publication';
 import type { DocumentSummary, PostPageData, PublishedDocument } from '$lib/types/blog';
 
 const DOCUMENTS_CACHE_KEY = 'documents:index';
 const DOCUMENT_BY_PATH_PREFIX = 'documents:path:';
 const DOCUMENTS_TTL_MS = 5 * 60 * 1000;
+
+function invalidateDocumentCaches(path?: string) {
+  deleteCache(DOCUMENTS_CACHE_KEY);
+  invalidateCache(DOCUMENT_BY_PATH_PREFIX);
+
+  if (path) {
+    deleteCache(`${DOCUMENT_BY_PATH_PREFIX}${normalizePath(path)}`);
+  }
+}
 
 type ListRecordsResponse = {
   records: Array<{
@@ -118,4 +128,35 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
 
   setCache(cacheKey, post, DOCUMENTS_TTL_MS);
   return post;
+}
+
+export async function publishedPathExists(path: string) {
+  const documents = await listDocumentRecords();
+  const normalizedPath = normalizePath(path);
+  return documents.some((document) => document.record.path === normalizedPath);
+}
+
+export async function createPublishedDocument(did: string, record: PublishedDocument) {
+  const publication = await getPublication();
+
+  if (!publication.uri) {
+    throw new Error('PUBLICATION_AT_URI is not configured');
+  }
+
+  const normalizedPath = normalizePath(record.path ?? '/');
+  const agent = await restoreOAuthAgent(did);
+  const response = await agent.com.atproto.repo.createRecord({
+    repo: did,
+    collection: 'site.standard.document',
+    validate: false,
+    record: {
+      ...record,
+      $type: 'site.standard.document',
+      site: publication.uri,
+      path: normalizedPath
+    }
+  });
+
+  invalidateDocumentCaches(normalizedPath);
+  return response.data;
 }

@@ -9,8 +9,19 @@
 <h1>Edit draft</h1>
 <p><code>{data.draft.uri}</code></p>
 
+{#if data.draft.record.sourceDocumentRkey}
+  <p>
+    Published as
+    <a href={`/blog/${data.draft.record.slug}`}>/blog/{data.draft.record.slug}</a>
+    (<code>{data.draft.record.sourceDocumentRkey}</code>)
+  </p>
+{/if}
+
 {#if form?.success}
   <p>{form.message}</p>
+  {#if form.publishedUrl}
+    <p><a href={form.publishedUrl}>View published post</a></p>
+  {/if}
 {/if}
 
 <form method="POST" action="?/save">
@@ -56,6 +67,10 @@
   {/if}
 
   <button type="submit">Save draft</button>
+</form>
+
+<form method="POST" action="?/publish">
+  <button type="submit" disabled={Boolean(data.draft.record.sourceDocumentRkey)}>Publish draft</button>
 </form>
 
 <form method="POST" action="?/delete">

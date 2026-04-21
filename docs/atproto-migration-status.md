@@ -4,9 +4,9 @@ Last updated: 2026-04-21
 
 ## Current status
 
-We have completed the initial migration foundation for the blog and now have working authenticated ATProto draft CRUD in the admin.
+We have completed the initial migration foundation for the blog, have working authenticated ATProto draft CRUD in the admin, and now have an initial publish flow from draft -> `site.standard.document`.
 
-The project is now in a good state to begin implementing the publish flow from draft -> `site.standard.document`.
+The project is now in a good state to begin implementing published post editing/deletion and polish around the publish workflow.
 
 ---
 
@@ -166,11 +166,20 @@ Key files:
 
 ### Draft CRUD
 - ATProto draft listing works in admin
-- `/admin/new` creates real `dev.disnet.blog.draft` records
+- `/admin/new` creates real draft records
 - `/admin/edit/draft/[rkey]` loads existing drafts
 - draft save updates the record in place
 - draft delete removes the record
 - minimal title/slug validation is in place
+
+### Publish flow
+- draft edit page can publish to `site.standard.document`
+- canonical path is derived as `/blog/${slug}`
+- markdown plaintext is stored in `textContent`
+- document caches are invalidated after publish
+- duplicate publish is blocked if the draft was already published
+- duplicate path publish is blocked if `/blog/${slug}` already exists
+- draft is retained after publish and stores `sourceDocumentRkey`
 
 ### Bootstrap
 - publication bootstrap works
@@ -189,31 +198,7 @@ Key files:
 
 ## What still needs to be built next
 
-## Priority 1: Publish draft -> `site.standard.document`
-Draft CRUD is now in place, so publishing is the next major milestone.
-
-Flow:
-1. load draft
-2. derive canonical path, probably `/blog/${slug}`
-3. convert markdown to `textContent`
-4. create `site.standard.document`
-5. optionally delete draft after successful publish
-6. invalidate relevant caches
-
-Need to populate:
-- `site`
-- `title`
-- `publishedAt`
-- `path`
-- `description`
-- `tags`
-- `content = { $type: 'dev.disnet.blog.content.markdown', markdown }`
-- `textContent`
-- `updatedAt`
-
----
-
-## Priority 2: Edit/delete published posts
+## Priority 1: Edit/delete published posts
 Implement `/admin/edit/post/[rkey]` properly.
 
 Actions:
@@ -225,7 +210,7 @@ Actions:
 
 ---
 
-## Priority 3: Durable auth/session storage
+## Priority 2: Durable auth/session storage
 This is the biggest remaining infrastructure caveat.
 
 Current auth storage is in-memory:
@@ -245,7 +230,7 @@ Do this before depending on admin auth in production.
 
 ---
 
-## Priority 4: Blob upload support
+## Priority 3: Blob upload support
 Need to add image upload flow for:
 - cover images
 - later inline markdown images
@@ -258,7 +243,7 @@ Likely pieces:
 
 ---
 
-## Priority 5: Importer
+## Priority 4: Importer
 After draft/publish flow is stable, build the one-time importer.
 
 Planned script:
@@ -275,7 +260,7 @@ Responsibilities:
 
 ---
 
-## Priority 6: Public parity and polish
+## Priority 5: Public parity and polish
 After core content authoring is stable:
 - archive polish
 - feed polish
@@ -305,15 +290,15 @@ Draft writes now exist, but published post create/update/delete still need to be
 
 ## Recommended immediate next implementation
 
-Build **publish draft -> `site.standard.document`** next.
+Build **published post editing/deletion** next.
 
 Concrete tasks:
-1. add publish action on `/admin/edit/draft/[rkey]`
-2. derive canonical path from slug
-3. render markdown plaintext for `textContent`
-4. create `site.standard.document`
-5. decide whether to keep or delete the draft after publish
-6. invalidate document caches after publish
+1. load published post on `/admin/edit/post/[rkey]`
+2. edit title/path/description/tags/markdown/publishedAt
+3. update the existing `site.standard.document` record in place
+4. hard delete published posts
+5. invalidate document caches after updates/deletes
+6. decide how draft `sourceDocumentRkey` should interact with post edits
 
 ---
 
@@ -333,9 +318,11 @@ Concrete tasks:
 - [x] create draft
 - [x] edit draft
 - [x] delete draft
-- [ ] publish draft
-- [ ] published draft appears on `/blog`
-- [ ] published post page loads at `/blog/[slug]`
+- [x] publish draft
+- [x] published draft appears on `/blog`
+- [x] published post page loads at `/blog/[slug]`
+- [ ] edit published post
+- [ ] delete published post
 
 ---
 
@@ -344,4 +331,4 @@ Concrete tasks:
 We are past scaffolding and bootstrap/auth setup.
 
 The next real feature milestone is:
-**publish draft -> standards.site document**, followed by **editing and deleting published posts**.
+**editing and deleting published posts**, followed by **durable auth/session storage for production**.
