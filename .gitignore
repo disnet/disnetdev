@@ -37,4 +37,10 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# SvelteKit / Netlify build output
+.svelte-kit
+.netlify
+build
+
 _site
