@@ -1,7 +1,9 @@
-import { ATPROTO_XRPC_URL } from '$lib/config';
-
-function buildUrl(path: string, params?: Record<string, string | number | undefined>) {
-  const url = new URL(path, ATPROTO_XRPC_URL.endsWith('/') ? ATPROTO_XRPC_URL : `${ATPROTO_XRPC_URL}/`);
+function buildUrl(
+  baseUrl: string,
+  path: string,
+  params?: Record<string, string | number | undefined>
+) {
+  const url = new URL(path, baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`);
 
   for (const [key, value] of Object.entries(params ?? {})) {
     if (value !== undefined && value !== '') {
@@ -13,10 +15,11 @@ function buildUrl(path: string, params?: Record<string, string | number | undefi
 }
 
 export async function xrpc<T>(
+  baseUrl: string,
   path: string,
   params?: Record<string, string | number | undefined>
 ): Promise<T> {
-  const response = await fetch(buildUrl(path, params), {
+  const response = await fetch(buildUrl(baseUrl, path, params), {
     headers: {
       accept: 'application/json'
     }

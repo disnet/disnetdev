@@ -1,6 +1,7 @@
 import { PUBLICATION_AT_URI, SITE_DESCRIPTION, SITE_NAME, getSiteUrl } from '$lib/config';
 import { parseAtUri, xrpc } from '$lib/atproto/client';
 import { publicationRecordSchema } from '$lib/atproto/schema';
+import { getPdsUrlForDid } from '$lib/atproto/service';
 import { getCache, setCache } from '$lib/server/cache';
 import type { PublicationRecord } from '$lib/types/blog';
 
@@ -33,7 +34,8 @@ export async function getPublication(): Promise<{ uri: string; record: Publicati
   }
 
   const { repo, collection, rkey } = parseAtUri(PUBLICATION_AT_URI);
-  const response = await xrpc<GetRecordResponse>('xrpc/com.atproto.repo.getRecord', {
+  const pdsUrl = await getPdsUrlForDid(repo);
+  const response = await xrpc<GetRecordResponse>(pdsUrl, 'xrpc/com.atproto.repo.getRecord', {
     repo,
     collection,
     rkey

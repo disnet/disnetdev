@@ -1,6 +1,6 @@
-import { REPO_DID } from '$lib/config';
-import { xrpc } from '$lib/atproto/client';
+import { parseAtUri, xrpc } from '$lib/atproto/client';
 import { publishedDocumentSchema } from '$lib/atproto/schema';
+import { getPdsUrlForDid } from '$lib/atproto/service';
 import { getSlugFromPath, normalizePath } from '$lib/atproto/utils';
 import { renderMarkdown } from '$lib/markdown/render';
 import { getCache, setCache } from '$lib/server/cache';
@@ -30,18 +30,21 @@ async function listDocumentRecords(): Promise<StoredDocument[]> {
   const cached = getCache<StoredDocument[]>(DOCUMENTS_CACHE_KEY);
   if (cached) return cached;
 
-  if (!REPO_DID) {
+  const publication = await getPublication();
+  const repoDid = publication.uri ? parseAtUri(publication.uri).repo : '';
+
+  if (!repoDid) {
     setCache(DOCUMENTS_CACHE_KEY, [], DOCUMENTS_TTL_MS);
     return [];
   }
 
-  const publication = await getPublication();
+  const pdsUrl = await getPdsUrlForDid(repoDid);
   const all: StoredDocument[] = [];
   let cursor: string | undefined;
 
   do {
-    const response = await xrpc<ListRecordsResponse>('xrpc/com.atproto.repo.listRecords', {
-      repo: REPO_DID,
+    const response = await xrpc<ListRecordsResponse>(pdsUrl, 'xrpc/com.atproto.repo.listRecords', {
+      repo: repoDid,
       collection: 'site.standard.document',
       limit: 100,
       cursor

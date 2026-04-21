@@ -9,6 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "bootstrap:publication": "node --env-file=.env scripts/bootstrap-publication.mjs",
     "legacy:build": "npx @11ty/eleventy && npm run legacy:generate-og-images",
     "legacy:build-ghpages": "npx @11ty/eleventy --pathprefix=/eleventy-base-blog/",
     "legacy:start": "npx @11ty/eleventy --serve --quiet",
