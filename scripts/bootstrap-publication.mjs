@@ -109,14 +109,28 @@ async function main() {
     limit: 100
   });
 
+  const matchingUrlRecords = existing.data.records.filter((record) => record.value?.url === siteUrl);
+
   if (existing.data.records.length > 0) {
     console.log('\nFound existing publication record(s):');
     for (const record of existing.data.records) {
+      const recordUrl = typeof record.value?.url === 'string' ? ` (${record.value.url})` : '';
+      console.log(`- ${record.uri}${recordUrl}`);
+    }
+  }
+
+  if (matchingUrlRecords.length > 0) {
+    console.log(`\nFound existing publication record(s) for url ${siteUrl}:`);
+    for (const record of matchingUrlRecords) {
       console.log(`- ${record.uri}`);
     }
 
     console.log('\nUse one of the above as PUBLICATION_AT_URI.');
     return;
+  }
+
+  if (existing.data.records.length > 0) {
+    console.log(`\nNo existing publication record matched ${siteUrl}; creating a new one.`);
   }
 
   const record = {
