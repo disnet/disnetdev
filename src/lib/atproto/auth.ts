@@ -45,6 +45,20 @@ const sessionStore = {
 
 let client: NodeOAuthClient | undefined;
 
+// Cloudflare Workers rejects `redirect: 'error'` at runtime; upstream
+// @atproto resolvers pass it to fail-closed on redirects. Rewrite to
+// 'manual' and surface a redirect status as an error.
+const workerFetch: typeof globalThis.fetch = async (input, init) => {
+  if (init?.redirect === 'error') {
+    const res = await globalThis.fetch(input, { ...init, redirect: 'manual' });
+    if (res.status >= 300 && res.status < 400) {
+      throw new Error(`Unexpected redirect (${res.status}) from ${String(input)}`);
+    }
+    return res;
+  }
+  return globalThis.fetch(input, init);
+};
+
 function buildClientId(siteUrl: string, scope: string) {
   const url = new URL(siteUrl);
   const isLocalDev =
@@ -84,8 +98,10 @@ function createClient() {
       token_endpoint_auth_method: 'none',
       dpop_bound_access_tokens: true
     },
+    fetch: workerFetch,
     handleResolver: new AtprotoDohHandleResolver({
-      dohEndpoint: 'https://cloudflare-dns.com/dns-query'
+      dohEndpoint: 'https://cloudflare-dns.com/dns-query',
+      fetch: workerFetch
     }),
     stateStore,
     sessionStore
