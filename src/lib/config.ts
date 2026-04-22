@@ -26,6 +26,14 @@ export function requirePublicationAtUri() {
   return PUBLICATION_AT_URI;
 }
 
+export function requireAuthorDid() {
+  if (!AUTHOR_DID) {
+    throw new Error('AUTHOR_DID is not configured');
+  }
+
+  return AUTHOR_DID;
+}
+
 export function getSiteUrl() {
   return publicEnv.PUBLIC_SITE_URL || 'http://localhost:5173';
 }
