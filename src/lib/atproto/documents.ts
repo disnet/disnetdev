@@ -1,4 +1,5 @@
 import { restoreOAuthAgent } from '$lib/atproto/auth';
+import { getBlobUrl, resolveInlineBlobUrls } from '$lib/atproto/blobs';
 import { parseAtUri, xrpc } from '$lib/atproto/client';
 import { publishedDocumentSchema } from '$lib/atproto/schema';
 import { getPdsUrlForDid } from '$lib/atproto/service';
@@ -112,7 +113,18 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
     return null;
   }
 
-  const html = await renderMarkdown(match.record.content.markdown);
+  const publication = await getPublication();
+  const repoDid = publication.uri ? parseAtUri(publication.uri).repo : '';
+  const pdsUrl = repoDid ? await getPdsUrlForDid(repoDid) : '';
+
+  const rawHtml = await renderMarkdown(match.record.content.markdown);
+  const html = repoDid && pdsUrl ? resolveInlineBlobUrls(rawHtml, pdsUrl, repoDid) : rawHtml;
+
+  const coverImageUrl =
+    match.record.coverImage && repoDid && pdsUrl
+      ? getBlobUrl(pdsUrl, repoDid, match.record.coverImage.ref.$link)
+      : undefined;
+
   const post: PostPageData = {
     uri: match.uri,
     rkey: match.rkey,
@@ -123,7 +135,9 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
     tags: match.record.tags,
     updatedAt: match.record.updatedAt,
     publishedAt: match.record.publishedAt,
-    html
+    html,
+    coverImageUrl,
+    coverImageAlt: match.record.title
   };
 
   setCache(cacheKey, post, DOCUMENTS_TTL_MS);

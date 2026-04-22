@@ -1,3 +1,4 @@
+import { getAuthorBlobUrl } from '$lib/atproto/blobs';
 import {
   deletePublishedDocument,
   getPublishedDocument,
@@ -25,12 +26,14 @@ export const load: PageServerLoad = async (event) => {
   }
 
   const linkedDraft = (await listDrafts()).find((draft) => draft.record.sourceDocumentRkey === post.rkey);
+  const coverImageUrl = await getAuthorBlobUrl(post.record.coverImage);
 
   return {
     post: {
       rkey: post.rkey,
       uri: post.uri,
       record: post.record,
+      coverImageUrl,
       formValues: getPostFormDefaults(post.record),
       linkedDraft: linkedDraft
         ? {
@@ -84,6 +87,8 @@ export const actions: Actions = {
       path: result.recordInput.path,
       description: result.recordInput.description,
       tags: result.recordInput.tags,
+      coverImage: result.recordInput.coverImage,
+      embeddedBlobs: result.recordInput.embeddedBlobs,
       content: {
         $type: 'dev.disnet.blog.content.markdown',
         markdown: result.recordInput.markdown,

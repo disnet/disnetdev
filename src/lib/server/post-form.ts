@@ -1,7 +1,15 @@
 import { z } from 'zod';
+import type { BlobRef } from '$lib/types/blog';
+import { filterEmbeddedBlobs } from '$lib/atproto/blobs';
 import { stringifyTags } from './draft-form';
 
 const pathPattern = /^\/[^\s]*$/;
+
+const blobRefSchema = z.object({
+  ref: z.object({ $link: z.string().min(1) }),
+  mimeType: z.string().min(1),
+  size: z.number().int().nonnegative()
+});
 
 const postFormSchema = z.object({
   title: z.string().trim().min(1, 'Title is required'),
@@ -23,6 +31,8 @@ export type PostFormValues = {
   tags: string;
   markdown: string;
   publishedAt: string;
+  coverImage: string;
+  embeddedBlobs: string;
 };
 
 export type PostFormResult =
@@ -36,6 +46,8 @@ export type PostFormResult =
         tags?: string[];
         markdown: string;
         publishedAt: string;
+        coverImage: BlobRef | undefined;
+        embeddedBlobs: BlobRef[] | undefined;
       };
     }
   | {
@@ -51,7 +63,9 @@ export function getPostFormValues(formData: FormData): PostFormValues {
     description: String(formData.get('description') ?? ''),
     tags: String(formData.get('tags') ?? ''),
     markdown: String(formData.get('markdown') ?? ''),
-    publishedAt: String(formData.get('publishedAt') ?? '')
+    publishedAt: String(formData.get('publishedAt') ?? ''),
+    coverImage: String(formData.get('coverImage') ?? ''),
+    embeddedBlobs: String(formData.get('embeddedBlobs') ?? '')
   };
 }
 
@@ -76,6 +90,10 @@ export function validatePostFormData(formData: FormData): PostFormResult {
     };
   }
 
+  const coverImage = parseBlobRef(values.coverImage);
+  const embeddedBlobsAll = parseBlobRefList(values.embeddedBlobs);
+  const embeddedBlobs = filterEmbeddedBlobs(embeddedBlobsAll, parsed.data.markdown);
+
   const description = parsed.data.description || undefined;
   const tags = parsed.data.tags
     ? Array.from(
@@ -93,7 +111,9 @@ export function validatePostFormData(formData: FormData): PostFormResult {
     values: {
       ...parsed.data,
       description: parsed.data.description ?? '',
-      tags: parsed.data.tags ?? ''
+      tags: parsed.data.tags ?? '',
+      coverImage: coverImage ? JSON.stringify(coverImage) : '',
+      embeddedBlobs: embeddedBlobs.length ? JSON.stringify(embeddedBlobs) : ''
     },
     recordInput: {
       title: parsed.data.title,
@@ -101,7 +121,9 @@ export function validatePostFormData(formData: FormData): PostFormResult {
       ...(description ? { description } : {}),
       ...(tags.length > 0 ? { tags } : {}),
       markdown: parsed.data.markdown,
-      publishedAt: parsed.data.publishedAt
+      publishedAt: parsed.data.publishedAt,
+      coverImage,
+      embeddedBlobs: embeddedBlobs.length ? embeddedBlobs : undefined
     }
   };
 }
@@ -113,6 +135,8 @@ export function getPostFormDefaults(record: {
   tags?: string[];
   content?: { markdown: string };
   publishedAt: string;
+  coverImage?: BlobRef;
+  embeddedBlobs?: BlobRef[];
 }): PostFormValues {
   return {
     title: record.title,
@@ -120,6 +144,30 @@ export function getPostFormDefaults(record: {
     description: record.description ?? '',
     tags: stringifyTags(record.tags),
     markdown: record.content?.markdown ?? '',
-    publishedAt: record.publishedAt
+    publishedAt: record.publishedAt,
+    coverImage: record.coverImage ? JSON.stringify(record.coverImage) : '',
+    embeddedBlobs: record.embeddedBlobs?.length ? JSON.stringify(record.embeddedBlobs) : ''
   };
+}
+
+function parseBlobRef(value: string): BlobRef | undefined {
+  if (!value.trim()) return undefined;
+  try {
+    const parsed = blobRefSchema.safeParse(JSON.parse(value));
+    return parsed.success ? parsed.data : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function parseBlobRefList(value: string): BlobRef[] {
+  if (!value.trim()) return [];
+  try {
+    const data = JSON.parse(value);
+    if (!Array.isArray(data)) return [];
+    const parsed = z.array(blobRefSchema).safeParse(data);
+    return parsed.success ? parsed.data : [];
+  } catch {
+    return [];
+  }
 }

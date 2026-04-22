@@ -21,6 +21,11 @@
 
 <article class="post">
   <header class="post-header">
+    {#if data.post.coverImageUrl}
+      <figure class="post-cover">
+        <img src={data.post.coverImageUrl} alt={data.post.coverImageAlt ?? ''} loading="eager" />
+      </figure>
+    {/if}
     <h1 class="post-title">{data.post.title}</h1>
     {#if data.post.description}
       <p class="post-description">{data.post.description}</p>

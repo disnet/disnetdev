@@ -541,6 +541,19 @@ body {
   margin-bottom: var(--space-xl);
 }
 
+.post-cover {
+  margin: 0 0 var(--space-lg);
+}
+
+.post-cover img {
+  display: block;
+  width: 100%;
+  max-height: 28rem;
+  object-fit: cover;
+  border: var(--rule) solid var(--ink-rule);
+  background: var(--ink-surface);
+}
+
 .post-title {
   font-family: var(--font-display);
   font-weight: 400;

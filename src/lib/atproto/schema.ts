@@ -38,7 +38,8 @@ export const publishedDocumentSchema = z.object({
   content: markdownContentSchema.optional(),
   textContent: z.string().optional(),
   updatedAt: z.string().datetime().optional(),
-  coverImage: blobRefSchema.optional()
+  coverImage: blobRefSchema.optional(),
+  embeddedBlobs: z.array(blobRefSchema).optional()
 });
 
 export const draftRecordSchema = z.object({
@@ -51,6 +52,7 @@ export const draftRecordSchema = z.object({
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   coverImage: blobRefSchema.optional(),
+  embeddedBlobs: z.array(blobRefSchema).optional(),
   sourceDocumentRkey: z.string().optional(),
   legacy: z
     .object({

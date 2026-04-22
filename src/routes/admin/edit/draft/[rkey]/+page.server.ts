@@ -1,8 +1,9 @@
+import { getAuthorBlobUrl } from '$lib/atproto/blobs';
 import { createPublishedDocument, publishedPathExists } from '$lib/atproto/documents';
 import { deleteDraft, getDraft, updateDraft } from '$lib/atproto/drafts';
 import { DRAFT_COLLECTION_NSID } from '$lib/config';
 import { markdownToPlaintext } from '$lib/markdown/plaintext';
-import { stringifyTags, validateDraftFormData } from '$lib/server/draft-form';
+import { serializeBlobRef, serializeBlobRefList, stringifyTags, validateDraftFormData } from '$lib/server/draft-form';
 import { requireAuthor } from '$lib/server/session';
 import { error, fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
@@ -19,17 +20,22 @@ export const load: PageServerLoad = async (event) => {
     throw error(404, 'Draft not found');
   }
 
+  const coverImageUrl = await getAuthorBlobUrl(draft.record.coverImage);
+
   return {
     draft: {
       rkey: draft.rkey,
       uri: draft.uri,
       record: draft.record,
+      coverImageUrl,
       formValues: {
         title: draft.record.title,
         slug: draft.record.slug,
         description: draft.record.description ?? '',
         tags: stringifyTags(draft.record.tags),
-        markdown: draft.record.markdown
+        markdown: draft.record.markdown,
+        coverImage: serializeBlobRef(draft.record.coverImage),
+        embeddedBlobs: serializeBlobRefList(draft.record.embeddedBlobs)
       }
     }
   };
@@ -76,16 +82,20 @@ export const actions: Actions = {
       throw error(404, 'Draft not found');
     }
 
+    const draftFormValues = {
+      title: existing.record.title,
+      slug: existing.record.slug,
+      description: existing.record.description ?? '',
+      tags: stringifyTags(existing.record.tags),
+      markdown: existing.record.markdown,
+      coverImage: serializeBlobRef(existing.record.coverImage),
+      embeddedBlobs: serializeBlobRefList(existing.record.embeddedBlobs)
+    };
+
     if (existing.record.sourceDocumentRkey) {
       return fail(400, {
         action: 'publish',
-        values: {
-          title: existing.record.title,
-          slug: existing.record.slug,
-          description: existing.record.description ?? '',
-          tags: stringifyTags(existing.record.tags),
-          markdown: existing.record.markdown
-        },
+        values: draftFormValues,
         errors: {
           title: undefined,
           slug: 'This draft has already been published.',
@@ -100,13 +110,7 @@ export const actions: Actions = {
     if (await publishedPathExists(path)) {
       return fail(400, {
         action: 'publish',
-        values: {
-          title: existing.record.title,
-          slug: existing.record.slug,
-          description: existing.record.description ?? '',
-          tags: stringifyTags(existing.record.tags),
-          markdown: existing.record.markdown
-        },
+        values: draftFormValues,
         errors: {
           title: undefined,
           slug: `A published post already exists at ${path}.`,
@@ -126,6 +130,8 @@ export const actions: Actions = {
       path,
       ...(existing.record.description ? { description: existing.record.description } : {}),
       ...(existing.record.tags?.length ? { tags: existing.record.tags } : {}),
+      ...(existing.record.coverImage ? { coverImage: existing.record.coverImage } : {}),
+      ...(existing.record.embeddedBlobs?.length ? { embeddedBlobs: existing.record.embeddedBlobs } : {}),
       content: {
         $type: 'dev.disnet.blog.content.markdown',
         markdown: existing.record.markdown,
@@ -148,13 +154,7 @@ export const actions: Actions = {
       message: 'Draft published.',
       publishedUrl: path,
       publishedRkey: published.uri.split('/').at(-1),
-      values: {
-        title: existing.record.title,
-        slug: existing.record.slug,
-        description: existing.record.description ?? '',
-        tags: stringifyTags(existing.record.tags),
-        markdown: existing.record.markdown
-      }
+      values: draftFormValues
     };
   },
 

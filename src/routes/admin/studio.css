@@ -767,6 +767,13 @@
   font-variant-numeric: tabular-nums;
 }
 
+.editor-body-tools {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--s-5);
+  flex-wrap: wrap;
+}
+
 .editor-body-textarea {
   display: block;
   width: 100%;
@@ -931,3 +938,174 @@
 
 .editor-tags-preview .tag::before,
 .editor-tags-preview .tag::after { content: none; }
+
+/* ─────────────────────────────────────────────────────────
+   cover image — the plate above the title
+   ───────────────────────────────────────────────────────── */
+
+.cover-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.cover-field .editor-meta-label {
+  color: var(--ink-muted);
+}
+
+.cover-empty {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-1);
+  min-height: 7rem;
+  padding: var(--s-5) var(--s-4);
+  border: 1px dashed var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--paper-elev);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.cover-empty:hover {
+  border-color: var(--accent);
+  background: var(--paper-sunk);
+}
+
+.cover-empty input[type='file'] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.cover-empty-prompt {
+  font-family: var(--ff-body);
+  font-style: italic;
+  font-size: var(--fz-sm);
+  color: var(--ink-2);
+}
+
+.cover-empty-hint {
+  font-family: var(--ff-mono);
+  font-size: var(--fz-mono);
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+}
+
+.cover-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  margin: 0;
+}
+
+.cover-preview img {
+  display: block;
+  width: 100%;
+  max-height: 22rem;
+  object-fit: cover;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  background: var(--paper-sunk);
+}
+
+.cover-preview figcaption {
+  display: flex;
+  gap: var(--s-4);
+  align-items: baseline;
+  font-family: var(--ff-mono);
+  font-size: var(--fz-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.cover-replace {
+  position: relative;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink-muted);
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  transition: color var(--transition);
+}
+
+.cover-replace input[type='file'] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.cover-replace:hover {
+  color: var(--accent);
+}
+
+.cover-remove {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--ink-faint);
+  cursor: pointer;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  transition: color var(--transition);
+}
+
+.cover-remove:hover {
+  color: var(--danger);
+}
+
+.cover-status {
+  font-family: var(--ff-mono);
+  font-size: var(--fz-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.cover-status--error { color: var(--danger); }
+
+/* ─────────────────────────────────────────────────────────
+   inline image insert — quiet tool above the editor
+   ───────────────────────────────────────────────────────── */
+
+.image-insert {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3em;
+  font-family: var(--ff-mono);
+  font-size: var(--fz-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+
+.image-insert:hover { color: var(--accent); }
+
+.image-insert--busy { color: var(--ink-faint); cursor: progress; }
+
+.image-insert input[type='file'] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.image-insert-error {
+  margin-left: var(--s-3);
+  font-family: var(--ff-body);
+  font-style: italic;
+  font-size: var(--fz-sm);
+  color: var(--danger);
+}

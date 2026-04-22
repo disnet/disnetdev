@@ -65,7 +65,9 @@ function createClient() {
     'atproto',
     `repo:${DRAFT_COLLECTION_NSID}`,
     'repo:site.standard.document',
-    'repo:site.standard.publication'
+    'repo:site.standard.publication',
+    'rpc:com.atproto.repo.uploadBlob',
+    'blob:*/*'
   ].join(' ');
 
   return new NodeOAuthClient({

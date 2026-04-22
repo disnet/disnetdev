@@ -1,6 +1,9 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import { autogrow } from '$lib/actions/autogrow';
+  import CoverImageField from '$lib/components/CoverImageField.svelte';
+  import InsertImageButton from '$lib/components/InsertImageButton.svelte';
+  import type { BlobRef } from '$lib/types/blog';
 
   let { data, form } = $props();
 
@@ -13,6 +16,18 @@
   let description = $state<string>(initial.description ?? '');
   let tags = $state<string>(initial.tags ?? '');
   let markdown = $state<string>(initial.markdown ?? '');
+  let embeddedBlobs = $state<BlobRef[]>(untrack(() => data.post.record.embeddedBlobs ?? []));
+  let markdownEl = $state<HTMLTextAreaElement | undefined>(undefined);
+
+  function onImageInserted(blob: BlobRef) {
+    if (!embeddedBlobs.some((b) => b.ref.$link === blob.ref.$link)) {
+      embeddedBlobs = [...embeddedBlobs, blob];
+    }
+  }
+
+  const embeddedBlobsSerialized = $derived(
+    embeddedBlobs.length ? JSON.stringify(embeddedBlobs) : ''
+  );
 
   $effect(() => {
     if (form?.values) {
@@ -181,23 +196,30 @@
     {/if}
   </div>
 
+  <CoverImageField initial={data.post.record.coverImage} initialPreviewUrl={data.post.coverImageUrl} />
+
   <div class="editor-body-wrap">
     <div class="editor-body-label">
       <label for="markdown">
         <span>the writing</span>
       </label>
-      <span class="editor-body-stats">
-        {wordCount === 1 ? '1 word' : `${wordCount} words`}
+      <span class="editor-body-tools">
+        <InsertImageButton textarea={markdownEl} onInsert={onImageInserted} />
+        <span class="editor-body-stats">
+          {wordCount === 1 ? '1 word' : `${wordCount} words`}
+        </span>
       </span>
     </div>
     <textarea
       id="markdown"
       name="markdown"
       class="editor-body-textarea"
+      bind:this={markdownEl}
       bind:value={markdown}
       use:autogrow
       spellcheck="true"
     ></textarea>
+    <input type="hidden" name="embeddedBlobs" value={embeddedBlobsSerialized} />
     {#if errors.markdown}
       <p class="field-error">{errors.markdown}</p>
     {/if}

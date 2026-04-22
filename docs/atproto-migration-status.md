@@ -4,9 +4,9 @@ Last updated: 2026-04-22
 
 ## Current status
 
-We have completed the initial migration foundation for the blog, have working authenticated ATProto draft CRUD in the admin, and now have working published post editing/deletion in the admin in addition to the initial draft -> `site.standard.document` publish flow.
+We have completed the initial migration foundation for the blog, have working authenticated ATProto draft CRUD in the admin, working published post editing/deletion, the initial draft -> `site.standard.document` publish flow, and now have working blob upload support for cover images and inline markdown images.
 
-The next major milestone is now blob upload support, with production auth/session durability partially addressed by moving OAuth state/session storage off in-memory and switching the lightweight web session to a signed cookie.
+The next major milestone is the importer for existing Eleventy-era content, with a short production-readiness pass still pending for auth env wiring.
 
 ---
 
@@ -156,6 +156,32 @@ Key files:
 - `src/routes/admin/edit/draft/[rkey]/+page.server.ts`
 - `src/routes/admin/edit/draft/[rkey]/+page.svelte`
 
+### 11. Blob upload support
+Implemented cover image and inline markdown image uploads backed by `com.atproto.repo.uploadBlob`.
+
+Implemented:
+- author-only upload endpoint at `/api/upload-blob` (MIME + size validation, up to 4MB, jpg/png/webp/gif)
+- shared `CoverImageField` component with upload-on-select, live preview, replace, and remove
+- shared `InsertImageButton` component that uploads a file and inserts `![alt](blob:CID)` at the textarea cursor
+- `embeddedBlobs` tracked on both `dev.disnet.blog.draft` and `site.standard.document` so referenced blobs aren't GC'd by the PDS (filtered at save time against the current markdown so orphans don't accumulate)
+- `coverImage` and `embeddedBlobs` carried from draft to published document on publish
+- public post page renders the cover image and rewrites inline `blob:CID` refs to full `com.atproto.sync.getBlob` URLs at render time
+
+Key files:
+- `src/routes/api/upload-blob/+server.ts`
+- `src/lib/atproto/blobs.ts`
+- `src/lib/admin/upload.ts`
+- `src/lib/components/CoverImageField.svelte`
+- `src/lib/components/InsertImageButton.svelte`
+- `src/lib/atproto/schema.ts`
+- `src/lib/types/blog.ts`
+- `src/lib/server/draft-form.ts`
+- `src/lib/server/post-form.ts`
+- `src/lib/atproto/documents.ts`
+- `src/routes/blog/[slug]/+page.svelte`
+- `src/routes/admin/studio.css`
+- `src/routes/cathode.css`
+
 ---
 
 ## Verified working
@@ -188,6 +214,12 @@ Key files:
 - published posts can be hard deleted
 - linked drafts are unlinked on delete by clearing `sourceDocumentRkey`
 
+### Blob uploads
+- `/api/upload-blob` accepts multipart uploads from the admin and calls `com.atproto.repo.uploadBlob` as the author
+- cover images can be attached, replaced, or removed on drafts and published posts, with live preview
+- inline markdown images can be inserted from the editor toolbar; markdown stores `blob:CID` refs which render through `com.atproto.sync.getBlob` on the public page
+- `embeddedBlobs` is filtered to only blobs still referenced in the current markdown before each save
+
 ### Bootstrap
 - publication bootstrap works
 - duplicate prevention now checks by publication `url`
@@ -217,6 +249,21 @@ Implemented `/admin/edit/post/[rkey]` with:
 - linked draft discovery in the admin UI
 - draft unlinking on published post delete so a retained draft can be republished later
 
+## Priority 3: Blob upload support
+Completed.
+
+Implemented cover image + inline markdown image uploads with:
+- `/api/upload-blob` endpoint (author-only, MIME + size validation)
+- shared `CoverImageField` and `InsertImageButton` components
+- `coverImage` + `embeddedBlobs` fields on draft and document records
+- inline `blob:CID` refs in markdown, rewritten to `com.atproto.sync.getBlob` URLs at render time
+- `embeddedBlobs` filtered against the current markdown on save to prune orphans
+- cover image + embedded blobs carried from draft to document on publish
+
+Known follow-ups:
+- OAuth scope updated to include `rpc:com.atproto.repo.uploadBlob` and `blob:*/*`. Existing OAuth sessions should be signed out and re-authorized so they pick up the new scope grant. In production this is a one-time forced re-login; in dev, just `logout` + `login` again.
+- No image size/format transformation — uploads are stored as-is. A later pass could resize/webp the cover image before upload.
+
 ---
 
 ## Priority 2: Durable auth/session storage
@@ -239,19 +286,6 @@ Before relying on admin auth in production:
 2. bind it as `KV` on the Pages project (Settings → Functions → KV namespace bindings)
 3. set `SESSION_COOKIE_SECRET`
 4. ensure the Pages project uses a compatibility date / flags that include `nodejs_compat` so `node:async_hooks` (`AsyncLocalStorage`) is available
-
----
-
-## Priority 3: Blob upload support
-Need to add image upload flow for:
-- cover images
-- later inline markdown images
-
-Likely pieces:
-- server-side upload endpoint or action
-- MIME/size validation
-- ATProto blob upload
-- storage of blob refs on drafts/documents
 
 ---
 
@@ -353,12 +387,16 @@ Concrete tasks:
 - [x] published post page loads at `/blog/[slug]`
 - [x] edit published post
 - [x] delete published post
+- [ ] attach a cover image to a new draft (upload succeeds, preview renders)
+- [ ] replace + remove cover image on an existing draft
+- [ ] insert an inline image from the editor toolbar
+- [ ] publish a draft with cover + inline images and verify both render on `/blog/[slug]`
+- [ ] edit a published post's cover image in place
 
 ---
 
 ## Bottom line
 
-We are past scaffolding and bootstrap/auth setup.
+We are past scaffolding, bootstrap/auth setup, and blob upload support.
 
-The next real feature milestone is now:
-**blob upload support**, with a short production-readiness pass to finish auth env wiring and verification.
+The next real feature milestone is now the **legacy content importer**, with a short production-readiness pass still pending for auth env wiring and verification.

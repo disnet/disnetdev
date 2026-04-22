@@ -35,6 +35,7 @@ export type PublishedDocument = {
   textContent?: string;
   updatedAt?: string;
   coverImage?: BlobRef;
+  embeddedBlobs?: BlobRef[];
 };
 
 export type DraftRecord = {
@@ -47,6 +48,7 @@ export type DraftRecord = {
   createdAt: string;
   updatedAt: string;
   coverImage?: BlobRef;
+  embeddedBlobs?: BlobRef[];
   sourceDocumentRkey?: string;
   legacy?: {
     sourcePath?: string;
@@ -78,4 +80,5 @@ export type PostPageData = {
   publishedAt: string;
   html: string;
   coverImageUrl?: string;
+  coverImageAlt?: string;
 };
