@@ -27,7 +27,8 @@
   --ink-selection: oklch(0.88 0.1 85 / 0.5);
 
   --measure: 68ch;
-  --measure-wide: 84ch;
+  --measure-wide: 92ch;
+  --shell-max: calc(var(--measure-wide) + var(--space-xl) * 2);
 
   --space-3xs: 0.25rem;
   --space-2xs: 0.5rem;
@@ -118,7 +119,7 @@ body {
 
 .cathode-main {
   width: 100%;
-  max-width: 72rem;
+  max-width: var(--shell-max);
   margin: 0 auto;
   padding: var(--space-xl) clamp(var(--space-md), 4vw, var(--space-xl))
     var(--space-2xl);
@@ -127,7 +128,7 @@ body {
 /* ——— masthead ——— */
 
 .masthead {
-  max-width: 72rem;
+  max-width: var(--shell-max);
   margin: 0 auto;
   padding: var(--space-lg) clamp(var(--space-md), 4vw, var(--space-xl))
     var(--space-md);
@@ -522,34 +523,22 @@ body {
   color: var(--ink-text-soft);
 }
 
-/* ——— post header & compiler-status-line footer ——— */
+/* ——— post layout: right-margin reference column ——— */
+
+.post {
+  display: grid;
+  grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
+  grid-template-areas:
+    "header margin"
+    "body   margin"
+    "footer footer";
+  column-gap: clamp(var(--space-md), 3vw, var(--space-xl));
+  max-width: var(--measure-wide);
+}
 
 .post-header {
+  grid-area: header;
   margin-bottom: var(--space-xl);
-  max-width: var(--measure);
-}
-
-.post-meta {
-  font-family: var(--font-mono);
-  font-size: var(--type-sm);
-  color: var(--ink-muted);
-  letter-spacing: 0.04em;
-  font-variant-numeric: tabular-nums;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-  align-items: baseline;
-  margin: 0 0 var(--space-sm);
-}
-
-.post-meta-item {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.5ch;
-}
-
-.post-meta-marker {
-  color: var(--ink-accent);
 }
 
 .post-title {
@@ -570,7 +559,85 @@ body {
   max-width: var(--measure);
 }
 
+.post > .prose {
+  grid-area: body;
+}
+
+.post-margin {
+  grid-area: margin;
+  align-self: start;
+  position: sticky;
+  top: var(--space-lg);
+  padding-top: 0.55rem;
+}
+
+.post-margin-list {
+  margin: 0;
+  padding-inline-start: var(--space-sm);
+  border-inline-start: var(--rule) solid var(--ink-rule-soft);
+  display: grid;
+  gap: var(--space-md);
+}
+
+.post-margin-item {
+  display: grid;
+  gap: var(--space-3xs);
+}
+
+.post-margin-item dt {
+  font-family: var(--font-meta);
+  font-size: var(--type-xs);
+  letter-spacing: 0.14em;
+  color: var(--ink-muted);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6ch;
+}
+
+.post-margin-item dt::before {
+  content: '▸';
+  color: var(--ink-accent);
+  font-size: 0.9em;
+}
+
+.post-margin-item dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  color: var(--ink-text);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.45;
+}
+
+.post-margin-tags {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.4ch;
+  font-family: var(--font-body);
+  font-size: var(--type-sm);
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+.post-margin-tags li {
+  color: var(--ink-text);
+  font-style: italic;
+}
+
+.post-margin-tags li:not(:last-child)::after {
+  content: '·';
+  color: var(--ink-rule);
+  font-style: normal;
+  margin-inline-start: 0.4ch;
+}
+
+/* ——— compiler-status-line footer ——— */
+
 .post-statusline {
+  grid-area: footer;
   margin-top: var(--space-2xl);
   padding-top: var(--space-md);
   border-top: var(--rule) solid var(--ink-rule);
@@ -581,27 +648,69 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-md);
+  justify-content: space-between;
   align-items: baseline;
-  max-width: var(--measure);
   font-variant-numeric: tabular-nums;
 }
 
-.post-statusline-key {
-  color: var(--ink-muted);
-}
-
-.post-statusline-val {
+.post-statusline-path {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6ch;
   color: var(--ink-text-soft);
 }
 
-.post-statusline-tag {
+.post-statusline-prompt {
   color: var(--ink-accent);
+}
+
+.post-statusline-return {
+  color: var(--ink-text-soft);
+  text-decoration: none;
+  transition: color 120ms ease-out;
+}
+
+.post-statusline-return:hover,
+.post-statusline-return:focus-visible {
+  color: var(--ink-accent-hover);
+}
+
+/* Narrow screens — collapse to a single column.
+   Order: meta → title → body → status (matches the pre-grid page shape). */
+@media (max-width: 56rem) {
+  .post {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "margin"
+      "header"
+      "body"
+      "footer";
+    max-width: var(--measure);
+    row-gap: var(--space-lg);
+  }
+
+  .post-header {
+    margin-bottom: 0;
+  }
+
+  .post-margin {
+    position: static;
+    padding-top: 0;
+  }
+
+  .post-margin-list {
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: var(--space-lg);
+    padding-inline-start: 0;
+    border-inline-start: 0;
+  }
 }
 
 /* ——— footer colophon ——— */
 
 .colophon {
-  max-width: 72rem;
+  max-width: var(--shell-max);
   margin: 0 auto;
   padding: var(--space-xl) clamp(var(--space-md), 4vw, var(--space-xl))
     var(--space-xl);
