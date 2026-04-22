@@ -1,82 +1,69 @@
 <script lang="ts">
+  import '@fontsource-variable/alegreya/wght.css';
+  import '@fontsource-variable/alegreya/wght-italic.css';
+  import '@fontsource/young-serif/400.css';
+  import '@fontsource/alegreya-sans-sc/500.css';
+  import '@fontsource/commit-mono/400.css';
+  import '@fontsource/commit-mono/400-italic.css';
+  import '@fontsource/commit-mono/500.css';
+  import './cathode.css';
+
   import { page } from '$app/state';
 
   let { children } = $props();
 
   const nav = [
-    { href: '/', label: 'Home' },
-    { href: '/blog', label: 'Blog' },
-    { href: '/archive', label: 'Archive' },
-    { href: '/admin', label: 'Admin' }
+    { href: '/', label: 'index', match: (p: string) => p === '/' },
+    { href: '/blog', label: 'blog', match: (p: string) => p === '/blog' },
+    {
+      href: '/archive',
+      label: 'archive',
+      match: (p: string) => p.startsWith('/archive')
+    }
   ];
 
-  // The admin area has its own full-page chrome (see src/routes/admin/+layout.svelte).
-  // We render it bare so the studio theme fully owns the viewport.
+  // The admin area owns its own viewport chrome (src/routes/admin/+layout.svelte).
   const isAdminArea = $derived(page.url.pathname.startsWith('/admin'));
+  const pathname = $derived(page.url.pathname);
 </script>
 
 <svelte:head>
-  <meta name="color-scheme" content="dark light" />
+  <meta name="color-scheme" content="light dark" />
 </svelte:head>
 
 {#if isAdminArea}
   {@render children?.()}
 {:else}
-  <div class="shell">
-    <header>
-      <a class="brand" href="/">disnetdev</a>
-      <nav>
+  <div class="cathode">
+    <header class="masthead">
+      <a class="masthead-mark" href="/" aria-label="disnetdev, home">
+        disnetdev<span class="masthead-mark-dot">.</span>
+      </a>
+      <nav class="masthead-nav" aria-label="Primary">
         {#each nav as item}
-          <a href={item.href}>{item.label}</a>
+          <a
+            href={item.href}
+            aria-current={item.match(pathname) ? 'page' : undefined}>
+            {item.label}
+          </a>
         {/each}
       </nav>
     </header>
 
-    <main>
+    <main class="cathode-main">
       {@render children?.()}
     </main>
+
+    <footer class="colophon">
+      <div>
+        <span class="colophon-prompt">$</span>
+        disnetdev — a language workshop, since 2011
+      </div>
+      <div class="colophon-links">
+        <a href="/feed.xml">rss</a>
+        <span class="colophon-sep" aria-hidden="true">·</span>
+        <a href="/admin">studio</a>
+      </div>
+    </footer>
   </div>
 {/if}
-
-<style>
-  :global(body) {
-    margin: 0;
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  }
-
-  :global(a) {
-    color: inherit;
-  }
-
-  .shell {
-    min-height: 100vh;
-    padding: 2rem;
-    background: #0b1020;
-    color: #e5ecff;
-  }
-
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    max-width: 64rem;
-    margin: 0 auto 3rem;
-  }
-
-  nav {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .brand {
-    font-weight: 700;
-    text-decoration: none;
-  }
-
-  main {
-    max-width: 64rem;
-    margin: 0 auto;
-  }
-</style>
