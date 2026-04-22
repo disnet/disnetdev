@@ -3,7 +3,7 @@ import { destroyWebSession, getAuthSession } from '$lib/server/session';
 import { redirect } from '@sveltejs/kit';
 
 export async function POST({ cookies }) {
-  const auth = getAuthSession(cookies);
+  const auth = await getAuthSession(cookies);
 
   if (auth) {
     try {

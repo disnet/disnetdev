@@ -111,7 +111,7 @@ That keeps published content standards.site-native without abusing the spec.
 - social features beyond publishing
 
 ### Deployment
-- Netlify
+- Cloudflare Pages
 
 ### OG handling
 - Keep OG simple in v1
@@ -322,7 +322,7 @@ Only this DID can:
 - delete handled as a form action on edit page
 
 ### Rendering model
-Use SSR on Netlify for public pages with cache headers.
+Use SSR on Cloudflare Pages for public pages with cache headers.
 
 Why not static export:
 - content lives remotely in the repo
@@ -394,7 +394,7 @@ Cache:
 Implementation:
 - in-memory cache for v1
 
-### Layer B: Netlify/CDN cache
+### Layer B: Cloudflare/CDN cache
 Cache rendered public responses:
 - homepage
 - blog index
@@ -555,7 +555,7 @@ Keep OG simple in v1:
 
 ### Phase 1: scaffold SvelteKit app
 - create SvelteKit app
-- add Netlify adapter
+- add Cloudflare adapter for Cloudflare Pages
 - set up routes and env/config
 
 ### Phase 2: implement standards.site read layer
@@ -588,7 +588,7 @@ Keep OG simple in v1:
 - redirects for slug differences
 
 ### Phase 6: cutover
-- switch deployment on Netlify
+- switch deployment on Cloudflare Pages
 - remove Eleventy build/runtime path
 - verify URLs/feed/admin flows
 
@@ -616,7 +616,7 @@ Mitigation:
 Mitigation:
 - importer manifest and redirect map
 
-### Risk 6: Netlify runtime tradeoffs
+### Risk 6: Cloudflare runtime tradeoffs
 Mitigation:
 - keep server-side state simple and rely on CDN TTLs rather than durable cache in v1
 
@@ -713,7 +713,7 @@ static/
 
 ### Deployment
 - env vars configured
-- Netlify adapter works
+- Cloudflare adapter works
 - redirects configured if needed
 
 ---
@@ -722,7 +722,7 @@ static/
 
 1. Define custom draft + markdown content lexicons
 2. Create publication record shape
-3. Scaffold SvelteKit + Netlify adapter
+3. Scaffold SvelteKit + Cloudflare adapter
 4. Implement publication/document read path
 5. Implement markdown rendering + plaintext extraction
 6. Prototype OAuth login

@@ -1,12 +1,12 @@
 # ATProto Migration Status
 
-Last updated: 2026-04-21
+Last updated: 2026-04-22
 
 ## Current status
 
-We have completed the initial migration foundation for the blog, have working authenticated ATProto draft CRUD in the admin, and now have an initial publish flow from draft -> `site.standard.document`.
+We have completed the initial migration foundation for the blog, have working authenticated ATProto draft CRUD in the admin, and now have working published post editing/deletion in the admin in addition to the initial draft -> `site.standard.document` publish flow.
 
-The project is now in a good state to begin implementing published post editing/deletion and polish around the publish workflow.
+The next major milestone is now blob upload support, with production auth/session durability partially addressed by moving OAuth state/session storage off in-memory and switching the lightweight web session to a signed cookie.
 
 ---
 
@@ -14,7 +14,7 @@ The project is now in a good state to begin implementing published post editing/
 
 ### 1. SvelteKit migration scaffold
 - SvelteKit app added at repo root
-- Netlify adapter configured
+- Cloudflare adapter configured for Cloudflare Pages
 - Vite/TypeScript/Svelte config added
 - Eleventy commands preserved as `legacy:*` scripts
 
@@ -181,6 +181,13 @@ Key files:
 - duplicate path publish is blocked if `/blog/${slug}` already exists
 - draft is retained after publish and stores `sourceDocumentRkey`
 
+### Published post editing/deletion
+- `/admin/edit/post/[rkey]` loads real `site.standard.document` records
+- published posts can be edited in place
+- path collisions are blocked when changing a post path
+- published posts can be hard deleted
+- linked drafts are unlinked on delete by clearing `sourceDocumentRkey`
+
 ### Bootstrap
 - publication bootstrap works
 - duplicate prevention now checks by publication `url`
@@ -199,34 +206,33 @@ Key files:
 ## What still needs to be built next
 
 ## Priority 1: Edit/delete published posts
-Implement `/admin/edit/post/[rkey]` properly.
+Completed.
 
-Actions:
-- load published document
-- edit title/path/description/tags/markdown/publishedAt
-- update existing record in place
-- hard delete post
-- invalidate public caches
+Implemented `/admin/edit/post/[rkey]` with:
+- published document loading
+- editing title/path/description/tags/markdown/publishedAt
+- in-place `site.standard.document` updates
+- hard delete for published posts
+- public document cache invalidation after updates/deletes
+- linked draft discovery in the admin UI
+- draft unlinking on published post delete so a retained draft can be republished later
 
 ---
 
 ## Priority 2: Durable auth/session storage
-This is the biggest remaining infrastructure caveat.
+Partially completed.
 
-Current auth storage is in-memory:
-- OAuth state store
-- OAuth session store
-- web session store
+Implemented:
+- durable key/value backing for OAuth state/session storage via Upstash Redis when configured
+- signed cookie web session so the lightweight browser session no longer depends on an in-memory server map
+- local in-memory fallback when Upstash env vars are not configured
 
-That is fine for local development but not production-safe on Netlify/serverless.
-
-We need durable storage for production, such as:
-- Redis / Upstash
-- database-backed session/state store
-- another Netlify-compatible persistent store
+Current caveat:
+- production still needs `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` configured to avoid falling back to in-memory OAuth storage
+- `SESSION_COOKIE_SECRET` should be set in production for signed cookie integrity
 
 ### Important
-Do this before depending on admin auth in production.
+Before relying on admin auth in production, ensure the Upstash env vars are configured in Cloudflare Pages.
 
 ---
 
@@ -273,8 +279,8 @@ After core content authoring is stable:
 
 ## Known caveats right now
 
-### 1. Auth/session persistence is not production-ready
-All auth/session state is in-memory.
+### 1. OAuth durability still depends on env configuration
+OAuth state/session storage now supports Upstash Redis, but if the Upstash env vars are missing the app falls back to in-memory storage.
 
 ### 2. `/client-metadata.json` is not used in local OAuth mode
 For local dev we now rely on localhost-development client-id behavior, not fetched metadata.
@@ -283,22 +289,22 @@ That is expected.
 ### 3. Public content depends on real ATProto records existing
 If there are no matching `site.standard.document` records for the configured publication, public pages render but are empty.
 
-### 4. No ATProto write layer yet for published posts
-Draft writes now exist, but published post create/update/delete still need to be implemented.
+### 4. Production auth still needs env wiring
+Published post writes exist, signed cookie web sessions exist, and OAuth state/session storage supports Upstash, but production still needs the required secrets/env vars configured.
 
 ---
 
 ## Recommended immediate next implementation
 
-Build **published post editing/deletion** next.
+Finish **production auth env wiring and validation** next.
 
 Concrete tasks:
-1. load published post on `/admin/edit/post/[rkey]`
-2. edit title/path/description/tags/markdown/publishedAt
-3. update the existing `site.standard.document` record in place
-4. hard delete published posts
-5. invalidate document caches after updates/deletes
-6. decide how draft `sourceDocumentRkey` should interact with post edits
+1. configure `UPSTASH_REDIS_REST_URL` in Cloudflare Pages
+2. configure `UPSTASH_REDIS_REST_TOKEN` in Cloudflare Pages
+3. configure `SESSION_COOKIE_SECRET` in Cloudflare Pages
+4. verify login/logout/admin access across cold starts and deploys
+5. document local-vs-production auth storage behavior
+6. confirm OAuth session restore works after deploy/server restart
 
 ---
 
@@ -321,8 +327,8 @@ Concrete tasks:
 - [x] publish draft
 - [x] published draft appears on `/blog`
 - [x] published post page loads at `/blog/[slug]`
-- [ ] edit published post
-- [ ] delete published post
+- [x] edit published post
+- [x] delete published post
 
 ---
 
@@ -330,5 +336,5 @@ Concrete tasks:
 
 We are past scaffolding and bootstrap/auth setup.
 
-The next real feature milestone is:
-**editing and deleting published posts**, followed by **durable auth/session storage for production**.
+The next real feature milestone is now:
+**blob upload support**, with a short production-readiness pass to finish auth env wiring and verification.

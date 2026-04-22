@@ -5,9 +5,10 @@ import {
   type NodeSavedState
 } from '@atproto/oauth-client-node';
 import { DRAFT_COLLECTION_NSID, getSiteUrl } from '$lib/config';
+import { getKeyValueStore } from '$lib/server/kv';
 
-const stateStoreMap = new Map<string, NodeSavedState>();
-const sessionStoreMap = new Map<string, NodeSavedSession>();
+const OAUTH_STATE_TTL_SECONDS = 10 * 60;
+const OAUTH_SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
 
 type OAuthState = {
   redirectTo?: string;
@@ -15,25 +16,29 @@ type OAuthState = {
 
 const stateStore = {
   async set(key: string, value: NodeSavedState) {
-    stateStoreMap.set(key, value);
+    await getKeyValueStore().set(`oauth:state:${key}`, value, {
+      ttlSeconds: OAUTH_STATE_TTL_SECONDS
+    });
   },
   async get(key: string) {
-    return stateStoreMap.get(key);
+    return getKeyValueStore().get<NodeSavedState>(`oauth:state:${key}`);
   },
   async del(key: string) {
-    stateStoreMap.delete(key);
+    await getKeyValueStore().del(`oauth:state:${key}`);
   }
 };
 
 const sessionStore = {
   async set(key: string, value: NodeSavedSession) {
-    sessionStoreMap.set(key, value);
+    await getKeyValueStore().set(`oauth:session:${key}`, value, {
+      ttlSeconds: OAUTH_SESSION_TTL_SECONDS
+    });
   },
   async get(key: string) {
-    return sessionStoreMap.get(key);
+    return getKeyValueStore().get<NodeSavedSession>(`oauth:session:${key}`);
   },
   async del(key: string) {
-    sessionStoreMap.delete(key);
+    await getKeyValueStore().del(`oauth:session:${key}`);
   }
 };
 

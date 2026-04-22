@@ -32,7 +32,7 @@
     "@11ty/eleventy-plugin-bundle": "^1.0.4",
     "@11ty/eleventy-plugin-rss": "^1.2.0",
     "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
-    "@sveltejs/adapter-netlify": "^5.0.0",
+    "@sveltejs/adapter-cloudflare": "^7.2.3",
     "@sveltejs/kit": "^2.18.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@types/node": "^22.15.3",
@@ -46,6 +46,7 @@
   "dependencies": {
     "@atproto/api": "^0.19.9",
     "@atproto/oauth-client-node": "^0.3.17",
+    "@upstash/redis": "^1.37.0",
     "glob": "^11.0.3",
     "gray-matter": "^4.0.3",
     "marked": "^15.0.12",

@@ -7,7 +7,7 @@ This document turns the migration plan into an implementation-ready spec for a S
 It is intentionally v1-scoped:
 - single author
 - markdown-first editing
-- Netlify deployment
+- Cloudflare Pages deployment
 - simple OG handling
 - minimal admin
 - no comments
@@ -859,7 +859,7 @@ scripts/
 
 1. Define local TS/Zod schemas for `site.standard.publication` and `site.standard.document`
 2. Define custom lexicons for `dev.disnet.blog.draft` and `dev.disnet.blog.content.markdown`
-3. Scaffold SvelteKit app with Netlify adapter
+3. Scaffold SvelteKit app with Cloudflare adapter for Cloudflare Pages
 4. Implement publication/document read path and verification endpoint/tag
 5. Add markdown rendering and plaintext extraction
 6. Add OAuth authentication and DID authorization

@@ -130,10 +130,17 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
   return post;
 }
 
-export async function publishedPathExists(path: string) {
+export async function getPublishedDocument(rkey: string): Promise<StoredDocument | null> {
+  const documents = await listDocumentRecords();
+  return documents.find((document) => document.rkey === rkey) ?? null;
+}
+
+export async function publishedPathExists(path: string, options?: { excludeRkey?: string }) {
   const documents = await listDocumentRecords();
   const normalizedPath = normalizePath(path);
-  return documents.some((document) => document.record.path === normalizedPath);
+  return documents.some(
+    (document) => document.record.path === normalizedPath && document.rkey !== options?.excludeRkey
+  );
 }
 
 export async function createPublishedDocument(did: string, record: PublishedDocument) {
@@ -159,4 +166,43 @@ export async function createPublishedDocument(did: string, record: PublishedDocu
 
   invalidateDocumentCaches(normalizedPath);
   return response.data;
+}
+
+export async function updatePublishedDocument(did: string, rkey: string, record: PublishedDocument) {
+  const publication = await getPublication();
+
+  if (!publication.uri) {
+    throw new Error('PUBLICATION_AT_URI is not configured');
+  }
+
+  const normalizedPath = normalizePath(record.path ?? '/');
+  const agent = await restoreOAuthAgent(did);
+  const response = await agent.com.atproto.repo.putRecord({
+    repo: did,
+    collection: 'site.standard.document',
+    rkey,
+    validate: false,
+    record: {
+      ...record,
+      $type: 'site.standard.document',
+      site: publication.uri,
+      path: normalizedPath
+    }
+  });
+
+  invalidateDocumentCaches(normalizedPath);
+  return response.data;
+}
+
+export async function deletePublishedDocument(did: string, rkey: string) {
+  const existing = await getPublishedDocument(rkey);
+  const agent = await restoreOAuthAgent(did);
+
+  await agent.com.atproto.repo.deleteRecord({
+    repo: did,
+    collection: 'site.standard.document',
+    rkey
+  });
+
+  invalidateDocumentCaches(existing?.record.path);
 }

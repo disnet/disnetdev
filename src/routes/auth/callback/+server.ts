@@ -11,6 +11,6 @@ export async function GET({ url, cookies }) {
     throw redirect(303, '/auth/login?error=unauthorized');
   }
 
-  createWebSession(cookies, result.did);
+  await createWebSession(cookies, result.did);
   throw redirect(303, result.state.redirectTo || '/admin');
 }
