@@ -21,6 +21,11 @@
       match: (p: string) => p.startsWith('/reading')
     },
     {
+      href: '/library',
+      label: 'library',
+      match: (p: string) => p.startsWith('/library')
+    },
+    {
       href: '/papers',
       label: 'papers',
       match: (p: string) => p.startsWith('/papers')

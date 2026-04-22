@@ -65,6 +65,65 @@ export const shareRecordSchema = z.object({
     .optional()
 });
 
+const strongRefSchema = z.object({
+  uri: z.string(),
+  cid: z.string()
+});
+
+export const cardUrlContentSchema = z.object({
+  $type: z.literal('network.cosmik.card#urlContent').optional(),
+  url: z.string().url().max(2048),
+  metadata: z
+    .object({
+      title: z.string().max(512).optional(),
+      description: z.string().max(2000).optional(),
+      author: z.string().max(256).optional(),
+      publishedDate: z.string().datetime().optional(),
+      siteName: z.string().max(256).optional(),
+      imageUrl: z.string().url().max(2048).optional(),
+      type: z.string().max(64).optional(),
+      retrievedAt: z.string().datetime().optional(),
+      doi: z.string().max(256).optional(),
+      isbn: z.string().max(32).optional()
+    })
+    .optional()
+});
+
+export const cardNoteContentSchema = z.object({
+  $type: z.literal('network.cosmik.card#noteContent').optional(),
+  text: z.string().max(10000)
+});
+
+export const cardRecordSchema = z.object({
+  $type: z.literal('network.cosmik.card').optional(),
+  type: z.enum(['URL', 'NOTE']),
+  content: z.union([cardUrlContentSchema, cardNoteContentSchema]),
+  url: z.string().url().max(2048).optional(),
+  parentCard: strongRefSchema.optional(),
+  originalCard: strongRefSchema.optional(),
+  createdAt: z.string().datetime().optional()
+});
+
+export const collectionRecordSchema = z.object({
+  $type: z.literal('network.cosmik.collection').optional(),
+  name: z.string().min(1).max(100),
+  description: z.string().max(500).optional(),
+  accessType: z.enum(['OPEN', 'CLOSED']),
+  collaborators: z.array(z.string()).optional(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional()
+});
+
+export const collectionLinkRecordSchema = z.object({
+  $type: z.literal('network.cosmik.collectionLink').optional(),
+  collection: strongRefSchema,
+  card: strongRefSchema,
+  originalCard: strongRefSchema.optional(),
+  addedBy: z.string(),
+  addedAt: z.string().datetime(),
+  createdAt: z.string().datetime().optional()
+});
+
 export const draftRecordSchema = z.object({
   $type: z.literal(DRAFT_COLLECTION_NSID),
   title: z.string().min(1),
@@ -92,3 +151,6 @@ export type PublishedDocument = z.infer<typeof publishedDocumentSchema>;
 export type DraftRecord = z.infer<typeof draftRecordSchema>;
 export type MarkdownContent = z.infer<typeof markdownContentSchema>;
 export type ShareRecord = z.infer<typeof shareRecordSchema>;
+export type CardRecord = z.infer<typeof cardRecordSchema>;
+export type CollectionRecord = z.infer<typeof collectionRecordSchema>;
+export type CollectionLinkRecord = z.infer<typeof collectionLinkRecordSchema>;

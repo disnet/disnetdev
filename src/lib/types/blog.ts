@@ -83,6 +83,30 @@ export type ShareSummary = {
   createdAt: string;
 };
 
+export type CardSummary = {
+  rkey: string;
+  uri: string;
+  url: string;
+  title?: string;
+  description?: string;
+  author?: string;
+  siteName?: string;
+  publishedDate?: string;
+  createdAt: string;
+  collectionRkeys: string[];
+};
+
+export type CollectionSummary = {
+  rkey: string;
+  uri: string;
+  name: string;
+  description?: string;
+  accessType: 'OPEN' | 'CLOSED';
+  cardCount: number;
+  updatedAt?: string;
+  createdAt?: string;
+};
+
 export type PostPageData = {
   uri: string;
   rkey: string;

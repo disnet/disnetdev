@@ -86,6 +86,8 @@
     const hasMorePosts = $derived(data.posts.length > 3);
     const recentShares = $derived(data.shares);
     const hasMoreShares = $derived(data.sharesTotal > data.shares.length);
+    const recentCards = $derived(data.cards);
+    const hasMoreCards = $derived(data.cardsTotal > data.cards.length);
 
     function hostOf(url: string) {
         try {
@@ -235,6 +237,43 @@
                                 >
                             </p>
                         {/if}
+                    </div>
+                </li>
+            {/each}
+        </ol>
+    </section>
+{/if}
+
+{#if recentCards.length > 0}
+    <section aria-labelledby="filed-heading" class="band">
+        <header class="band-header">
+            <h2 id="filed-heading" class="band-title">
+                Recently filed in the <a href="/library">library</a>
+            </h2>
+            {#if hasMoreCards}
+                <a href="/library" class="read-more">all cards</a>
+            {/if}
+        </header>
+
+        <ol class="filed">
+            {#each recentCards as card}
+                <li class="filed-item">
+                    <span class="filed-mark" aria-hidden="true">◆</span>
+                    <div class="filed-body">
+                        <h3 class="filed-title">
+                            <a href={card.url} rel="noopener">
+                                {card.title || card.url}
+                            </a>
+                        </h3>
+                        <p class="filed-meta">
+                            <span class="filed-meta-host">
+                                {card.siteName || hostOf(card.url)}
+                            </span>
+                            {#if card.author}
+                                <span class="filed-meta-sep">·</span>
+                                <span class="filed-meta-author">{card.author}</span>
+                            {/if}
+                        </p>
                     </div>
                 </li>
             {/each}
@@ -578,5 +617,81 @@
         flex-wrap: wrap;
         align-items: baseline;
         gap: 0.5ch;
+    }
+
+    /* ——— filed (recently filed library cards) ——— */
+    .filed {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-width: var(--measure-wide);
+    }
+
+    .filed-item {
+        display: grid;
+        grid-template-columns: 1.5ch 1fr;
+        column-gap: var(--space-sm);
+        padding: var(--space-sm) 0;
+        border-top: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .filed-item:last-child {
+        border-bottom: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .filed-mark {
+        color: var(--ink-accent);
+        font-size: 0.7em;
+        padding-top: 0.75em;
+        line-height: 1;
+        user-select: none;
+    }
+
+    .filed-body {
+        display: grid;
+        gap: var(--space-3xs);
+        max-width: var(--measure);
+        min-width: 0;
+    }
+
+    .filed-title {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: var(--type-lg);
+        line-height: 1.3;
+        letter-spacing: -0.005em;
+        margin: 0;
+    }
+
+    .filed-title a {
+        color: var(--ink-text);
+        text-decoration: none;
+        overflow-wrap: anywhere;
+    }
+
+    .filed-title a:hover,
+    .filed-title a:focus-visible {
+        color: var(--ink-accent-hover);
+    }
+
+    .filed-meta {
+        font-family: var(--font-mono);
+        font-size: var(--type-xs);
+        color: var(--ink-muted);
+        letter-spacing: 0.04em;
+        margin: 0;
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.5ch;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .filed-meta-sep {
+        color: var(--ink-rule);
+    }
+
+    .filed-meta-author {
+        color: var(--ink-text-soft);
     }
 </style>
