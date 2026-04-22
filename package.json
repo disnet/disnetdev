@@ -41,6 +41,7 @@
   "dependencies": {
     "@atproto/api": "^0.19.9",
     "@atproto/oauth-client-node": "^0.3.17",
+    "@atproto-labs/handle-resolver": "^0.3.6",
     "glob": "^11.0.3",
     "gray-matter": "^4.0.3",
     "marked": "^15.0.12",

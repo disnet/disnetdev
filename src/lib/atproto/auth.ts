@@ -4,6 +4,7 @@ import {
   type NodeSavedSession,
   type NodeSavedState
 } from '@atproto/oauth-client-node';
+import { AtprotoDohHandleResolver } from '@atproto-labs/handle-resolver';
 import { DRAFT_COLLECTION_NSID, getSiteUrl } from '$lib/config';
 import { getKeyValueStore } from '$lib/server/kv';
 
@@ -83,6 +84,9 @@ function createClient() {
       token_endpoint_auth_method: 'none',
       dpop_bound_access_tokens: true
     },
+    handleResolver: new AtprotoDohHandleResolver({
+      dohEndpoint: 'https://cloudflare-dns.com/dns-query'
+    }),
     stateStore,
     sessionStore
   });
