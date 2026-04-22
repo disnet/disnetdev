@@ -1,3 +1,5 @@
+/// <reference types="@cloudflare/workers-types" />
+
 declare global {
   namespace App {
     interface Locals {
@@ -5,6 +7,12 @@ declare global {
         did: string;
         isAuthor: boolean;
       } | null;
+    }
+
+    interface Platform {
+      env?: {
+        KV?: KVNamespace;
+      };
     }
   }
 }

@@ -1,6 +1,5 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { dev } from '$app/environment';
-import { env } from '$env/dynamic/private';
-import { Redis } from '@upstash/redis';
 
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 
@@ -8,6 +7,19 @@ export interface KeyValueStore {
   get<T>(key: string): Promise<T | undefined>;
   set<T>(key: string, value: T, options?: { ttlSeconds?: number }): Promise<void>;
   del(key: string): Promise<void>;
+}
+
+// Cloudflare KV enforces a 60s minimum on expirationTtl.
+const KV_MIN_TTL_SECONDS = 60;
+
+const platformStorage = new AsyncLocalStorage<App.Platform | undefined>();
+
+export function runWithPlatform<T>(platform: App.Platform | undefined, fn: () => T): T {
+  return platformStorage.run(platform, fn);
+}
+
+function getPlatform(): App.Platform | undefined {
+  return platformStorage.getStore();
 }
 
 const memoryStore = new Map<string, { value: string; expiresAt?: number }>();
@@ -40,55 +52,44 @@ const inMemoryKeyValueStore: KeyValueStore = {
   }
 };
 
-let store: KeyValueStore | undefined;
-
-function createUpstashStore(): KeyValueStore | null {
-  const url = env.UPSTASH_REDIS_REST_URL;
-  const token = env.UPSTASH_REDIS_REST_TOKEN;
-
-  if (!url || !token) {
-    return null;
-  }
-
-  const redis = new Redis({ url, token });
-
+function createCloudflareKvStore(kv: KVNamespace): KeyValueStore {
   return {
     async get<T>(key: string) {
-      const value = await redis.get<string>(key);
-      if (!value) return undefined;
-      return JSON.parse(value) as T;
+      const value = await kv.get(key, { type: 'json' });
+      return (value as T | null) ?? undefined;
     },
 
     async set<T>(key: string, value: T, options?: { ttlSeconds?: number }) {
+      const serialized = JSON.stringify(value);
       if (options?.ttlSeconds) {
-        await redis.set(key, JSON.stringify(value), { ex: options.ttlSeconds });
+        const expirationTtl = Math.max(options.ttlSeconds, KV_MIN_TTL_SECONDS);
+        await kv.put(key, serialized, { expirationTtl });
         return;
       }
-
-      await redis.set(key, JSON.stringify(value));
+      await kv.put(key, serialized);
     },
 
     async del(key: string) {
-      await redis.del(key);
+      await kv.delete(key);
     }
   };
 }
 
+let warnedAboutFallback = false;
+
 export function getKeyValueStore(): KeyValueStore {
-  if (store) return store;
+  const kv = getPlatform()?.env?.KV;
 
-  const upstashStore = createUpstashStore();
-  store = upstashStore ?? undefined;
-
-  if (!store) {
-    if (!dev) {
-      console.warn(
-        'UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN not configured; falling back to in-memory key-value storage.'
-      );
-    }
-
-    store = inMemoryKeyValueStore;
+  if (kv) {
+    return createCloudflareKvStore(kv);
   }
 
-  return store;
+  if (!dev && !warnedAboutFallback) {
+    warnedAboutFallback = true;
+    console.warn(
+      'Cloudflare KV binding "KV" is not available on event.platform.env; falling back to in-memory key-value storage.'
+    );
+  }
+
+  return inMemoryKeyValueStore;
 }

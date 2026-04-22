@@ -223,16 +223,22 @@ Implemented `/admin/edit/post/[rkey]` with:
 Partially completed.
 
 Implemented:
-- durable key/value backing for OAuth state/session storage via Upstash Redis when configured
+- durable key/value backing for OAuth state/session storage via a Cloudflare KV binding (`KV`)
 - signed cookie web session so the lightweight browser session no longer depends on an in-memory server map
-- local in-memory fallback when Upstash env vars are not configured
+- local in-memory fallback when the KV binding is not present (dev/local)
+- request-scoped access to `event.platform.env` via AsyncLocalStorage so module-level OAuth client stores can reach the binding
 
 Current caveat:
-- production still needs `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` configured to avoid falling back to in-memory OAuth storage
+- production needs a Cloudflare KV namespace bound as `KV` on the Pages project to avoid falling back to in-memory OAuth storage
 - `SESSION_COOKIE_SECRET` should be set in production for signed cookie integrity
+- KV is eventually consistent across POPs (propagation up to ~60s); realistic worst case is an occasional forced re-login if a token-refresh write hasn't propagated to the POP serving the next request
 
 ### Important
-Before relying on admin auth in production, ensure the Upstash env vars are configured in Cloudflare Pages.
+Before relying on admin auth in production:
+1. create a KV namespace in Cloudflare
+2. bind it as `KV` on the Pages project (Settings → Functions → KV namespace bindings)
+3. set `SESSION_COOKIE_SECRET`
+4. ensure the Pages project uses a compatibility date / flags that include `nodejs_compat` so `node:async_hooks` (`AsyncLocalStorage`) is available
 
 ---
 
@@ -277,10 +283,28 @@ After core content authoring is stable:
 
 ---
 
+## Future: upgrade OAuth to a confidential client
+Currently the OAuth client is public (`token_endpoint_auth_method: 'none'`) with DPoP-bound access tokens. Acceptable for a single-author admin today, but worth upgrading later for stronger token-exchange protections and broader scope compatibility on PDSes that gate features on confidential clients.
+
+Pieces required:
+- generate a signing key (ES256 recommended), store private JWK as a secret (e.g. `OAUTH_PRIVATE_JWK`)
+- add a `/jwks.json` route that serves the public JWK set
+- update client metadata to set `token_endpoint_auth_method: 'private_key_jwt'` and `jwks_uri: ${siteUrl}/jwks.json`
+- pass a `keyset` into `NodeOAuthClient({ keyset, clientMetadata, ... })` built from the private JWK
+- keep DPoP on
+- rotate existing sessions on cutover (old public-client sessions stored in KV will not authenticate under the new method)
+
+Key files to touch:
+- `src/lib/atproto/auth.ts`
+- `src/routes/client-metadata.json/+server.ts`
+- new `src/routes/jwks.json/+server.ts`
+
+---
+
 ## Known caveats right now
 
-### 1. OAuth durability still depends on env configuration
-OAuth state/session storage now supports Upstash Redis, but if the Upstash env vars are missing the app falls back to in-memory storage.
+### 1. OAuth durability still depends on the KV binding
+OAuth state/session storage uses a Cloudflare KV binding named `KV`; if the binding is missing from `event.platform.env` the app falls back to in-memory storage.
 
 ### 2. `/client-metadata.json` is not used in local OAuth mode
 For local dev we now rely on localhost-development client-id behavior, not fetched metadata.
@@ -290,7 +314,7 @@ That is expected.
 If there are no matching `site.standard.document` records for the configured publication, public pages render but are empty.
 
 ### 4. Production auth still needs env wiring
-Published post writes exist, signed cookie web sessions exist, and OAuth state/session storage supports Upstash, but production still needs the required secrets/env vars configured.
+Published post writes exist, signed cookie web sessions exist, and OAuth state/session storage uses a Cloudflare KV binding, but production still needs the KV namespace bound as `KV`, `SESSION_COOKIE_SECRET` set, and `nodejs_compat` enabled.
 
 ---
 
@@ -299,9 +323,9 @@ Published post writes exist, signed cookie web sessions exist, and OAuth state/s
 Finish **production auth env wiring and validation** next.
 
 Concrete tasks:
-1. configure `UPSTASH_REDIS_REST_URL` in Cloudflare Pages
-2. configure `UPSTASH_REDIS_REST_TOKEN` in Cloudflare Pages
-3. configure `SESSION_COOKIE_SECRET` in Cloudflare Pages
+1. create a Cloudflare KV namespace and bind it as `KV` on the Pages project
+2. configure `SESSION_COOKIE_SECRET` in Cloudflare Pages
+3. ensure `nodejs_compat` is enabled for the Pages project (compatibility flags)
 4. verify login/logout/admin access across cold starts and deploys
 5. document local-vs-production auth storage behavior
 6. confirm OAuth session restore works after deploy/server restart

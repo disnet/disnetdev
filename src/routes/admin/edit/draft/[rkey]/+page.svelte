@@ -1,80 +1,213 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+  import { autogrow } from '$lib/actions/autogrow';
+
   let { data, form } = $props();
 
-  function getValues() {
-    return form?.values ?? data.draft.formValues;
+  const errors = $derived(form?.errors ?? {});
+  const isPublished = $derived(Boolean(data.draft.record.sourceDocumentRkey));
+
+  const initial = untrack(() => form?.values ?? data.draft.formValues);
+  let title = $state<string>(initial.title ?? '');
+  let slug = $state<string>(initial.slug ?? '');
+  let description = $state<string>(initial.description ?? '');
+  let tags = $state<string>(initial.tags ?? '');
+  let markdown = $state<string>(initial.markdown ?? '');
+
+  $effect(() => {
+    if (form?.values) {
+      title = form.values.title;
+      slug = form.values.slug;
+      description = form.values.description ?? '';
+      tags = form.values.tags ?? '';
+      markdown = form.values.markdown ?? '';
+    }
+  });
+
+  const tagList = $derived(
+    tags
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean)
+  );
+
+  const wordCount = $derived(
+    markdown.trim() ? markdown.trim().split(/\s+/).length : 0
+  );
+
+  let armedDiscard = $state(false);
+  let armedTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function onDiscard(event: Event) {
+    if (!armedDiscard) {
+      event.preventDefault();
+      armedDiscard = true;
+      clearTimeout(armedTimer);
+      armedTimer = setTimeout(() => (armedDiscard = false), 4000);
+    }
   }
 </script>
 
-<h1>Edit draft</h1>
-<p><code>{data.draft.uri}</code></p>
+<a href="/admin" class="editor-crumb">
+  <span class="editor-crumb-arrow">←</span>
+  <span>back to the desk</span>
+</a>
 
-{#if data.draft.record.sourceDocumentRkey}
-  <p>
-    Published as
-    <a href={`/blog/${data.draft.record.slug}`}>/blog/{data.draft.record.slug}</a>
-    (<code>{data.draft.record.sourceDocumentRkey}</code>)
+<header>
+  <p class="editor-status">
+    {#if isPublished}
+      <span class="eyebrow eyebrow--accent">
+        <span class="editor-status-dot editor-status-dot--pub"></span>
+        Published draft
+      </span>
+    {:else}
+      <span class="eyebrow">
+        <span class="editor-status-dot editor-status-dot--motion"></span>
+        In motion
+      </span>
+    {/if}
   </p>
-{/if}
 
-{#if form?.success}
-  <p>{form.message}</p>
-  {#if form.publishedUrl}
-    <p><a href={form.publishedUrl}>View published post</a></p>
-  {/if}
-{/if}
-
-<form method="POST" action="?/save">
-  <label>
-    Title
-    <input name="title" type="text" value={getValues().title} required />
-  </label>
-  {#if form?.errors?.title}
-    <p>{form.errors.title}</p>
+  {#if isPublished}
+    <p class="editor-crosslink">
+      Lives at
+      <a href={`/blog/${data.draft.record.slug}`} class="editor-crosslink-target">
+        /blog/{data.draft.record.slug}
+      </a>.
+      Further edits here don't change the published copy.
+    </p>
   {/if}
 
-  <label>
-    Slug
-    <input name="slug" type="text" value={getValues().slug} required />
-  </label>
-  {#if form?.errors?.slug}
-    <p>{form.errors.slug}</p>
+  {#if form?.success}
+    <p class="flash" role="status">
+      <span class="flash-mark">saved</span>
+      <span>{form.message}</span>
+      {#if form.publishedUrl}
+        <a href={form.publishedUrl} class="editor-crosslink-target">view</a>
+      {/if}
+    </p>
   {/if}
+</header>
 
-  <label>
-    Description
-    <textarea name="description" rows="3">{getValues().description}</textarea>
-  </label>
-  {#if form?.errors?.description}
-    <p>{form.errors.description}</p>
-  {/if}
+<form method="POST" action="?/save" class="editor-form" autocomplete="off">
+  <div class="editor-title-field">
+    <label for="title" class="editor-title-label">Title</label>
+    <input
+      id="title"
+      name="title"
+      type="text"
+      class="editor-title-input"
+      bind:value={title}
+      placeholder="Give it a name…"
+      required
+    />
+    {#if errors.title}
+      <p class="field-error">{errors.title}</p>
+    {/if}
+  </div>
 
-  <label>
-    Tags
-    <input name="tags" type="text" value={getValues().tags} />
-  </label>
-  <p>Comma-separated.</p>
-  {#if form?.errors?.tags}
-    <p>{form.errors.tags}</p>
-  {/if}
+  <div class="editor-meta-grid">
+    <div class="editor-meta-field">
+      <label for="slug" class="editor-meta-label">slug</label>
+      <input
+        id="slug"
+        name="slug"
+        type="text"
+        class="editor-meta-input"
+        bind:value={slug}
+        required
+      />
+      <p class="editor-meta-help">/blog/{slug || '…'}</p>
+      {#if errors.slug}
+        <p class="field-error">{errors.slug}</p>
+      {/if}
+    </div>
 
-  <label>
-    Markdown
-    <textarea name="markdown" rows="24">{getValues().markdown}</textarea>
-  </label>
-  {#if form?.errors?.markdown}
-    <p>{form.errors.markdown}</p>
-  {/if}
+    <div class="editor-meta-field">
+      <label for="tags" class="editor-meta-label">tags</label>
+      <input
+        id="tags"
+        name="tags"
+        type="text"
+        class="editor-meta-input"
+        bind:value={tags}
+        placeholder="essays, notes, quiet tools"
+      />
+      <div class="editor-tags-preview" aria-live="polite">
+        {#each tagList as tag (tag)}
+          <span class="tag">{tag}</span>
+        {/each}
+      </div>
+      {#if errors.tags}
+        <p class="field-error">{errors.tags}</p>
+      {/if}
+    </div>
+  </div>
 
-  <button type="submit">Save draft</button>
+  <div>
+    <label for="description" class="editor-meta-label" style="margin-bottom: var(--s-2); display: block;">
+      subtitle
+    </label>
+    <textarea
+      id="description"
+      name="description"
+      class="editor-description-input"
+      rows="2"
+      bind:value={description}
+      placeholder="A line to set the scene. Optional."
+      use:autogrow
+    ></textarea>
+    {#if errors.description}
+      <p class="field-error">{errors.description}</p>
+    {/if}
+  </div>
+
+  <div class="editor-body-wrap">
+    <div class="editor-body-label">
+      <label for="markdown">
+        <span>the writing</span>
+      </label>
+      <span class="editor-body-stats">
+        {wordCount === 1 ? '1 word' : `${wordCount} words`}
+      </span>
+    </div>
+    <textarea
+      id="markdown"
+      name="markdown"
+      class="editor-body-textarea"
+      bind:value={markdown}
+      use:autogrow
+      spellcheck="true"
+    ></textarea>
+    {#if errors.markdown}
+      <p class="field-error">{errors.markdown}</p>
+    {/if}
+  </div>
+
+  <footer class="editor-foot">
+    <div class="editor-foot-primary">
+      <button type="submit" class="action action--primary">Save draft</button>
+      <button
+        type="submit"
+        formaction="?/publish"
+        class="action action--publish"
+        disabled={isPublished}
+        title={isPublished ? 'This draft has already been published' : 'Publish this draft to your PDS'}
+      >
+        {isPublished ? 'already published' : 'Publish →'}
+      </button>
+    </div>
+
+    <div class="editor-foot-end">
+      <button
+        type="submit"
+        formaction="?/delete"
+        class="action--discard"
+        class:action--discard--armed={armedDiscard}
+        onclick={onDiscard}
+      >
+        {armedDiscard ? 'really discard?' : 'discard draft'}
+      </button>
+    </div>
+  </footer>
 </form>
-
-<form method="POST" action="?/publish">
-  <button type="submit" disabled={Boolean(data.draft.record.sourceDocumentRkey)}>Publish draft</button>
-</form>
-
-<form method="POST" action="?/delete">
-  <button type="submit">Delete draft</button>
-</form>
-
-<p><a href="/admin">Back to admin</a></p>
