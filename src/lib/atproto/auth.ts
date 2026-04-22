@@ -45,9 +45,28 @@ const sessionStore = {
 
 let client: NodeOAuthClient | undefined;
 
-// Cloudflare Workers rejects `redirect: 'error'` at runtime; upstream
-// @atproto resolvers pass it to fail-closed on redirects. Rewrite to
-// 'manual' and surface a redirect status as an error.
+// Cloudflare Workers rejects `redirect: 'error'` in both the Request
+// constructor and fetch init. Upstream @atproto-labs resolvers pass it
+// to fail-closed on redirects (via bindFetch, which wraps arguments in
+// `new Request(...)` before our fetch ever runs). Patch globalThis.Request
+// to substitute 'manual' so construction succeeds. plc.directory and the
+// well-known endpoints don't redirect in normal operation.
+type ShimMarker = { __disnetdevRedirectShim?: boolean };
+if (!(globalThis.Request as unknown as ShimMarker).__disnetdevRedirectShim) {
+  const Original = globalThis.Request;
+  class PatchedRequest extends Original {
+    constructor(input: RequestInfo | URL, init?: RequestInit) {
+      if (init?.redirect === 'error') {
+        super(input, { ...init, redirect: 'manual' });
+      } else {
+        super(input, init);
+      }
+    }
+  }
+  (PatchedRequest as unknown as ShimMarker).__disnetdevRedirectShim = true;
+  globalThis.Request = PatchedRequest;
+}
+
 const workerFetch: typeof globalThis.fetch = async (input, init) => {
   if (init?.redirect === 'error') {
     const res = await globalThis.fetch(input, { ...init, redirect: 'manual' });
