@@ -69,6 +69,16 @@
 
     const recentPosts = $derived(data.posts.slice(0, 3));
     const hasMorePosts = $derived(data.posts.length > 3);
+    const recentShares = $derived(data.shares);
+    const hasMoreShares = $derived(data.sharesTotal > data.shares.length);
+
+    function hostOf(url: string) {
+        try {
+            return new URL(url).hostname.replace(/^www\./, "");
+        } catch {
+            return url;
+        }
+    }
 </script>
 
 <svelte:head>
@@ -146,6 +156,66 @@
         </ol>
     {/if}
 </section>
+
+{#if recentShares.length > 0}
+    <section aria-labelledby="shared-heading" class="band">
+        <header class="band-header">
+            <h2 id="shared-heading" class="band-title">
+                Recently shared via <a href="https://skyreader.app">Skyreader</a>
+            </h2>
+            {#if hasMoreShares}
+                <a href="/reading" class="read-more">all shares</a>
+            {/if}
+        </header>
+
+        <ol class="shares">
+            {#each recentShares as share}
+                <li class="share">
+                    <span class="share-date">
+                        {new Date(share.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                        })}
+                    </span>
+                    <div class="share-body">
+                        {#if share.note}
+                            <p class="share-note">{share.note}</p>
+                            <p class="share-cite">
+                                <span class="share-cite-glyph" aria-hidden="true">▸</span>
+                                <a class="share-cite-link" href={share.itemUrl} rel="noopener">
+                                    {share.itemTitle || share.itemUrl}
+                                </a>
+                                {#if share.itemAuthor}
+                                    <span class="share-cite-sep">·</span>
+                                    <span class="share-cite-author">{share.itemAuthor}</span>
+                                {:else}
+                                    <span class="share-cite-sep">·</span>
+                                    <span class="share-cite-host">{hostOf(share.itemUrl)}</span>
+                                {/if}
+                            </p>
+                        {:else}
+                            <h3 class="share-title">
+                                <a href={share.itemUrl} rel="noopener">
+                                    {share.itemTitle || share.itemUrl}
+                                </a>
+                            </h3>
+                            {#if share.itemDescription}
+                                <p class="share-desc">{share.itemDescription}</p>
+                            {/if}
+                            <p class="share-meta">
+                                {#if share.itemAuthor}
+                                    <span>{share.itemAuthor}</span>
+                                    <span class="share-cite-sep">·</span>
+                                {/if}
+                                <span class="share-cite-host">{hostOf(share.itemUrl)}</span>
+                            </p>
+                        {/if}
+                    </div>
+                </li>
+            {/each}
+        </ol>
+    </section>
+{/if}
 
 <section aria-labelledby="workshop-heading" class="band">
     <header class="band-header">
@@ -346,5 +416,142 @@
         color: var(--ink-accent);
         font-style: normal;
         margin-right: 0.3ch;
+    }
+
+    /* ——— shares (marginalia band) ——— */
+    .shares {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-width: var(--measure-wide);
+    }
+
+    .share {
+        display: grid;
+        grid-template-columns: 5ch 1fr;
+        column-gap: var(--space-md);
+        padding: var(--space-md) 0;
+        border-top: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .share:last-child {
+        border-bottom: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .share-date {
+        font-family: var(--font-mono);
+        font-size: var(--type-sm);
+        color: var(--ink-muted);
+        letter-spacing: 0.02em;
+        font-variant-numeric: tabular-nums;
+        padding-top: 0.4em;
+        white-space: nowrap;
+    }
+
+    .share-body {
+        display: grid;
+        gap: var(--space-2xs);
+        max-width: var(--measure);
+    }
+
+    .share-note {
+        font-family: var(--font-body);
+        font-size: var(--type-lg);
+        line-height: 1.5;
+        color: var(--ink-text);
+        margin: 0;
+    }
+
+    .share-cite {
+        font-family: var(--font-meta);
+        font-size: var(--type-sm);
+        letter-spacing: 0.04em;
+        color: var(--ink-text-soft);
+        margin: 0;
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.5ch;
+        line-height: 1.5;
+    }
+
+    .share-cite-glyph {
+        color: var(--ink-accent);
+    }
+
+    .share-cite-link {
+        color: var(--ink-text);
+        text-decoration: none;
+        padding-bottom: 1px;
+        border-bottom: 1px dotted var(--ink-rule);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        letter-spacing: 0;
+        font-style: italic;
+        transition:
+            color 120ms ease-out,
+            border-color 120ms ease-out;
+    }
+
+    .share-cite-link:hover,
+    .share-cite-link:focus-visible {
+        color: var(--ink-accent-hover);
+        border-bottom-color: currentColor;
+    }
+
+    .share-cite-sep {
+        color: var(--ink-rule);
+    }
+
+    .share-cite-author {
+        color: var(--ink-text-soft);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        letter-spacing: 0;
+    }
+
+    .share-cite-host {
+        font-family: var(--font-mono);
+        font-size: var(--type-xs);
+        color: var(--ink-muted);
+        letter-spacing: 0.04em;
+    }
+
+    .share-title {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: var(--type-lg);
+        line-height: 1.3;
+        letter-spacing: -0.005em;
+        margin: 0;
+    }
+
+    .share-title a {
+        color: var(--ink-text);
+        text-decoration: none;
+    }
+
+    .share-title a:hover,
+    .share-title a:focus-visible {
+        color: var(--ink-accent-hover);
+    }
+
+    .share-desc {
+        color: var(--ink-text-soft);
+        font-size: 1rem;
+        line-height: 1.55;
+        margin: 0;
+    }
+
+    .share-meta {
+        font-family: var(--font-meta);
+        font-size: var(--type-sm);
+        letter-spacing: 0.04em;
+        color: var(--ink-muted);
+        margin: 0;
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.5ch;
     }
 </style>

@@ -42,6 +42,29 @@ export const publishedDocumentSchema = z.object({
   embeddedBlobs: z.array(blobRefSchema).optional()
 });
 
+export const shareRecordSchema = z.object({
+  $type: z.literal('app.skyreader.social.share').optional(),
+  subscriptionUri: z.string().optional(),
+  feedUrl: z.string().url().max(2048).optional(),
+  itemUrl: z.string().url().max(2048),
+  itemTitle: z.string().max(512).optional(),
+  itemAuthor: z.string().max(256).optional(),
+  itemDescription: z.string().max(1000).optional(),
+  content: z.string().max(100000).optional(),
+  itemImage: z.string().url().max(2048).optional(),
+  itemGuid: z.string().max(512).optional(),
+  itemPublishedAt: z.string().datetime().optional(),
+  note: z.string().max(3000).optional(),
+  tags: z.array(z.string().max(64)).max(5).optional(),
+  createdAt: z.string().datetime(),
+  reshareOf: z
+    .object({
+      uri: z.string(),
+      authorDid: z.string()
+    })
+    .optional()
+});
+
 export const draftRecordSchema = z.object({
   $type: z.literal(DRAFT_COLLECTION_NSID),
   title: z.string().min(1),
@@ -68,3 +91,4 @@ export type PublicationRecord = z.infer<typeof publicationRecordSchema>;
 export type PublishedDocument = z.infer<typeof publishedDocumentSchema>;
 export type DraftRecord = z.infer<typeof draftRecordSchema>;
 export type MarkdownContent = z.infer<typeof markdownContentSchema>;
+export type ShareRecord = z.infer<typeof shareRecordSchema>;

@@ -68,6 +68,21 @@ export type DocumentSummary = {
   publishedAt: string;
 };
 
+export type ShareSummary = {
+  rkey: string;
+  uri: string;
+  itemUrl: string;
+  itemTitle?: string;
+  itemAuthor?: string;
+  itemDescription?: string;
+  itemImage?: string;
+  itemPublishedAt?: string;
+  feedUrl?: string;
+  note?: string;
+  tags?: string[];
+  createdAt: string;
+};
+
 export type PostPageData = {
   uri: string;
   rkey: string;
