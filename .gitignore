@@ -41,9 +41,9 @@ jspm_packages
 # Local env overrides / secrets
 .env.local
 
-# SvelteKit / Netlify build output
+# SvelteKit / Cloudflare build output
 .svelte-kit
-.netlify
+.wrangler
 build
 
 _site

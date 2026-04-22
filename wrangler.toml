@@ -1,0 +1,10 @@
+name = "disnetdev"
+compatibility_date = "2025-11-12"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = ".svelte-kit/cloudflare"
+
+# Bind the KV namespace used for OAuth state/session storage (see src/lib/server/kv.ts).
+# Create the namespace with `wrangler kv namespace create disnetdev-kv` and paste the id here.
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
