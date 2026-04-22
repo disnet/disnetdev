@@ -1,7 +1,6 @@
 ---
 tags:
   - posts
-layout: layouts/post.njk
 date: 2025-01-07
 title: Never Forgive Them
 ---

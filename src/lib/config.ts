@@ -16,7 +16,7 @@ export const PUBLICATION_AT_URI = env.PUBLICATION_AT_URI ?? '';
 export const DRAFT_COLLECTION_NSID = requirePrivateEnv('DRAFT_COLLECTION_NSID');
 export const SITE_NAME = env.SITE_NAME ?? 'disnetdev';
 export const SITE_DESCRIPTION =
-  env.SITE_DESCRIPTION ?? 'Personal site migrating from Eleventy to ATProto-backed SvelteKit.';
+  env.SITE_DESCRIPTION ?? 'Personal site on ATProto-backed SvelteKit.';
 
 export function requirePublicationAtUri() {
   if (!PUBLICATION_AT_URI) {

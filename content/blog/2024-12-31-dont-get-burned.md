@@ -1,7 +1,6 @@
 ---
 tags:
   - posts
-layout: layouts/post.njk
 date: 2024-12-31
 title: Don't Get Burned
 ---

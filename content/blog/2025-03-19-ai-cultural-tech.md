@@ -1,7 +1,6 @@
 ---
 tags:
   - posts
-layout: layouts/post.njk
 date: 2025-03-19
 title: Large AI Models Are Cultural and Social Technologies
 description: Large AI models are cultural and social technologies that are allowing humans to take advantage of information other humans have accumulated.

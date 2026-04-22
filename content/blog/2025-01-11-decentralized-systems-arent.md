@@ -1,7 +1,6 @@
 ---
 tags:
   - posts
-layout: layouts/post.njk
 date: 2025-01-11
 title: Decentralized Systems Aren't
 ---

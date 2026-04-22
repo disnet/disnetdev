@@ -10,14 +10,7 @@
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "bootstrap:publication": "node --env-file=.env scripts/bootstrap-publication.mjs",
-    "import:posts": "node --env-file=.env scripts/import-posts.mjs",
-    "legacy:build": "npx @11ty/eleventy && npm run legacy:generate-og-images",
-    "legacy:build-ghpages": "npx @11ty/eleventy --pathprefix=/eleventy-base-blog/",
-    "legacy:start": "npx @11ty/eleventy --serve --quiet",
-    "legacy:debug": "DEBUG=Eleventy* npx @11ty/eleventy",
-    "legacy:debugstart": "DEBUG=Eleventy* npx @11ty/eleventy --serve --quiet",
-    "legacy:benchmark": "DEBUG=Eleventy:Benchmark* npx @11ty/eleventy",
-    "legacy:generate-og-images": "node scripts/generate-og-images.js"
+    "import:posts": "node --env-file=.env scripts/import-posts.mjs"
   },
   "repository": {
     "type": "git",
@@ -28,11 +21,6 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.0",
-    "@11ty/eleventy-navigation": "^0.3.5",
-    "@11ty/eleventy-plugin-bundle": "^1.0.4",
-    "@11ty/eleventy-plugin-rss": "^1.2.0",
-    "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.0",
     "@fontsource-variable/alegreya": "^5.2.8",
     "@fontsource-variable/literata": "^5.2.8",
     "@fontsource-variable/vollkorn": "^5.2.10",
@@ -45,8 +33,6 @@
     "@sveltejs/kit": "^2.18.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@types/node": "^22.15.3",
-    "luxon": "^3.3.0",
-    "markdown-it-anchor": "^9.2.0",
     "svelte": "^5.28.2",
     "svelte-check": "^4.1.6",
     "typescript": "^5.8.3",
@@ -58,7 +44,6 @@
     "glob": "^11.0.3",
     "gray-matter": "^4.0.3",
     "marked": "^15.0.12",
-    "node-html-to-image": "^5.0.0",
     "zod": "^3.24.4"
   }
 }

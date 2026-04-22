@@ -1,7 +1,6 @@
 ---
 tags:
   - posts
-layout: layouts/post.njk
 date: 2025-02-13
 title: Zed Edit Prediction Feature
 ---
