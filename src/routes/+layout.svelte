@@ -19,6 +19,11 @@
       href: '/archive',
       label: 'archive',
       match: (p: string) => p.startsWith('/archive')
+    },
+    {
+      href: '/papers',
+      label: 'papers',
+      match: (p: string) => p.startsWith('/papers')
     }
   ];
 
