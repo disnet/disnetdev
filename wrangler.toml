@@ -7,4 +7,4 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 # Create the namespace with `wrangler kv namespace create disnetdev-kv` and paste the id here.
 [[kv_namespaces]]
 binding = "KV"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+id = "eb75dab3d008415f94233d619cef8e96"

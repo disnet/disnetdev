@@ -12,6 +12,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+      url: ${{ vars.PUBLIC_SITE_URL }}
     permissions:
       contents: read
       deployments: write
@@ -28,13 +31,6 @@ jobs:
       - run: npm ci
 
       - run: npm run build
-        env:
-          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
-          SITE_NAME: ${{ vars.SITE_NAME }}
-          SITE_DESCRIPTION: ${{ vars.SITE_DESCRIPTION }}
-          AUTHOR_DID: ${{ vars.AUTHOR_DID }}
-          PUBLICATION_AT_URI: ${{ vars.PUBLICATION_AT_URI }}
-          DRAFT_COLLECTION_NSID: ${{ vars.DRAFT_COLLECTION_NSID }}
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
