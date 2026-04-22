@@ -9,12 +9,18 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 binding = "KV"
 id = "eb75dab3d008415f94233d619cef8e96"
 
-[vars]
+[env.production.vars]
 AUTHOR_DID = "did:plc:4vjd3fe2cgzq5d24j4f3zvar"
 PUBLICATION_AT_URI = "at://did:plc:4vjd3fe2cgzq5d24j4f3zvar/site.standard.publication/3mjz2bzni752x"
 DRAFT_COLLECTION_NSID = "com.disnetdev.blog.draft"
 SITE_NAME = "disnetdev"
 SITE_DESCRIPTION = "home page for disnetdev"
+PUBLIC_SITE_URL = "https://www.disnetdev.com"
 
 [env.preview.vars]
+AUTHOR_DID = "did:plc:4vjd3fe2cgzq5d24j4f3zvar"
+PUBLICATION_AT_URI = "at://did:plc:4vjd3fe2cgzq5d24j4f3zvar/site.standard.publication/3mjz2bzni752x"
+DRAFT_COLLECTION_NSID = "com.disnetdev.blog.draft"
+SITE_NAME = "disnetdev"
+SITE_DESCRIPTION = "home page for disnetdev"
 PUBLIC_SITE_URL = "https://deploy-branch.disnetdev.pages.dev"
