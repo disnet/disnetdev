@@ -47,3 +47,6 @@ jspm_packages
 build
 
 _site
+
+# Importer state
+scripts/import-manifest.json

@@ -4,9 +4,9 @@ Last updated: 2026-04-22
 
 ## Current status
 
-We have completed the initial migration foundation for the blog, have working authenticated ATProto draft CRUD in the admin, working published post editing/deletion, the initial draft -> `site.standard.document` publish flow, and now have working blob upload support for cover images and inline markdown images.
+We have completed the initial migration foundation for the blog, have working authenticated ATProto draft CRUD in the admin, working published post editing/deletion, the initial draft -> `site.standard.document` publish flow, working blob upload support for cover images and inline markdown images, and a working one-shot importer for the Eleventy-era archive.
 
-The next major milestone is the importer for existing Eleventy-era content, with a short production-readiness pass still pending for auth env wiring.
+The next remaining milestone is a short production-readiness pass for auth env wiring, followed by public-parity polish.
 
 ---
 
@@ -182,6 +182,33 @@ Key files:
 - `src/routes/admin/studio.css`
 - `src/routes/cathode.css`
 
+### 12. Legacy content importer
+Implemented a one-shot importer for the Eleventy-era archive.
+
+Behavior:
+- reads `content/blog/*.md`, parses frontmatter via `gray-matter`
+- replicates Eleventy's permalink (`/blog/{YYYY-MM-DD}-{slugify(title)}`) using `@sindresorhus/slugify` with `{ decamelize: false }` so existing URLs are preserved
+- logs in via app-password (same pattern as `bootstrap-publication.mjs`)
+- uploads inline `/img/*` references to the PDS via `com.atproto.repo.uploadBlob`, rewrites them to `blob:CID`, and records `embeddedBlobs`
+- writes directly to `site.standard.document` (no intermediate draft)
+- persists state to `scripts/import-manifest.json` (gitignored) so resume skips already-imported posts and deduplicates repeated images by source path
+- supports `--dry-run` and `--limit N`
+
+Key files:
+- `scripts/import-posts.mjs`
+- `package.json` (adds `import:posts` script and `@sindresorhus/slugify` devDependency)
+- `.gitignore` (ignores `scripts/import-manifest.json`)
+
+Command:
+
+```bash
+npm run import:posts -- --dry-run          # preview everything
+npm run import:posts -- --limit 5          # import next 5
+npm run import:posts                       # import all remaining
+```
+
+Slug verification: all 50 source posts produce paths that match the live `_site/blog/` output exactly, so existing links keep working once imports go live.
+
 ---
 
 ## Verified working
@@ -290,19 +317,19 @@ Before relying on admin auth in production:
 ---
 
 ## Priority 4: Importer
-After draft/publish flow is stable, build the one-time importer.
+Completed.
 
-Planned script:
-- `scripts/import-posts.ts`
+Implemented `scripts/import-posts.mjs` with:
+- frontmatter parsing via `gray-matter`
+- canonical path derived from `frontmatter.date` + `@sindresorhus/slugify(title, { decamelize: false })` to match Eleventy's output
+- `/img/*` references uploaded via `com.atproto.repo.uploadBlob`, rewritten to `blob:CID`, collected into `embeddedBlobs`
+- direct `site.standard.document` creates (no draft round-trip)
+- manifest-backed resume at `scripts/import-manifest.json` (gitignored) with per-image CID caching
+- `--dry-run` and `--limit N` flags
 
-Responsibilities:
-- read `content/blog/*.md`
-- parse frontmatter
-- derive canonical paths
-- detect and migrate image refs
-- create `site.standard.document` records
-- write manifest
-- support dry-run/resume
+Known follow-ups:
+- legacy `aliases:` frontmatter entries (20 posts) are currently dropped; redirects for those will be handled in priority 5
+- `posted: false` and `type: blog draft` frontmatter are not treated as skip signals — Eleventy built these anyway, so the importer follows suit
 
 ---
 
@@ -397,6 +424,6 @@ Concrete tasks:
 
 ## Bottom line
 
-We are past scaffolding, bootstrap/auth setup, and blob upload support.
+We are past scaffolding, bootstrap/auth setup, blob upload support, and the legacy content importer.
 
-The next real feature milestone is now the **legacy content importer**, with a short production-readiness pass still pending for auth env wiring and verification.
+What remains is a short production-readiness pass for auth env wiring, then public-parity polish (archive, feed, sitemap, redirects for legacy aliases).
