@@ -98,9 +98,19 @@ export function getOAuthClient() {
 }
 
 export async function beginOAuthLogin(handle: string, redirectTo?: string) {
-  return getOAuthClient().authorize(handle, {
-    state: JSON.stringify({ redirectTo } satisfies OAuthState)
-  });
+  try {
+    return await getOAuthClient().authorize(handle, {
+      state: JSON.stringify({ redirectTo } satisfies OAuthState)
+    });
+  } catch (err) {
+    const cause = (err as { cause?: unknown })?.cause;
+    console.error('[oauth-login] authorize failed', {
+      handle,
+      error: err instanceof Error ? { name: err.name, message: err.message, stack: err.stack } : err,
+      cause: cause instanceof Error ? { name: cause.name, message: cause.message, stack: cause.stack } : cause
+    });
+    throw err;
+  }
 }
 
 export async function finishOAuthLogin(params: URLSearchParams) {
