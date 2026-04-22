@@ -4,7 +4,7 @@ import { renderSitemap } from '$lib/feeds/sitemap';
 
 export async function GET() {
   const [publication, posts] = await Promise.all([getPublication(), listPublishedDocuments()]);
-  const body = renderSitemap(publication.record.url, ['/', '/blog', '/archive', ...posts.map((post) => post.path)]);
+  const body = renderSitemap(publication.record.url, ['/', '/blog', ...posts.map((post) => post.path)]);
 
   return new Response(body, {
     headers: {

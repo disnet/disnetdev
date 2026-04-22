@@ -255,7 +255,7 @@ body {
   margin: 0 0 var(--space-xl);
 }
 
-/* ——— index list (blog, home, archive) ——— */
+/* ——— index list (blog, home) ——— */
 
 .index {
   list-style: none;

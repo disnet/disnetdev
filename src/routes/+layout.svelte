@@ -16,19 +16,14 @@
     { href: '/', label: 'index', match: (p: string) => p === '/' },
     { href: '/blog', label: 'blog', match: (p: string) => p === '/blog' },
     {
-      href: '/archive',
-      label: 'archive',
-      match: (p: string) => p.startsWith('/archive')
+      href: '/reading',
+      label: 'reading',
+      match: (p: string) => p.startsWith('/reading')
     },
     {
       href: '/papers',
       label: 'papers',
       match: (p: string) => p.startsWith('/papers')
-    },
-    {
-      href: '/reading',
-      label: 'reading',
-      match: (p: string) => p.startsWith('/reading')
     }
   ];
 
