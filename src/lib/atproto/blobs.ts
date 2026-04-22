@@ -12,10 +12,8 @@ export async function getAuthorBlobUrl(ref: BlobRef | undefined): Promise<string
   }
 }
 
-export function getBlobUrl(pdsUrl: string, did: string, cid: string) {
-  const base = pdsUrl.endsWith('/') ? pdsUrl.slice(0, -1) : pdsUrl;
-  const params = new URLSearchParams({ did, cid });
-  return `${base}/xrpc/com.atproto.sync.getBlob?${params.toString()}`;
+export function getBlobUrl(_pdsUrl: string, did: string, cid: string) {
+  return `/blob/${did}/${cid}`;
 }
 
 export function getBlobUrlFromRef(pdsUrl: string, did: string, ref: BlobRef) {
