@@ -27,6 +27,21 @@
 
     const projects = [
         {
+            name: "Skyreader",
+            href: "https://skyreader.app",
+            blurb: "An RSS reader on the Atmosphere",
+        },
+        {
+            name: "Skyboard",
+            href: "https://skyboard.dev",
+            blurb: "A Kanban board on the Atmosphere",
+        },
+        {
+            name: "SembleIt",
+            href: "https://sembleit.dev",
+            blurb: "An alternative client for Semble",
+        },
+        {
             name: "Flint",
             href: "https://www.flintnote.com",
             blurb: "A note-taking app.",
@@ -182,15 +197,23 @@
                             <p class="share-note">{share.note}</p>
                             <p class="share-cite">
                                 <span class="share-cite-glyph" aria-hidden="true">▸</span>
-                                <a class="share-cite-link" href={share.itemUrl} rel="noopener">
+                                <a
+                                    class="share-cite-link"
+                                    href={share.itemUrl}
+                                    rel="noopener"
+                                >
                                     {share.itemTitle || share.itemUrl}
                                 </a>
                                 {#if share.itemAuthor}
                                     <span class="share-cite-sep">·</span>
-                                    <span class="share-cite-author">{share.itemAuthor}</span>
+                                    <span class="share-cite-author"
+                                        >{share.itemAuthor}</span
+                                    >
                                 {:else}
                                     <span class="share-cite-sep">·</span>
-                                    <span class="share-cite-host">{hostOf(share.itemUrl)}</span>
+                                    <span class="share-cite-host"
+                                        >{hostOf(share.itemUrl)}</span
+                                    >
                                 {/if}
                             </p>
                         {:else}
@@ -207,7 +230,9 @@
                                     <span>{share.itemAuthor}</span>
                                     <span class="share-cite-sep">·</span>
                                 {/if}
-                                <span class="share-cite-host">{hostOf(share.itemUrl)}</span>
+                                <span class="share-cite-host"
+                                    >{hostOf(share.itemUrl)}</span
+                                >
                             </p>
                         {/if}
                     </div>
