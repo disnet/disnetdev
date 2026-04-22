@@ -1,6 +1,26 @@
-import satori, { init as satoriInit } from 'satori';
+// Use satori/standalone, not satori — the main entry eagerly runs yoga-layout's
+// emscripten loader at import time (top-level `await loadYoga()`), which tries
+// to compile wasm from bytes and is forbidden on Cloudflare. The standalone
+// variant defers that until we call init().
+import satori, { init as satoriInit } from 'satori/standalone';
 import { Resvg, initWasm as initResvg } from '@resvg/resvg-wasm';
 import { buildOgTree, type OgInputs, OG_WIDTH, OG_HEIGHT } from './template';
+
+// Cloudflare Workers disallow compile-from-bytes at every stage, so we rely on
+// Wrangler's bundler to pre-compile these imports into WebAssembly.Module
+// bindings. The `og-wasm-external` plugin in vite.config.ts keeps these
+// imports external through the SSR bundle so they survive for Wrangler to see.
+// We use dynamic import so Node doesn't try to evaluate the .wasm extension
+// during SvelteKit's build-time manifest/prerender pass — the endpoints that
+// call into this file are not prerendered.
+function loadYogaModule(): Promise<WebAssembly.Module> {
+  // @ts-expect-error resolved by Wrangler at upload time
+  return import('./wasm/yoga.wasm').then((m) => m.default);
+}
+function loadResvgModule(): Promise<WebAssembly.Module> {
+  // @ts-expect-error resolved by Wrangler at upload time
+  return import('./wasm/resvg.wasm').then((m) => m.default);
+}
 
 type FontSpec = {
   name: string;
@@ -24,55 +44,54 @@ type LoadedFont = {
   style: 'normal' | 'italic';
 };
 
-const YOGA_PATH = '/og-wasm/yoga.wasm';
-const RESVG_PATH = '/og-wasm/resvg.wasm';
-
 let satoriReady: Promise<void> | null = null;
 let resvgReady: Promise<void> | null = null;
 let fontsCache: Promise<LoadedFont[]> | null = null;
-
-async function fetchBytes(origin: string, fetcher: typeof fetch, path: string) {
-  const res = await fetcher(new URL(path, origin));
-  if (!res.ok) throw new Error(`og: failed to load ${path}: ${res.status}`);
-  return res.arrayBuffer();
-}
 
 function isAlreadyInitialized(err: unknown) {
   return err instanceof Error && /already initialized/i.test(err.message);
 }
 
-function ensureSatori(origin: string, fetcher: typeof fetch) {
+function ensureSatori() {
   if (!satoriReady) {
-    satoriReady = (async () => {
-      const bytes = await fetchBytes(origin, fetcher, YOGA_PATH);
-      try {
-        await satoriInit(bytes);
-      } catch (err) {
-        if (!isAlreadyInitialized(err)) throw err;
-      }
-    })().catch((err) => {
-      satoriReady = null;
-      throw err;
-    });
+    satoriReady = loadYogaModule()
+      .then(async (mod) => {
+        try {
+          await satoriInit(mod);
+        } catch (err) {
+          if (!isAlreadyInitialized(err)) throw err;
+        }
+      })
+      .catch((err) => {
+        satoriReady = null;
+        throw err;
+      });
   }
   return satoriReady;
 }
 
-function ensureResvg(origin: string, fetcher: typeof fetch) {
+function ensureResvg() {
   if (!resvgReady) {
-    resvgReady = (async () => {
-      const bytes = await fetchBytes(origin, fetcher, RESVG_PATH);
-      try {
-        await initResvg(bytes);
-      } catch (err) {
-        if (!isAlreadyInitialized(err)) throw err;
-      }
-    })().catch((err) => {
-      resvgReady = null;
-      throw err;
-    });
+    resvgReady = loadResvgModule()
+      .then(async (mod) => {
+        try {
+          await initResvg(mod);
+        } catch (err) {
+          if (!isAlreadyInitialized(err)) throw err;
+        }
+      })
+      .catch((err) => {
+        resvgReady = null;
+        throw err;
+      });
   }
   return resvgReady;
+}
+
+async function fetchBytes(origin: string, fetcher: typeof fetch, path: string) {
+  const res = await fetcher(new URL(path, origin));
+  if (!res.ok) throw new Error(`og: failed to load ${path}: ${res.status}`);
+  return res.arrayBuffer();
 }
 
 function ensureFonts(origin: string, fetcher: typeof fetch) {
@@ -97,8 +116,8 @@ export async function renderOgImage(
   { origin, fetch: fetcher }: { origin: string; fetch: typeof fetch }
 ): Promise<Response> {
   const [, , fonts] = await Promise.all([
-    ensureSatori(origin, fetcher),
-    ensureResvg(origin, fetcher),
+    ensureSatori(),
+    ensureResvg(),
     ensureFonts(origin, fetcher)
   ]);
 
