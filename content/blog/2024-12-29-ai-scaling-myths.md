@@ -1,7 +1,6 @@
 ---
 tags:
   - posts
-layout: layouts/post.njk
 title: AI Scaling Myths
 date: 2024-12-29
 ---

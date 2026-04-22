@@ -1,7 +1,6 @@
 ---
 tags:
   - posts
-layout: layouts/post.njk
 date: 2025-01-16
 title: We're Getting the Social Media Crisis Wrong
 ---

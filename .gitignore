@@ -37,4 +37,16 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# Local env overrides / secrets
+.env.local
+
+# SvelteKit / Cloudflare build output
+.svelte-kit
+.wrangler
+build
+
 _site
+
+# Importer state
+scripts/import-manifest.json
