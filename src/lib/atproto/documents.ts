@@ -117,8 +117,16 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
   const repoDid = publication.uri ? parseAtUri(publication.uri).repo : '';
   const pdsUrl = repoDid ? await getPdsUrlForDid(repoDid) : '';
 
-  const rawHtml = await renderMarkdown(match.record.content.markdown);
-  const html = repoDid && pdsUrl ? resolveInlineBlobUrls(rawHtml, pdsUrl, repoDid) : rawHtml;
+  const rendered = await renderMarkdown(match.record.content.markdown);
+  const html =
+    repoDid && pdsUrl ? resolveInlineBlobUrls(rendered.html, pdsUrl, repoDid) : rendered.html;
+  const footnotes =
+    repoDid && pdsUrl
+      ? rendered.footnotes.map((footnote) => ({
+          ...footnote,
+          html: resolveInlineBlobUrls(footnote.html, pdsUrl, repoDid)
+        }))
+      : rendered.footnotes;
 
   const coverImageUrl =
     match.record.coverImage && repoDid && pdsUrl
@@ -136,6 +144,7 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
     updatedAt: match.record.updatedAt,
     publishedAt: match.record.publishedAt,
     html,
+    footnotes,
     coverImageUrl,
     coverImageAlt: match.record.title
   };

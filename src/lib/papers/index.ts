@@ -96,6 +96,7 @@ export function listPapers(): PaperSummary[] {
 export async function getPaperBySlug(slug: string): Promise<Paper | null> {
   const entry = papers[slug];
   if (!entry) return null;
-  const html = String(await renderMarkdown(entry.body));
+  const rendered = await renderMarkdown(entry.body);
+  const html = rendered.html;
   return { ...entry.summary, html };
 }

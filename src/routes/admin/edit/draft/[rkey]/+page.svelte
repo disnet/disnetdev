@@ -91,6 +91,13 @@
       </a>.
       Further edits here don't change the published copy.
     </p>
+  {:else}
+    <p class="editor-crosslink">
+      Preview the last saved draft at
+      <a href={`/preview/draft/${data.draft.rkey}`} class="editor-crosslink-target" target="_blank" rel="noreferrer">
+        /preview/draft/{data.draft.rkey}
+      </a>.
+    </p>
   {/if}
 
   {#if form?.success}
@@ -200,6 +207,7 @@
       use:autogrow
       spellcheck="true"
     ></textarea>
+    <p class="editor-meta-help">Footnotes: <code>[^note]</code> in the text, then <code>[^note]: note text</code> below.</p>
     <input type="hidden" name="embeddedBlobs" value={embeddedBlobsSerialized} />
     {#if errors.markdown}
       <p class="field-error">{errors.markdown}</p>
@@ -209,6 +217,9 @@
   <footer class="editor-foot">
     <div class="editor-foot-primary">
       <button type="submit" class="action action--primary">Save draft</button>
+      <a href={`/preview/draft/${data.draft.rkey}`} class="action action--preview" target="_blank" rel="noreferrer">
+        Preview saved draft
+      </a>
       <button
         type="submit"
         formaction="?/publish"
