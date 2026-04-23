@@ -1,9 +1,9 @@
-import { listPublishedDocuments } from '$lib/atproto/documents';
+import { listPublishedDocumentsForFeed } from '$lib/atproto/documents';
 import { getPublication } from '$lib/atproto/publication';
 import { renderRssFeed } from '$lib/feeds/rss';
 
 export async function GET() {
-  const [publication, posts] = await Promise.all([getPublication(), listPublishedDocuments()]);
+  const [publication, posts] = await Promise.all([getPublication(), listPublishedDocumentsForFeed()]);
 
   const body = renderRssFeed({
     siteUrl: publication.record.url,

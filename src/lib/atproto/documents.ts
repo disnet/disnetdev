@@ -7,7 +7,7 @@ import { getSlugFromPath, normalizePath } from '$lib/atproto/utils';
 import { renderMarkdown } from '$lib/markdown/render';
 import { deleteCache, getCache, invalidateCache, setCache } from '$lib/server/cache';
 import { getPublication } from './publication';
-import type { DocumentSummary, PostPageData, PublishedDocument } from '$lib/types/blog';
+import type { DocumentSummary, FeedDocument, PostPageData, PublishedDocument } from '$lib/types/blog';
 
 const DOCUMENTS_CACHE_KEY = 'documents:index';
 const DOCUMENT_BY_PATH_PREFIX = 'documents:path:';
@@ -99,6 +99,58 @@ export async function listPublishedDocuments(): Promise<DocumentSummary[]> {
   }));
 }
 
+async function renderDocument(record: PublishedDocument, repoDid: string, pdsUrl: string) {
+  if (record.content?.$type !== 'dev.disnet.blog.content.markdown') {
+    return {
+      html: '',
+      footnotes: []
+    };
+  }
+
+  const rendered = await renderMarkdown(record.content.markdown);
+  return {
+    html: repoDid && pdsUrl ? resolveInlineBlobUrls(rendered.html, pdsUrl, repoDid) : rendered.html,
+    footnotes:
+      repoDid && pdsUrl
+        ? rendered.footnotes.map((footnote) => ({
+            ...footnote,
+            html: resolveInlineBlobUrls(footnote.html, pdsUrl, repoDid)
+          }))
+        : rendered.footnotes
+  };
+}
+
+export async function listPublishedDocumentsForFeed(): Promise<FeedDocument[]> {
+  const [documents, publication] = await Promise.all([listDocumentRecords(), getPublication()]);
+  const repoDid = publication.uri ? parseAtUri(publication.uri).repo : '';
+  const pdsUrl = repoDid ? await getPdsUrlForDid(repoDid) : '';
+
+  return Promise.all(
+    documents.map(async ({ rkey, record }) => {
+      const path = record.path ?? '/blog/untitled';
+      const rendered = await renderDocument(record, repoDid, pdsUrl);
+      const coverImageUrl =
+        record.coverImage && repoDid && pdsUrl
+          ? getBlobUrl(pdsUrl, repoDid, record.coverImage.ref.$link)
+          : undefined;
+
+      return {
+        rkey,
+        path,
+        slug: getSlugFromPath(path),
+        title: record.title,
+        description: record.description,
+        tags: record.tags,
+        updatedAt: record.updatedAt,
+        publishedAt: record.publishedAt,
+        html: rendered.html,
+        coverImageUrl,
+        coverImageAlt: record.title
+      };
+    })
+  );
+}
+
 export async function getPublishedDocumentBySlug(slug: string): Promise<PostPageData | null> {
   const expectedPath = `/blog/${slug}`;
   const cacheKey = `${DOCUMENT_BY_PATH_PREFIX}${expectedPath}`;
@@ -117,16 +169,7 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
   const repoDid = publication.uri ? parseAtUri(publication.uri).repo : '';
   const pdsUrl = repoDid ? await getPdsUrlForDid(repoDid) : '';
 
-  const rendered = await renderMarkdown(match.record.content.markdown);
-  const html =
-    repoDid && pdsUrl ? resolveInlineBlobUrls(rendered.html, pdsUrl, repoDid) : rendered.html;
-  const footnotes =
-    repoDid && pdsUrl
-      ? rendered.footnotes.map((footnote) => ({
-          ...footnote,
-          html: resolveInlineBlobUrls(footnote.html, pdsUrl, repoDid)
-        }))
-      : rendered.footnotes;
+  const rendered = await renderDocument(match.record, repoDid, pdsUrl);
 
   const coverImageUrl =
     match.record.coverImage && repoDid && pdsUrl
@@ -143,8 +186,8 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
     tags: match.record.tags,
     updatedAt: match.record.updatedAt,
     publishedAt: match.record.publishedAt,
-    html,
-    footnotes,
+    html: rendered.html,
+    footnotes: rendered.footnotes,
     coverImageUrl,
     coverImageAlt: match.record.title
   };

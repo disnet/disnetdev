@@ -68,6 +68,13 @@ export type DocumentSummary = {
   publishedAt: string;
 };
 
+export type FeedDocument = DocumentSummary & {
+  updatedAt?: string;
+  html: string;
+  coverImageUrl?: string;
+  coverImageAlt?: string;
+};
+
 export type ShareSummary = {
   rkey: string;
   uri: string;
