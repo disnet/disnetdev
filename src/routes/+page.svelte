@@ -93,6 +93,7 @@
     const hasMoreShares = $derived(data.sharesTotal > data.shares.length);
     const recentCards = $derived(data.cards);
     const hasMoreCards = $derived(data.cardsTotal > data.cards.length);
+    const recentPhotos = $derived(data.photos);
 
     function hostOf(url: string) {
         try {
@@ -198,6 +199,38 @@
         </ol>
     {/if}
 </section>
+
+{#if recentPhotos.length > 0}
+    <section aria-labelledby="photos-heading" class="band">
+        <header class="band-header">
+            <h2 id="photos-heading" class="band-title">
+                Recent photos
+            </h2>
+            <a href="/photos" class="read-more">all photos</a>
+        </header>
+
+        <ol class="photo-strip">
+            {#each recentPhotos as photo}
+                <li class="photo-strip-item">
+                    <a class="photo-strip-link" href={photo.url} rel="noopener">
+                        <img
+                            src={photo.images[0].thumb}
+                            alt={photo.images[0].alt}
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span class="photo-strip-date">
+                            {new Date(photo.createdAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                            })}
+                        </span>
+                    </a>
+                </li>
+            {/each}
+        </ol>
+    </section>
+{/if}
 
 {#if recentShares.length > 0}
     <section aria-labelledby="shared-heading" class="band">
@@ -507,6 +540,50 @@
         margin-right: 0.3ch;
     }
 
+    /* ——— photos (latest from Bluesky photo account) ——— */
+    .photo-strip {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--space-sm);
+        max-width: var(--measure-wide);
+    }
+
+    .photo-strip-item {
+        min-width: 0;
+    }
+
+    .photo-strip-link {
+        display: grid;
+        gap: var(--space-2xs);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .photo-strip-link img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        background: var(--ink-surface);
+        border: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .photo-strip-date {
+        font-family: var(--font-mono);
+        font-size: var(--type-xs);
+        color: var(--ink-muted);
+        letter-spacing: 0.04em;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .photo-strip-link:hover .photo-strip-date,
+    .photo-strip-link:focus-visible .photo-strip-date {
+        color: var(--ink-accent-hover);
+    }
+
     /* ——— shares (marginalia band) ——— */
     .shares {
         list-style: none;
@@ -718,5 +795,11 @@
 
     .filed-meta-author {
         color: var(--ink-text-soft);
+    }
+
+    @media (max-width: 42rem) {
+        .photo-strip {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
