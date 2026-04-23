@@ -118,6 +118,13 @@ export type PostPageData = {
   updatedAt?: string;
   publishedAt: string;
   html: string;
+  footnotes: Array<{
+    id: string;
+    refId: string;
+    label: string;
+    number: number;
+    html: string;
+  }>;
   coverImageUrl?: string;
   coverImageAlt?: string;
 };

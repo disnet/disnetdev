@@ -219,6 +219,7 @@
       use:autogrow
       spellcheck="true"
     ></textarea>
+    <p class="editor-meta-help">Footnotes: <code>[^note]</code> in the text, then <code>[^note]: note text</code> below.</p>
     <input type="hidden" name="embeddedBlobs" value={embeddedBlobsSerialized} />
     {#if errors.markdown}
       <p class="field-error">{errors.markdown}</p>
