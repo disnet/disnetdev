@@ -5,6 +5,7 @@ const APPVIEW_URL = 'https://public.api.bsky.app';
 const PHOTO_ACTOR = 'photos.disnetdev.com';
 const PHOTOS_CACHE_KEY = `photos:${PHOTO_ACTOR}`;
 const PHOTOS_TTL_MS = 5 * 60 * 1000;
+const DEFAULT_PHOTO_LIMIT = 60;
 
 type BskyImage = {
   thumb?: string;
@@ -115,11 +116,12 @@ function toPhotoPost(post: BskyPostView): PhotoPost | null {
   };
 }
 
-export async function listPhotoPosts(limit = 60): Promise<PhotoPost[]> {
+export async function listPhotoPosts(limit = DEFAULT_PHOTO_LIMIT): Promise<PhotoPost[]> {
   const cached = getCache<PhotoPost[]>(PHOTOS_CACHE_KEY);
-  if (cached) return cached.slice(0, limit);
+  if (cached && cached.length >= limit) return cached.slice(0, limit);
 
   const photos: PhotoPost[] = [];
+  const fetchLimit = Math.max(limit, DEFAULT_PHOTO_LIMIT);
   let cursor: string | undefined;
 
   do {
@@ -140,11 +142,11 @@ export async function listPhotoPosts(limit = 60): Promise<PhotoPost[]> {
 
       const photo = toPhotoPost(item.post);
       if (photo) photos.push(photo);
-      if (photos.length >= limit) break;
+      if (photos.length >= fetchLimit) break;
     }
 
     cursor = response.cursor;
-  } while (cursor && photos.length < limit);
+  } while (cursor && photos.length < fetchLimit);
 
   setCache(PHOTOS_CACHE_KEY, photos, PHOTOS_TTL_MS);
   return photos.slice(0, limit);
