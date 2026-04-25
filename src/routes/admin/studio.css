@@ -774,30 +774,177 @@
   flex-wrap: wrap;
 }
 
-.editor-body-textarea {
+/* prosemirror writing surface — see Editor.svelte */
+
+.pm-editor-host {
   display: block;
   width: 100%;
-  min-height: calc(100vh - 22rem);
+  max-height: calc(100vh - 16rem);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-strong) transparent;
+  scroll-padding-block: var(--s-5);
+}
+
+.pm-editor-host::-webkit-scrollbar {
+  width: 8px;
+}
+
+.pm-editor-host::-webkit-scrollbar-thumb {
+  background: var(--rule-strong);
+  border-radius: 4px;
+}
+
+.pm-editor-host::-webkit-scrollbar-track {
   background: transparent;
-  border: none;
-  padding: 0;
+}
+
+.pm-editor-host .ProseMirror {
+  min-height: calc(100vh - 22rem);
+  padding-right: var(--s-3);
+  outline: none;
   font-family: var(--ff-body);
   font-size: var(--fz-md);
   line-height: var(--lh-prose);
   color: var(--ink);
-  resize: none;
   font-variation-settings: 'opsz' 16;
-  /* baseline grid feel */
   caret-color: var(--accent);
 }
 
-.editor-body-textarea:focus {
-  outline: none;
+.pm-editor-host .ProseMirror > * + * {
+  margin-top: 1em;
 }
 
-.editor-body-textarea::placeholder {
+.pm-editor-host .ProseMirror p {
+  margin: 0;
+}
+
+.pm-editor-host .ProseMirror h1,
+.pm-editor-host .ProseMirror h2,
+.pm-editor-host .ProseMirror h3,
+.pm-editor-host .ProseMirror h4 {
+  font-family: var(--ff-display);
+  font-weight: 500;
+  line-height: var(--lh-snug);
+  color: var(--ink);
+  margin: 1.5em 0 0.5em;
+}
+
+.pm-editor-host .ProseMirror h1 { font-size: var(--fz-2xl); letter-spacing: -0.01em; }
+.pm-editor-host .ProseMirror h2 { font-size: var(--fz-xl); }
+.pm-editor-host .ProseMirror h3 { font-size: var(--fz-lg); }
+.pm-editor-host .ProseMirror h4 { font-size: var(--fz-md); font-style: italic; }
+
+.pm-editor-host .ProseMirror a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: var(--accent-soft);
+  text-underline-offset: 0.2em;
+}
+
+.pm-editor-host .ProseMirror code {
+  font-family: var(--ff-mono);
+  font-size: 0.9em;
+  background: var(--paper-sunk);
+  padding: 0.1em 0.35em;
+  border-radius: var(--radius-sm);
+}
+
+.pm-editor-host .ProseMirror pre {
+  font-family: var(--ff-mono);
+  font-size: var(--fz-sm);
+  line-height: var(--lh-snug);
+  background: var(--paper-sunk);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: var(--s-4);
+  overflow-x: auto;
+}
+
+.pm-editor-host .ProseMirror pre code {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.pm-editor-host .ProseMirror blockquote {
+  margin: 0;
+  padding-left: var(--s-4);
+  border-left: 2px solid var(--rule-strong);
+  color: var(--ink-2);
+  font-style: italic;
+}
+
+.pm-editor-host .ProseMirror ul,
+.pm-editor-host .ProseMirror ol {
+  padding-left: 1.4em;
+  margin: 0;
+}
+
+.pm-editor-host .ProseMirror li > p {
+  margin: 0;
+}
+
+.pm-editor-host .ProseMirror hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: var(--s-5) 0;
+}
+
+.pm-editor-host .ProseMirror img.pm-image {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: var(--s-3) auto;
+  border-radius: var(--radius-sm);
+}
+
+.pm-editor-host .ProseMirror sup.pm-footnote-ref {
+  font-family: var(--ff-mono);
+  font-size: 0.7em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 0.1em 0.3em;
+  border-radius: var(--radius-sm);
+  vertical-align: super;
+  line-height: 1;
+  cursor: default;
+}
+
+.pm-editor-host .ProseMirror aside.pm-footnote-def {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-3);
+  padding: var(--s-3) 0;
+  border-top: 1px dashed var(--rule);
+  font-size: var(--fz-sm);
+  color: var(--ink-2);
+}
+
+.pm-editor-host .ProseMirror aside.pm-footnote-def + aside.pm-footnote-def {
+  border-top: 1px dashed var(--rule);
+}
+
+.pm-editor-host .ProseMirror .pm-footnote-def-marker {
+  font-family: var(--ff-mono);
+  font-size: var(--fz-mono);
+  color: var(--ink-faint);
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+
+.pm-editor-host .ProseMirror .pm-footnote-def-body > p {
+  margin: 0;
+}
+
+/* placeholder — visible only when the editor is empty */
+.pm-editor-host .ProseMirror[data-placeholder]:empty::before,
+.pm-editor-host .ProseMirror[data-placeholder] > p:only-child:first-child:empty::before {
+  content: attr(data-placeholder);
   color: var(--ink-faint);
   font-style: italic;
+  pointer-events: none;
+  position: absolute;
 }
 
 /* action bar */

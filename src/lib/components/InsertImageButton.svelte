@@ -1,13 +1,11 @@
 <script lang="ts">
   import type { BlobRef } from '$lib/types/blog';
-  import { insertAtCursor, uploadBlob } from '$lib/admin/upload';
+  import { uploadBlob } from '$lib/admin/upload';
 
   let {
-    textarea,
     onInsert
   }: {
-    textarea: HTMLTextAreaElement | null | undefined;
-    onInsert: (blob: BlobRef) => void;
+    onInsert: (args: { blob: BlobRef; alt: string }) => void;
   } = $props();
 
   let status = $state<'idle' | 'uploading' | 'error'>('idle');
@@ -23,15 +21,8 @@
 
     try {
       const blob = await uploadBlob(file);
-      const cid = blob.ref.$link;
       const alt = file.name.replace(/\.[^.]+$/, '');
-
-      if (textarea) {
-        insertAtCursor(textarea, `\n\n![${alt}](blob:${cid})\n\n`);
-        textarea.focus();
-      }
-
-      onInsert(blob);
+      onInsert({ blob, alt });
       status = 'idle';
     } catch (err) {
       errorMessage = err instanceof Error ? err.message : 'Upload failed';

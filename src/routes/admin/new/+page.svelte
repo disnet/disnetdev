@@ -3,9 +3,14 @@
   import { autogrow } from '$lib/actions/autogrow';
   import CoverImageField from '$lib/components/CoverImageField.svelte';
   import InsertImageButton from '$lib/components/InsertImageButton.svelte';
+  import { Editor, type EditorRef } from '$lib/admin/editor';
+  import type { ContentValue } from '$lib/admin/editor';
   import type { BlobRef } from '$lib/types/blog';
 
-  let { form } = $props();
+  let { data, form } = $props();
+
+  const resolveImageSrc = (src: string) =>
+    src.startsWith('blob:') ? `/blob/${data.authorDid}/${src.slice(5)}` : src;
 
   const errors = $derived(form?.errors ?? {});
 
@@ -16,12 +21,24 @@
   let tags = $state<string>(initial?.tags ?? '');
   let markdown = $state<string>(initial?.markdown ?? '');
   let embeddedBlobs = $state<BlobRef[]>([]);
-  let markdownEl = $state<HTMLTextAreaElement | undefined>(undefined);
+  let editorRef = $state<EditorRef | null>(null);
 
-  function onImageInserted(blob: BlobRef) {
+  const initialContent: ContentValue = {
+    $type: 'dev.disnet.blog.content.markdown',
+    markdown: untrack(() => markdown)
+  };
+
+  function onContentChange(content: ContentValue) {
+    if (content.$type === 'dev.disnet.blog.content.markdown') {
+      markdown = content.markdown;
+    }
+  }
+
+  function onImageInserted({ blob, alt }: { blob: BlobRef; alt: string }) {
     if (!embeddedBlobs.some((b) => b.ref.$link === blob.ref.$link)) {
       embeddedBlobs = [...embeddedBlobs, blob];
     }
+    editorRef?.insertImage({ blob, alt });
   }
 
   const embeddedBlobsSerialized = $derived(
@@ -138,27 +155,23 @@
 
   <div class="editor-body-wrap">
     <div class="editor-body-label">
-      <label for="markdown">
-        <span>the writing</span>
-      </label>
+      <span id="markdown-label">the writing</span>
       <span class="editor-body-tools">
-        <InsertImageButton textarea={markdownEl} onInsert={onImageInserted} />
+        <InsertImageButton onInsert={onImageInserted} />
         <span class="editor-body-stats">
           {wordCount === 1 ? '1 word' : `${wordCount} words`}
         </span>
       </span>
     </div>
-    <textarea
-      id="markdown"
-      name="markdown"
-      class="editor-body-textarea"
-      bind:this={markdownEl}
-      bind:value={markdown}
+    <Editor
+      content={initialContent}
+      onChange={onContentChange}
       placeholder="Begin…"
-      use:autogrow
-      spellcheck="true"
-    ></textarea>
-    <p class="editor-meta-help">Footnotes: <code>[^note]</code> in the text, then <code>[^note]: note text</code> below.</p>
+      {resolveImageSrc}
+      bind:ref={editorRef}
+    />
+    <input type="hidden" name="markdown" value={markdown} />
+    <p class="editor-meta-help">Press <code>⌘.</code> to add a footnote.</p>
     <input type="hidden" name="embeddedBlobs" value={embeddedBlobsSerialized} />
     {#if errors.markdown}
       <p class="field-error">{errors.markdown}</p>

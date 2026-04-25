@@ -5,6 +5,7 @@
   import '@fontsource-variable/literata/opsz-italic.css';
   import '@fontsource/fragment-mono/400.css';
   import '@fontsource/fragment-mono/400-italic.css';
+  import 'prosemirror-view/style/prosemirror.css';
   import './studio.css';
 
   import { page } from '$app/state';
