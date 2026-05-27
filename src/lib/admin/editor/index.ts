@@ -3,7 +3,5 @@ export type {
   ContentValue,
   ContentType,
   MarkdownContentValue,
-  EditorAdapter,
   SerializedFor
 } from './types';
-export { getAdapter } from './registry';

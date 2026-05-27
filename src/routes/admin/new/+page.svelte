@@ -9,9 +9,6 @@
 
   let { data, form } = $props();
 
-  const resolveImageSrc = (src: string) =>
-    src.startsWith('blob:') ? `/blob/${data.authorDid}/${src.slice(5)}` : src;
-
   const errors = $derived(form?.errors ?? {});
 
   const initial = untrack(() => form?.values);
@@ -167,7 +164,6 @@
       content={initialContent}
       onChange={onContentChange}
       placeholder="Begin…"
-      {resolveImageSrc}
       bind:ref={editorRef}
     />
     <input type="hidden" name="markdown" value={markdown} />

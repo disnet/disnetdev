@@ -12,9 +12,6 @@
   const errors = $derived(form?.errors ?? {});
   const isPublished = $derived(Boolean(data.draft.record.sourceDocumentRkey));
 
-  const resolveImageSrc = (src: string) =>
-    src.startsWith('blob:') ? `/blob/${data.authorDid}/${src.slice(5)}` : src;
-
   const initial = untrack(() => form?.values ?? data.draft.formValues);
   let title = $state<string>(initial.title ?? '');
   let slug = $state<string>(initial.slug ?? '');
@@ -223,7 +220,6 @@
     <Editor
       content={initialContent}
       onChange={onContentChange}
-      {resolveImageSrc}
       bind:ref={editorRef}
     />
     <input type="hidden" name="markdown" value={markdown} />

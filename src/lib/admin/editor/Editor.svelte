@@ -11,20 +11,18 @@
 
 <script lang="ts">
   import { untrack } from 'svelte';
-  import { EditorState, type Transaction } from 'prosemirror-state';
-  import { EditorView, type NodeView } from 'prosemirror-view';
-  import type { Node as PMNode } from 'prosemirror-model';
-  import { getAdapter } from './registry';
-  import { BLOB_PROTOCOL } from './adapters/markdown/schema';
+  import { EditorState } from '@codemirror/state';
+  import { EditorView, keymap, placeholder as placeholderExt } from '@codemirror/view';
+  import { history, historyKeymap, defaultKeymap } from '@codemirror/commands';
+  import { markdown } from '@codemirror/lang-markdown';
+  import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+  import { tags as t } from '@lezer/highlight';
 
   type Props = {
     content: ContentValue;
     onChange: (content: ContentValue) => void;
     placeholder?: string;
     spellcheck?: boolean;
-    /** Resolves the storage src on a node (e.g. `blob:cid`) to a URL the
-        browser can fetch. Defaults to identity. */
-    resolveImageSrc?: (src: string) => string;
     ref?: EditorRef | null;
   };
 
@@ -33,73 +31,121 @@
     onChange,
     placeholder,
     spellcheck = true,
-    resolveImageSrc,
     ref = $bindable<EditorRef | null>(null)
   }: Props = $props();
 
   let container = $state<HTMLDivElement | undefined>(undefined);
 
+  function markdownText(value: ContentValue): string {
+    return value.$type === 'dev.disnet.blog.content.markdown' ? value.markdown : '';
+  }
+
+  function nextFootnoteLabel(text: string): string {
+    const used = new Set<number>();
+    for (const m of text.matchAll(/\[\^(\d+)\]/g)) {
+      used.add(Number(m[1]));
+    }
+    let n = 1;
+    while (used.has(n)) n += 1;
+    return String(n);
+  }
+
+  function insertFootnote(view: EditorView): boolean {
+    const doc = view.state.doc.toString();
+    const label = nextFootnoteLabel(doc);
+    const ref = `[^${label}]`;
+    const { from, to } = view.state.selection.main;
+
+    const trailingNewlines = /\n*$/.exec(doc)?.[0].length ?? 0;
+    const padding = trailingNewlines >= 2 ? '' : trailingNewlines === 1 ? '\n' : '\n\n';
+    const defText = `${padding}[^${label}]: `;
+    const docEnd = doc.length;
+    const defStart = docEnd + ref.length;
+    const cursor = defStart + defText.length;
+
+    view.dispatch({
+      changes: [
+        { from, to, insert: ref },
+        { from: docEnd, to: docEnd, insert: defText }
+      ],
+      selection: { anchor: cursor },
+      scrollIntoView: true
+    });
+    view.focus();
+    return true;
+  }
+
+  const highlightStyle = HighlightStyle.define([
+    { tag: t.heading1, fontFamily: 'var(--ff-display)', fontWeight: '500', fontSize: 'var(--fz-2xl)', color: 'var(--ink)' },
+    { tag: t.heading2, fontFamily: 'var(--ff-display)', fontWeight: '500', fontSize: 'var(--fz-xl)', color: 'var(--ink)' },
+    { tag: t.heading3, fontFamily: 'var(--ff-display)', fontWeight: '500', fontSize: 'var(--fz-lg)', color: 'var(--ink)' },
+    { tag: t.heading4, fontFamily: 'var(--ff-display)', fontWeight: '500', fontStyle: 'italic', color: 'var(--ink)' },
+    { tag: t.strong, fontWeight: '600', color: 'var(--ink)' },
+    { tag: t.emphasis, fontStyle: 'italic', color: 'var(--ink)' },
+    { tag: t.link, color: 'var(--accent)', textDecoration: 'underline' },
+    { tag: t.url, color: 'var(--accent)' },
+    { tag: t.monospace, fontFamily: 'var(--ff-mono)', color: 'var(--ink-2)' },
+    { tag: t.quote, fontStyle: 'italic', color: 'var(--ink-2)' },
+    { tag: t.list, color: 'var(--ink-2)' },
+    { tag: t.meta, color: 'var(--ink-faint)' },
+    { tag: t.processingInstruction, color: 'var(--ink-faint)' },
+    { tag: t.contentSeparator, color: 'var(--ink-faint)' }
+  ]);
+
   $effect(() => {
     if (!container) return;
 
-    // Read props once at mount; subsequent updates flow through `onChange`
-    // and the imperative `setContent` exposed on the ref.
     const initial = untrack(() => content);
     const initialPlaceholder = untrack(() => placeholder);
     const initialSpellcheck = untrack(() => spellcheck);
-    const resolveSrc = untrack(() => resolveImageSrc) ?? ((s: string) => s);
 
-    const adapter = getAdapter(initial.$type);
-    const initialDoc = adapter.parse(initial);
-    const state = EditorState.create({
-      doc: initialDoc,
-      schema: adapter.schema,
-      plugins: adapter.plugins()
-    });
-
-    const view = new EditorView(container, {
-      state,
-      attributes: {
-        class: 'pm-editor',
-        spellcheck: String(initialSpellcheck),
-        ...(initialPlaceholder ? { 'data-placeholder': initialPlaceholder } : {})
-      },
-      nodeViews: {
-        image: (node: PMNode): NodeView => {
-          const dom = document.createElement('img');
-          const src = node.attrs.src as string;
-          dom.src = resolveSrc(src);
-          dom.alt = (node.attrs.alt as string | null) ?? '';
-          if (node.attrs.title) dom.title = node.attrs.title as string;
-          dom.dataset.src = src;
-          dom.className = src.startsWith(BLOB_PROTOCOL) ? 'pm-image pm-image--blob' : 'pm-image';
-          return { dom };
-        }
-      },
-      dispatchTransaction(tr: Transaction) {
-        const next = view.state.apply(tr);
-        view.updateState(next);
-        if (tr.docChanged) {
-          onChange(adapter.serialize(next.doc));
-        }
-      }
+    const view = new EditorView({
+      parent: container,
+      state: EditorState.create({
+        doc: markdownText(initial),
+        extensions: [
+          history(),
+          keymap.of([
+            { key: 'Mod-.', run: insertFootnote },
+            ...defaultKeymap,
+            ...historyKeymap
+          ]),
+          markdown(),
+          syntaxHighlighting(highlightStyle),
+          EditorView.lineWrapping,
+          EditorView.contentAttributes.of({
+            spellcheck: String(initialSpellcheck)
+          }),
+          ...(initialPlaceholder ? [placeholderExt(initialPlaceholder)] : []),
+          EditorView.updateListener.of((u) => {
+            if (u.docChanged) {
+              onChange({
+                $type: 'dev.disnet.blog.content.markdown',
+                markdown: u.state.doc.toString()
+              });
+            }
+          })
+        ]
+      })
     });
 
     ref = {
       insertImage({ blob, alt }) {
-        const cmd = adapter.insertImage({ blob, alt: alt ?? '' });
-        cmd(view.state, view.dispatch);
+        const altText = alt ?? '';
+        const md = `![${altText}](blob:${blob.ref.$link})`;
+        const { from, to } = view.state.selection.main;
+        view.dispatch({
+          changes: { from, to, insert: md },
+          selection: { anchor: from + md.length },
+          scrollIntoView: true
+        });
         view.focus();
       },
       setContent(next) {
-        const nextAdapter = getAdapter(next.$type);
-        const nextDoc = nextAdapter.parse(next);
-        const newState = EditorState.create({
-          doc: nextDoc,
-          schema: nextAdapter.schema,
-          plugins: nextAdapter.plugins()
+        const text = markdownText(next);
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: text }
         });
-        view.updateState(newState);
       },
       focus() {
         view.focus();
@@ -113,4 +159,4 @@
   });
 </script>
 
-<div bind:this={container} class="pm-editor-host"></div>
+<div bind:this={container} class="cm-editor-host"></div>

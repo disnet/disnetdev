@@ -11,9 +11,6 @@
 
   const errors = $derived(form?.errors ?? {});
 
-  const resolveImageSrc = (src: string) =>
-    src.startsWith('blob:') ? `/blob/${data.authorDid}/${src.slice(5)}` : src;
-
   const initial = untrack(() => form?.values ?? data.post.formValues);
   let title = $state<string>(initial.title ?? '');
   let path = $state<string>(initial.path ?? '');
@@ -235,7 +232,6 @@
     <Editor
       content={initialContent}
       onChange={onContentChange}
-      {resolveImageSrc}
       bind:ref={editorRef}
     />
     <input type="hidden" name="markdown" value={markdown} />
