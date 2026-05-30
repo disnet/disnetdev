@@ -73,9 +73,6 @@
                                 {share.itemTitle || share.itemUrl}
                             </a>
                         </h2>
-                        {#if share.itemDescription}
-                            <p class="share-desc">{share.itemDescription}</p>
-                        {/if}
                         <p class="share-meta">
                             {#if share.itemAuthor}
                                 <span>{share.itemAuthor}</span>
@@ -254,13 +251,6 @@
     .share-title a:hover,
     .share-title a:focus-visible {
         color: var(--ink-accent-hover);
-    }
-
-    .share-desc {
-        color: var(--ink-text-soft);
-        font-size: 1rem;
-        line-height: 1.55;
-        margin: 0;
     }
 
     .share-meta {
