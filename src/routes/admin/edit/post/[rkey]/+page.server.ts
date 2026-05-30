@@ -5,6 +5,7 @@ import {
   publishedPathExists,
   updatePublishedDocument
 } from '$lib/atproto/documents';
+import { buildMarkpubContent } from '$lib/atproto/content';
 import { listDrafts, updateDraft } from '$lib/atproto/drafts';
 import { DRAFT_COLLECTION_NSID } from '$lib/config';
 import { markdownToPlaintext } from '$lib/markdown/plaintext';
@@ -89,11 +90,7 @@ export const actions: Actions = {
       tags: result.recordInput.tags,
       coverImage: result.recordInput.coverImage,
       embeddedBlobs: result.recordInput.embeddedBlobs,
-      content: {
-        $type: 'dev.disnet.blog.content.markdown',
-        markdown: result.recordInput.markdown,
-        sourceFormat: 'markdown'
-      },
+      content: buildMarkpubContent(result.recordInput.markdown),
       textContent: markdownToPlaintext(result.recordInput.markdown),
       updatedAt
     });

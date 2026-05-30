@@ -1,6 +1,7 @@
 import { restoreOAuthAgent } from '$lib/atproto/auth';
 import { getBlobUrl, resolveInlineBlobUrls } from '$lib/atproto/blobs';
 import { parseAtUri, xrpc } from '$lib/atproto/client';
+import { buildMarkpubContent, getDocumentMarkdown } from '$lib/atproto/content';
 import { publishedDocumentSchema } from '$lib/atproto/schema';
 import { getPdsUrlForDid } from '$lib/atproto/service';
 import { getSlugFromPath, normalizePath } from '$lib/atproto/utils';
@@ -100,14 +101,15 @@ export async function listPublishedDocuments(): Promise<DocumentSummary[]> {
 }
 
 async function renderDocument(record: PublishedDocument, repoDid: string, pdsUrl: string) {
-  if (record.content?.$type !== 'dev.disnet.blog.content.markdown') {
+  const markdown = getDocumentMarkdown(record.content);
+  if (markdown === null) {
     return {
       html: '',
       footnotes: []
     };
   }
 
-  const rendered = await renderMarkdown(record.content.markdown);
+  const rendered = await renderMarkdown(markdown);
   return {
     html: repoDid && pdsUrl ? resolveInlineBlobUrls(rendered.html, pdsUrl, repoDid) : rendered.html,
     footnotes:
@@ -160,7 +162,7 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
   const documents = await listDocumentRecords();
   const match = documents.find(({ record }) => record.path === expectedPath);
 
-  if (!match || match.record.content?.$type !== 'dev.disnet.blog.content.markdown') {
+  if (!match || getDocumentMarkdown(match.record.content) === null) {
     setCache(cacheKey, null, DOCUMENTS_TTL_MS);
     return null;
   }
@@ -258,6 +260,55 @@ export async function updatePublishedDocument(did: string, rkey: string, record:
 
   invalidateDocumentCaches(normalizedPath);
   return response.data;
+}
+
+// One-time migration: rewrite legacy `dev.disnet.blog.content.markdown` embeds
+// on published documents into the markpub.at format. Operates on the raw record
+// value so every other field (bskyPostRef, coverImage, etc.) is preserved.
+export async function migrateLegacyContentToMarkpub(did: string) {
+  const agent = await restoreOAuthAgent(did);
+  const collection = 'site.standard.document';
+  const migrated: string[] = [];
+  const skipped: string[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const response = await agent.com.atproto.repo.listRecords({
+      repo: did,
+      collection,
+      limit: 100,
+      cursor
+    });
+
+    for (const item of response.data.records) {
+      const value = item.value as Record<string, unknown> & {
+        content?: { $type?: string; markdown?: string };
+      };
+      const rkey = item.uri.split('/').at(-1) ?? '';
+
+      if (value.content?.$type !== 'dev.disnet.blog.content.markdown') {
+        skipped.push(rkey);
+        continue;
+      }
+
+      await agent.com.atproto.repo.putRecord({
+        repo: did,
+        collection,
+        rkey,
+        validate: false,
+        record: {
+          ...value,
+          content: buildMarkpubContent(value.content.markdown ?? '')
+        }
+      });
+      migrated.push(rkey);
+    }
+
+    cursor = response.data.cursor;
+  } while (cursor);
+
+  invalidateDocumentCaches();
+  return { migrated, skipped };
 }
 
 export async function deletePublishedDocument(did: string, rkey: string) {

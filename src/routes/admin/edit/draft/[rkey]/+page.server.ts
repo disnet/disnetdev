@@ -1,4 +1,5 @@
 import { getAuthorBlobUrl } from '$lib/atproto/blobs';
+import { buildMarkpubContent } from '$lib/atproto/content';
 import { createPublishedDocument, publishedPathExists } from '$lib/atproto/documents';
 import { deleteDraft, getDraft, updateDraft } from '$lib/atproto/drafts';
 import { DRAFT_COLLECTION_NSID } from '$lib/config';
@@ -132,11 +133,7 @@ export const actions: Actions = {
       ...(existing.record.tags?.length ? { tags: existing.record.tags } : {}),
       ...(existing.record.coverImage ? { coverImage: existing.record.coverImage } : {}),
       ...(existing.record.embeddedBlobs?.length ? { embeddedBlobs: existing.record.embeddedBlobs } : {}),
-      content: {
-        $type: 'dev.disnet.blog.content.markdown',
-        markdown: existing.record.markdown,
-        sourceFormat: 'markdown'
-      },
+      content: buildMarkpubContent(existing.record.markdown),
       textContent: markdownToPlaintext(existing.record.markdown),
       updatedAt: now
     });

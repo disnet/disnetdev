@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import type { BlobRef } from '$lib/types/blog';
+import type { BlobRef, DocumentContent } from '$lib/types/blog';
 import { filterEmbeddedBlobs } from '$lib/atproto/blobs';
+import { getDocumentMarkdown } from '$lib/atproto/content';
 import { stringifyTags } from './draft-form';
 
 const pathPattern = /^\/[^\s]*$/;
@@ -133,7 +134,7 @@ export function getPostFormDefaults(record: {
   path?: string;
   description?: string;
   tags?: string[];
-  content?: { markdown: string };
+  content?: DocumentContent;
   publishedAt: string;
   coverImage?: BlobRef;
   embeddedBlobs?: BlobRef[];
@@ -143,7 +144,7 @@ export function getPostFormDefaults(record: {
     path: record.path ?? '/',
     description: record.description ?? '',
     tags: stringifyTags(record.tags),
-    markdown: record.content?.markdown ?? '',
+    markdown: getDocumentMarkdown(record.content) ?? '',
     publishedAt: record.publishedAt,
     coverImage: record.coverImage ? JSON.stringify(record.coverImage) : '',
     embeddedBlobs: record.embeddedBlobs?.length ? JSON.stringify(record.embeddedBlobs) : ''

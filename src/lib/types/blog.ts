@@ -5,12 +5,29 @@ export type BlobRef = {
   size: number;
 };
 
-export type MarkdownContent = {
+// markpub.at markdown embed (https://markpub.at). The canonical publish format.
+export type MarkpubText = {
+  $type?: 'at.markpub.text';
+  markdown: string;
+};
+
+export type MarkpubMarkdownContent = {
+  $type: 'at.markpub.markdown';
+  text: MarkpubText;
+  flavor?: 'gfm' | 'commonmark';
+  renderingRules?: string;
+  extensions?: string[];
+};
+
+// Legacy custom embed still present on older published records. Read-only.
+export type LegacyMarkdownContent = {
   $type: 'dev.disnet.blog.content.markdown';
   markdown: string;
   sourceFormat?: 'markdown';
   wordCount?: number;
 };
+
+export type DocumentContent = MarkpubMarkdownContent | LegacyMarkdownContent;
 
 export type PublicationRecord = {
   $type: 'site.standard.publication';
@@ -31,7 +48,7 @@ export type PublishedDocument = {
   path?: string;
   description?: string;
   tags?: string[];
-  content?: MarkdownContent;
+  content?: DocumentContent;
   textContent?: string;
   updatedAt?: string;
   coverImage?: BlobRef;
