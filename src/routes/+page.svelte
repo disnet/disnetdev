@@ -108,6 +108,10 @@
     <title>{data.publication.record.name}</title>
     <meta name="description" content={data.publication.record.description ?? ""} />
 
+    {#if data.publication.uri}
+        <link rel="site.standard.publication" href={data.publication.uri} />
+    {/if}
+
     <meta property="og:type" content="website" />
     <meta property="og:title" content={data.publication.record.name} />
     <meta
