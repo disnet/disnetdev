@@ -30,7 +30,7 @@
     "@fontsource/young-serif": "^5.2.7",
     "@sindresorhus/slugify": "^2.2.1",
     "@sveltejs/adapter-cloudflare": "^7.2.3",
-    "@sveltejs/kit": "^2.18.0",
+    "@sveltejs/kit": "^2.60.1",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
     "@types/markdown-it": "^14.1.2",
     "@types/node": "^22.15.3",
