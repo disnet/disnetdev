@@ -110,6 +110,44 @@ export function destroyWebSession(cookies: Cookies) {
   });
 }
 
+// A subscriber cookie carries the signed DID so we can later restore their
+// OAuth agent to remove the subscription record. TTL tracks the stored OAuth
+// session (30 days) — past that, restoring the agent would fail anyway.
+const SUBSCRIBER_COOKIE = 'disnetdev_subscriber';
+const SUBSCRIBER_TTL_SECONDS = 60 * 60 * 24 * 30;
+
+export async function markSubscriber(cookies: Cookies, did: string) {
+  const token = await encodeSession({ did, exp: Date.now() + SUBSCRIBER_TTL_SECONDS * 1000 });
+  cookies.set(SUBSCRIBER_COOKIE, token, {
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: !dev,
+    maxAge: SUBSCRIBER_TTL_SECONDS
+  });
+}
+
+export async function getSubscriber(cookies: Cookies): Promise<{ did: string } | null> {
+  const token = cookies.get(SUBSCRIBER_COOKIE);
+  if (!token) return null;
+
+  const payload = await decodeSession(token);
+  return payload ? { did: payload.did } : null;
+}
+
+export function clearSubscriber(cookies: Cookies) {
+  cookies.delete(SUBSCRIBER_COOKIE, { path: '/' });
+}
+
+// Only allow same-origin paths through a post-OAuth redirect — never an
+// absolute or protocol-relative URL a tampered form field could smuggle in.
+export function safeInternalPath(path: string | undefined, fallback = '/') {
+  if (!path || !path.startsWith('/') || path.startsWith('//') || path.startsWith('/\\')) {
+    return fallback;
+  }
+  return path;
+}
+
 export async function getAuthSession(cookies: Cookies): Promise<AuthSession | null> {
   const sessionToken = cookies.get(SESSION_COOKIE);
   if (!sessionToken) return null;

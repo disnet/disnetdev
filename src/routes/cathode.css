@@ -191,6 +191,162 @@ body {
   color: var(--ink-accent);
 }
 
+/* ——— subscribe widget ——— */
+
+.subscribe {
+  position: relative;
+}
+
+/* A bordered chip sets the control apart from the plain text nav links. */
+.subscribe-summary {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  font-family: var(--font-meta);
+  font-size: var(--type-sm);
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: var(--ink-text-soft);
+  padding: 0.18rem 0.7rem;
+  border: var(--rule) solid var(--ink-rule);
+  border-radius: 999px;
+  cursor: pointer;
+  list-style: none;
+  white-space: nowrap;
+  transition:
+    color 150ms ease-out,
+    border-color 150ms ease-out;
+}
+
+.subscribe-summary::-webkit-details-marker {
+  display: none;
+}
+
+.subscribe-summary:hover,
+.subscribe[open] .subscribe-summary,
+.subscribe-summary:focus-visible {
+  color: var(--ink-accent-hover);
+  border-color: var(--ink-accent-hover);
+}
+
+.subscribe.is-subscribed .subscribe-summary {
+  color: var(--ink-accent);
+  border-color: color-mix(in oklch, var(--ink-accent) 55%, var(--ink-rule));
+}
+
+.subscribe-check {
+  color: var(--ink-accent);
+  margin-right: 0.4ch;
+}
+
+.subscribe-status {
+  margin: 0;
+  font-family: var(--font-meta);
+  font-size: var(--type-sm);
+  letter-spacing: 0.04em;
+  color: var(--ink-text-soft);
+}
+
+.subscribe-unsub {
+  margin-top: var(--space-2xs);
+}
+
+.subscribe-unsub-button {
+  padding: 0;
+  font-family: var(--font-meta);
+  font-size: var(--type-sm);
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--ink-muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--ink-rule);
+  text-underline-offset: 0.22em;
+  transition: color 150ms ease-out;
+}
+
+.subscribe-unsub-button:hover,
+.subscribe-unsub-button:focus-visible {
+  color: var(--ink-accent-hover);
+}
+
+.subscribe-popover {
+  position: absolute;
+  top: calc(100% + var(--space-2xs));
+  right: 0;
+  z-index: 20;
+  width: min(20rem, calc(100vw - 2 * var(--space-md)));
+  padding: var(--space-sm);
+  background: var(--ink-surface);
+  border: var(--rule) solid var(--ink-rule);
+  border-radius: 0.5rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.subscribe-mini-label {
+  display: block;
+  font-family: var(--font-meta);
+  font-size: var(--type-sm);
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-2xs);
+}
+
+.subscribe-mini-row {
+  display: flex;
+  gap: var(--space-3xs);
+  align-items: stretch;
+}
+
+.subscribe-mini-row button {
+  flex: 0 0 auto;
+  padding: 0.45rem 0.7rem;
+  font-family: var(--font-mono);
+  font-size: var(--type-base);
+  line-height: 1;
+  color: var(--ink-page);
+  background: var(--ink-accent);
+  border: var(--rule) solid var(--ink-accent);
+  border-radius: 0.35rem;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease-out,
+    border-color 150ms ease-out;
+}
+
+.subscribe-mini-row button:hover,
+.subscribe-mini-row button:focus-visible {
+  background: var(--ink-accent-hover);
+  border-color: var(--ink-accent-hover);
+}
+
+.subscribe-rss {
+  display: block;
+  margin-top: var(--space-sm);
+  padding-top: var(--space-2xs);
+  border-top: var(--rule) solid var(--ink-rule);
+  font-family: var(--font-meta);
+  font-size: var(--type-sm);
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  color: var(--ink-text-soft);
+  text-decoration: none;
+  transition: color 150ms ease-out;
+}
+
+.subscribe-rss:hover,
+.subscribe-rss:focus-visible {
+  color: var(--ink-accent-hover);
+}
+
+.subscribe-rss-glyph {
+  color: var(--ink-accent);
+  margin-right: 0.35ch;
+}
+
 /* ——— links (default) ——— */
 
 .cathode-main a,

@@ -9,8 +9,9 @@
   import './cathode.css';
 
   import { page } from '$app/state';
+  import HandleField from '$lib/components/HandleField.svelte';
 
-  let { children } = $props();
+  let { children, data } = $props();
 
   const nav = [
     { href: '/', label: 'index', match: (p: string) => p === '/' },
@@ -40,6 +41,28 @@
   // The admin area owns its own viewport chrome (src/routes/admin/+layout.svelte).
   const isAdminArea = $derived(page.url.pathname.startsWith('/admin'));
   const pathname = $derived(page.url.pathname);
+  const subscribed = $derived(Boolean(data?.subscribed));
+
+  // Native <details> stays open on outside clicks — dismiss it ourselves.
+  let subscribeEl = $state<HTMLDetailsElement>();
+  $effect(() => {
+    function onPointerDown(event: MouseEvent) {
+      if (subscribeEl?.open && !subscribeEl.contains(event.target as Node)) {
+        subscribeEl.open = false;
+      }
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape' && subscribeEl?.open) {
+        subscribeEl.open = false;
+      }
+    }
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  });
 </script>
 
 <svelte:head>
@@ -63,6 +86,38 @@
             {item.label}
           </a>
         {/each}
+
+        <details class="subscribe" class:is-subscribed={subscribed} bind:this={subscribeEl}>
+          <summary class="subscribe-summary">
+            {#if subscribed}<span class="subscribe-check" aria-hidden="true">▸</span
+              >subscribed{:else}subscribe{/if}
+          </summary>
+          <div class="subscribe-popover">
+            {#if subscribed}
+              <p class="subscribe-status">
+                <span class="subscribe-check" aria-hidden="true">▸</span> Following over ATProto.
+              </p>
+              <form class="subscribe-unsub" method="POST" action="/subscribe?/unsubscribe">
+                <input type="hidden" name="redirectTo" value={pathname} />
+                <button type="submit" class="subscribe-unsub-button">unsubscribe</button>
+              </form>
+            {:else}
+              <form class="subscribe-mini" method="POST" action="/subscribe?/subscribe">
+                <input type="hidden" name="redirectTo" value={pathname} />
+                <label class="subscribe-mini-label" for="masthead-handle">
+                  Subscribe with your Atmosphere Account
+                </label>
+                <div class="subscribe-mini-row">
+                  <HandleField id="masthead-handle" placeholder="you.bsky.social" />
+                  <button type="submit" aria-label="Subscribe with your Atmosphere account">▸</button>
+                </div>
+              </form>
+            {/if}
+            <a class="subscribe-rss" href="/feed.xml">
+              <span class="subscribe-rss-glyph" aria-hidden="true">▸</span> rss feed
+            </a>
+          </div>
+        </details>
       </nav>
     </header>
 
