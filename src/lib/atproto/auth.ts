@@ -11,8 +11,15 @@ import { getKeyValueStore } from '$lib/server/kv';
 const OAUTH_STATE_TTL_SECONDS = 10 * 60;
 const OAUTH_SESSION_TTL_SECONDS = 60 * 60 * 24 * 30;
 
+export const SUBSCRIPTION_COLLECTION_NSID = 'site.standard.graph.subscription';
+
+// Subscribers grant only enough to write a subscription record to their own
+// repo — nothing the author flow asks for.
+const SUBSCRIBE_SCOPE = ['atproto', `repo:${SUBSCRIPTION_COLLECTION_NSID}`].join(' ');
+
 type OAuthState = {
   redirectTo?: string;
+  intent?: 'admin' | 'subscribe';
 };
 
 const stateStore = {
@@ -100,6 +107,7 @@ function createClient() {
     `repo:${DRAFT_COLLECTION_NSID}`,
     'repo:site.standard.document',
     'repo:site.standard.publication',
+    `repo:${SUBSCRIPTION_COLLECTION_NSID}`,
     'rpc:com.atproto.repo.uploadBlob',
     'blob:*/*'
   ].join(' ');
@@ -140,6 +148,23 @@ export async function beginOAuthLogin(handle: string, redirectTo?: string) {
   } catch (err) {
     const cause = (err as { cause?: unknown })?.cause;
     console.error('[oauth-login] authorize failed', {
+      handle,
+      error: err instanceof Error ? { name: err.name, message: err.message, stack: err.stack } : err,
+      cause: cause instanceof Error ? { name: cause.name, message: cause.message, stack: cause.stack } : cause
+    });
+    throw err;
+  }
+}
+
+export async function beginSubscribeLogin(handle: string, redirectTo?: string) {
+  try {
+    return await getOAuthClient().authorize(handle, {
+      scope: SUBSCRIBE_SCOPE,
+      state: JSON.stringify({ intent: 'subscribe', redirectTo } satisfies OAuthState)
+    });
+  } catch (err) {
+    const cause = (err as { cause?: unknown })?.cause;
+    console.error('[oauth-subscribe] authorize failed', {
       handle,
       error: err instanceof Error ? { name: err.name, message: err.message, stack: err.stack } : err,
       cause: cause instanceof Error ? { name: cause.name, message: cause.message, stack: cause.stack } : cause
