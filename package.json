@@ -52,7 +52,7 @@
     "@resvg/resvg-wasm": "^2.6.2",
     "glob": "^11.0.3",
     "gray-matter": "^4.0.3",
-    "markdown-it": "^14.1.1",
+    "markdown-it": "^14.2.0",
     "markdown-it-footnote": "^4.0.0",
     "marked": "^15.0.12",
     "satori": "^0.26.0",
