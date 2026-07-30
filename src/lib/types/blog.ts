@@ -1,5 +1,5 @@
 export type BlobRef = {
-  $type?: 'blob';
+  $type: 'blob';
   ref: { $link: string };
   mimeType: string;
   size: number;

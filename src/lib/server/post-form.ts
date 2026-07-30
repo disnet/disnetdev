@@ -7,6 +7,7 @@ import { stringifyTags } from './draft-form';
 const pathPattern = /^\/[^\s]*$/;
 
 const blobRefSchema = z.object({
+  $type: z.literal('blob').default('blob'),
   ref: z.object({ $link: z.string().min(1) }),
   mimeType: z.string().min(1),
   size: z.number().int().nonnegative()

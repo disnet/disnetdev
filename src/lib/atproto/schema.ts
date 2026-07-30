@@ -2,6 +2,9 @@ import { DRAFT_COLLECTION_NSID } from '$lib/config';
 import { z } from 'zod';
 
 const blobRefSchema = z.object({
+  // Older records written by the admin omitted this discriminator. Default it
+  // while reading so the next save repairs those records.
+  $type: z.literal('blob').default('blob'),
   ref: z.object({ $link: z.string() }),
   mimeType: z.string(),
   size: z.number().int().nonnegative()

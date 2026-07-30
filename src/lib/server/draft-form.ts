@@ -5,6 +5,7 @@ import { filterEmbeddedBlobs } from '$lib/atproto/blobs';
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const blobRefSchema = z.object({
+  $type: z.literal('blob').default('blob'),
   ref: z.object({ $link: z.string().min(1) }),
   mimeType: z.string().min(1),
   size: z.number().int().nonnegative()

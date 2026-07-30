@@ -37,6 +37,7 @@ export const POST: RequestHandler = async (event) => {
 
   const blob = response.data.blob;
   const blobRef = {
+    $type: 'blob' as const,
     ref: { $link: typeof blob.ref === 'string' ? blob.ref : blob.ref.toString() },
     mimeType: blob.mimeType,
     size: blob.size

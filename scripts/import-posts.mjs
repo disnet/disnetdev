@@ -139,6 +139,7 @@ async function resolvePdsUrlFromDid(did) {
 
 function blobRefFromResponse(blob) {
   return {
+    $type: 'blob',
     ref: { $link: typeof blob.ref === 'string' ? blob.ref : blob.ref.toString() },
     mimeType: blob.mimeType,
     size: blob.size
@@ -157,7 +158,7 @@ async function uploadImage(agent, imgPath, { dryRun }) {
 
   if (dryRun) {
     const sha = createHash('sha256').update(bytes).digest('hex').slice(0, 12);
-    return { ref: { $link: `dryrun-${sha}` }, mimeType, size: bytes.length };
+    return { $type: 'blob', ref: { $link: `dryrun-${sha}` }, mimeType, size: bytes.length };
   }
 
   const res = await agent.com.atproto.repo.uploadBlob(bytes, { encoding: mimeType });
@@ -188,6 +189,10 @@ async function processPost(file, raw, { agent, did, publicationUri, manifest, dr
     } else {
       console.log(`    reuse  ${imgPath} (cached CID ${blobRef.ref.$link})`);
     }
+    // Normalize manifests created before blob refs included the required
+    // ATProto discriminator.
+    blobRef = { ...blobRef, $type: 'blob' };
+    manifest.blobs[imgPath] = blobRef;
     uploadedImages[imgPath] = blobRef;
     embeddedBlobs.push(blobRef);
     const cid = blobRef.ref.$link;
