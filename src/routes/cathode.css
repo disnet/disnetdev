@@ -28,7 +28,8 @@
 
   --measure: 68ch;
   --measure-wide: 92ch;
-  --shell-max: calc(var(--measure-wide) + var(--space-xl) * 2);
+  --post-measure-wide: 100ch;
+  --shell-max: calc(var(--post-measure-wide) + var(--space-xl) * 2);
 
   --space-3xs: 0.25rem;
   --space-2xs: 0.5rem;
@@ -754,8 +755,9 @@ body {
 /* ——— post layout: right-margin reference column ——— */
 
 .post {
+  --post-layout-width: var(--measure-wide);
   --post-column-gap: clamp(var(--space-md), 3vw, var(--space-xl));
-  --post-margin-width: calc(var(--measure-wide) - var(--measure) - var(--post-column-gap));
+  --post-margin-width: calc(var(--post-layout-width) - var(--measure) - var(--post-column-gap));
 
   display: grid;
   grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
@@ -764,7 +766,13 @@ body {
     "body   ."
     "footer footer";
   column-gap: var(--post-column-gap);
-  max-width: var(--measure-wide);
+  max-width: var(--post-layout-width);
+}
+
+@media (min-width: 75rem) {
+  .post {
+    --post-layout-width: var(--post-measure-wide);
+  }
 }
 
 .post-header {
