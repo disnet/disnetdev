@@ -26,6 +26,13 @@
         content={data.collection.description ||
             `Cards filed under ${data.collection.name}.`}
     />
+    <meta name="at:canonical" content={data.collection.uri} />
+    {#each data.cards as card (card.uri)}
+        <meta name="at:alternate" content={card.uri} />
+    {/each}
+    {#if data.authorDid}
+        <meta name="at:author" content={`at://${data.authorDid}`} />
+    {/if}
 </svelte:head>
 
 <nav class="crumbs" aria-label="Breadcrumb">

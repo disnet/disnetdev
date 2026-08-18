@@ -30,6 +30,9 @@
         name="description"
         content="Articles, posts, and pieces I've shared recently, with notes."
     />
+    {#each data.shares as share (share.uri)}
+        <meta name="at:alternate" content={share.uri} />
+    {/each}
 </svelte:head>
 
 <section class="heading-block">

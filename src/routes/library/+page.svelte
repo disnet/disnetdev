@@ -31,6 +31,12 @@
         name="description"
         content="Cards and collections from my Semble library — things saved for later, sorted into shelves."
     />
+    {#each data.collections as collection (collection.uri)}
+        <meta name="at:alternate" content={collection.uri} />
+    {/each}
+    {#each data.cards as card (card.uri)}
+        <meta name="at:alternate" content={card.uri} />
+    {/each}
 </svelte:head>
 
 <section class="heading-block">

@@ -24,6 +24,12 @@
     name="description"
     content="Photos from @photos.disnetdev.com on Bluesky."
   />
+  {#each data.photos as photo (photo.uri)}
+    <meta name="at:alternate" content={photo.uri} />
+  {/each}
+  {#if data.photoAuthorDid}
+    <meta name="at:author" content={`at://${data.photoAuthorDid}`} />
+  {/if}
 </svelte:head>
 
 <section class="heading-block">

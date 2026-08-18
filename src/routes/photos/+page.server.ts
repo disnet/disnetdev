@@ -10,6 +10,7 @@ export async function load({ url, setHeaders }) {
 
   const photos = await listPhotoPosts();
   const total = photos.length;
+  const photoAuthorDid = photos[0]?.uri.split('/')[2] ?? '';
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const rawPage = Number(url.searchParams.get('page') ?? '1');
@@ -17,7 +18,14 @@ export async function load({ url, setHeaders }) {
 
   if (page < 1 || page > totalPages) {
     if (total === 0 && page === 1) {
-      return { photos: [], page: 1, totalPages: 1, total: 0, pageSize: PAGE_SIZE };
+      return {
+        photos: [],
+        photoAuthorDid,
+        page: 1,
+        totalPages: 1,
+        total: 0,
+        pageSize: PAGE_SIZE
+      };
     }
     throw error(404, 'Page not found');
   }
@@ -26,6 +34,7 @@ export async function load({ url, setHeaders }) {
 
   return {
     photos: photos.slice(start, start + PAGE_SIZE),
+    photoAuthorDid,
     page,
     totalPages,
     total,

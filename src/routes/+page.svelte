@@ -110,6 +110,10 @@
 
     {#if data.publication.uri}
         <link rel="site.standard.publication" href={data.publication.uri} />
+        <meta name="at:canonical" content={data.publication.uri} />
+    {/if}
+    {#if data.authorDid}
+        <meta name="at:author" content={`at://${data.authorDid}`} />
     {/if}
 
     <meta property="og:type" content="website" />

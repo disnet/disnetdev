@@ -68,6 +68,9 @@
 <svelte:head>
   <meta name="color-scheme" content="light dark" />
   <link rel="alternate" type="application/rss+xml" title="disnetdev RSS" href="/feed.xml" />
+  {#if data.authorDid}
+    <meta name="at:me" content={`at://${data.authorDid}`} />
+  {/if}
 </svelte:head>
 
 {#if isAdminArea}

@@ -14,6 +14,10 @@
     <meta name="description" content={data.post.description} />
   {/if}
   <link rel="site.standard.document" href={data.post.uri} />
+  <meta name="at:canonical" content={data.post.uri} />
+  {#if data.authorDid}
+    <meta name="at:author" content={`at://${data.authorDid}`} />
+  {/if}
 
   <meta property="og:type" content="article" />
   <meta property="og:title" content={data.post.title} />

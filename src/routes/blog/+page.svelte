@@ -21,6 +21,9 @@
 
 <svelte:head>
   <title>Blog · disnetdev</title>
+  {#if data.publicationUri}
+    <meta name="at:alternate" content={data.publicationUri} />
+  {/if}
 </svelte:head>
 
 <section class="heading-block">
