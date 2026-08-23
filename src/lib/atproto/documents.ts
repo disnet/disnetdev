@@ -35,8 +35,32 @@ type ListRecordsResponse = {
 type StoredDocument = {
   uri: string;
   rkey: string;
+  // Where this document actually resolves on the site. Usually the record's
+  // own `path`, but see `documentPath` for the linkblog exception.
+  path: string;
+  linkblog: boolean;
   record: PublishedDocument;
 };
+
+// Skyreader writes its linkblog entries into `site.standard.document` with a
+// root-level `/<rkey>` path, because nothing in `site.standard.publication`
+// tells it where this site keeps documents. They are link posts rather than
+// essays, so we serve them alongside the rest of the shares under /reading.
+export const LINKBLOG_PATH_PREFIX = '/reading';
+
+function isLinkblogRecord(record: PublishedDocument) {
+  return Boolean(record.skyreaderLinkblog);
+}
+
+function documentPath(rkey: string, record: PublishedDocument) {
+  if (isLinkblogRecord(record)) return `${LINKBLOG_PATH_PREFIX}/${rkey}`;
+  return normalizePath(record.path ?? '/');
+}
+
+function sourceUrlOf(record: PublishedDocument) {
+  const related = record.links?.find((link) => link.rel === 'related') ?? record.links?.[0];
+  return related?.uri;
+}
 
 async function listDocumentRecords(): Promise<StoredDocument[]> {
   const cached = getCache<StoredDocument[]>(DOCUMENTS_CACHE_KEY);
@@ -68,9 +92,13 @@ async function listDocumentRecords(): Promise<StoredDocument[]> {
       if (publication.uri && record.data.site !== publication.uri) continue;
       if (!record.data.path) continue;
 
+      const rkey = item.uri.split('/').at(-1) ?? '';
+
       all.push({
         uri: item.uri,
-        rkey: item.uri.split('/').at(-1) ?? '',
+        rkey,
+        path: documentPath(rkey, record.data),
+        linkblog: isLinkblogRecord(record.data),
         record: {
           ...record.data,
           path: normalizePath(record.data.path)
@@ -86,18 +114,31 @@ async function listDocumentRecords(): Promise<StoredDocument[]> {
   return all;
 }
 
-export async function listPublishedDocuments(): Promise<DocumentSummary[]> {
-  const documents = await listDocumentRecords();
-
-  return documents.map(({ rkey, record }) => ({
+function toSummary({ uri, rkey, path, record }: StoredDocument): DocumentSummary {
+  return {
     rkey,
-    path: record.path ?? '/blog/untitled',
-    slug: getSlugFromPath(record.path ?? '/blog/untitled'),
+    uri,
+    path,
+    slug: getSlugFromPath(path),
     title: record.title,
     description: record.description,
     tags: record.tags,
-    publishedAt: record.publishedAt
-  }));
+    publishedAt: record.publishedAt,
+    createdAt: record.createdAt,
+    sourceUrl: sourceUrlOf(record)
+  };
+}
+
+// Essays only. Linkblog entries are listed by `listLinkblogDocuments` and
+// deliberately kept out of the post index, the homepage, and the feed.
+export async function listPublishedDocuments(): Promise<DocumentSummary[]> {
+  const documents = await listDocumentRecords();
+  return documents.filter((document) => !document.linkblog).map(toSummary);
+}
+
+export async function listLinkblogDocuments(): Promise<DocumentSummary[]> {
+  const documents = await listDocumentRecords();
+  return documents.filter((document) => document.linkblog).map(toSummary);
 }
 
 async function renderDocument(record: PublishedDocument, repoDid: string, pdsUrl: string) {
@@ -128,39 +169,44 @@ export async function listPublishedDocumentsForFeed(): Promise<FeedDocument[]> {
   const pdsUrl = repoDid ? await getPdsUrlForDid(repoDid) : '';
 
   return Promise.all(
-    documents.map(async ({ rkey, record }) => {
-      const path = record.path ?? '/blog/untitled';
-      const rendered = await renderDocument(record, repoDid, pdsUrl);
-      const coverImageUrl =
-        record.coverImage && repoDid && pdsUrl
-          ? getBlobUrl(pdsUrl, repoDid, record.coverImage.ref.$link)
-          : undefined;
+    documents
+      .filter((document) => !document.linkblog)
+      .map(async ({ uri, rkey, path, record }) => {
+        const rendered = await renderDocument(record, repoDid, pdsUrl);
+        const coverImageUrl =
+          record.coverImage && repoDid && pdsUrl
+            ? getBlobUrl(pdsUrl, repoDid, record.coverImage.ref.$link)
+            : undefined;
 
-      return {
-        rkey,
-        path,
-        slug: getSlugFromPath(path),
-        title: record.title,
-        description: record.description,
-        tags: record.tags,
-        updatedAt: record.updatedAt,
-        publishedAt: record.publishedAt,
-        html: rendered.html,
-        coverImageUrl,
-        coverImageAlt: record.title
-      };
-    })
+        return {
+          rkey,
+          uri,
+          path,
+          slug: getSlugFromPath(path),
+          title: record.title,
+          description: record.description,
+          tags: record.tags,
+          updatedAt: record.updatedAt,
+          publishedAt: record.publishedAt,
+          html: rendered.html,
+          coverImageUrl,
+          coverImageAlt: record.title
+        };
+      })
   );
 }
 
-export async function getPublishedDocumentBySlug(slug: string): Promise<PostPageData | null> {
-  const expectedPath = `/blog/${slug}`;
+// Resolve any document by the path it actually serves at. `path` is the
+// document's own declaration of where it lives, so this is the only lookup
+// the public routes need.
+export async function getPublishedDocumentByPath(path: string): Promise<PostPageData | null> {
+  const expectedPath = normalizePath(path);
   const cacheKey = `${DOCUMENT_BY_PATH_PREFIX}${expectedPath}`;
   const cached = getCache<PostPageData | null>(cacheKey);
   if (cached) return cached;
 
   const documents = await listDocumentRecords();
-  const match = documents.find(({ record }) => record.path === expectedPath);
+  const match = documents.find((document) => document.path === expectedPath);
 
   if (!match || getDocumentMarkdown(match.record.content) === null) {
     setCache(cacheKey, null, DOCUMENTS_TTL_MS);
@@ -181,8 +227,10 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
   const post: PostPageData = {
     uri: match.uri,
     rkey: match.rkey,
-    path: match.record.path ?? expectedPath,
-    slug,
+    path: match.path,
+    slug: getSlugFromPath(match.path),
+    sourceUrl: sourceUrlOf(match.record),
+    createdAt: match.record.createdAt,
     title: match.record.title,
     description: match.record.description,
     tags: match.record.tags,
@@ -198,6 +246,23 @@ export async function getPublishedDocumentBySlug(slug: string): Promise<PostPage
   return post;
 }
 
+export async function getPublishedDocumentBySlug(slug: string): Promise<PostPageData | null> {
+  return getPublishedDocumentByPath(`/blog/${slug}`);
+}
+
+// A document whose declared `path` is not where we serve it, i.e. a linkblog
+// entry. Those `/<rkey>` URLs already went out in the feed and sitemap, so keep
+// them resolving instead of 404ing.
+export async function getDocumentPathRedirect(path: string): Promise<string | null> {
+  const normalizedPath = normalizePath(path);
+  const documents = await listDocumentRecords();
+  const match = documents.find(
+    (document) => document.record.path === normalizedPath && document.path !== normalizedPath
+  );
+
+  return match?.path ?? null;
+}
+
 export async function getPublishedDocument(rkey: string): Promise<StoredDocument | null> {
   const documents = await listDocumentRecords();
   return documents.find((document) => document.rkey === rkey) ?? null;
@@ -207,7 +272,7 @@ export async function publishedPathExists(path: string, options?: { excludeRkey?
   const documents = await listDocumentRecords();
   const normalizedPath = normalizePath(path);
   return documents.some(
-    (document) => document.record.path === normalizedPath && document.rkey !== options?.excludeRkey
+    (document) => document.path === normalizedPath && document.rkey !== options?.excludeRkey
   );
 }
 

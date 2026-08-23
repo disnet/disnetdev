@@ -50,6 +50,11 @@ export const publicationRecordSchema = z.object({
     .optional()
 });
 
+export const documentLinkSchema = z.object({
+  rel: z.string().optional(),
+  uri: z.string()
+});
+
 export const publishedDocumentSchema = z.object({
   $type: z.literal('site.standard.document'),
   site: z.string().min(1),
@@ -60,9 +65,14 @@ export const publishedDocumentSchema = z.object({
   tags: z.array(z.string()).optional(),
   content: documentContentSchema.optional(),
   textContent: z.string().optional(),
+  links: z.array(documentLinkSchema).optional(),
+  createdAt: z.string().datetime().optional(),
   updatedAt: z.string().datetime().optional(),
   coverImage: blobRefSchema.optional(),
-  embeddedBlobs: z.array(blobRefSchema).optional()
+  embeddedBlobs: z.array(blobRefSchema).optional(),
+  // Skyreader stamps its linkblog entries with this. It is the only signal
+  // that a document is a link post rather than an essay.
+  skyreaderLinkblog: z.string().optional()
 });
 
 export const shareRecordSchema = z.object({

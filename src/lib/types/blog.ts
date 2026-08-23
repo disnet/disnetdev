@@ -40,6 +40,11 @@ export type PublicationRecord = {
   };
 };
 
+export type DocumentLink = {
+  rel?: string;
+  uri: string;
+};
+
 export type PublishedDocument = {
   $type: 'site.standard.document';
   site: string;
@@ -50,9 +55,13 @@ export type PublishedDocument = {
   tags?: string[];
   content?: DocumentContent;
   textContent?: string;
+  links?: DocumentLink[];
+  createdAt?: string;
   updatedAt?: string;
   coverImage?: BlobRef;
   embeddedBlobs?: BlobRef[];
+  // Present only on link posts written by Skyreader's linkblog.
+  skyreaderLinkblog?: string;
 };
 
 export type DraftRecord = {
@@ -77,12 +86,18 @@ export type DraftRecord = {
 
 export type DocumentSummary = {
   rkey: string;
+  uri: string;
   path: string;
   slug: string;
   title: string;
   description?: string;
   tags?: string[];
   publishedAt: string;
+  // When the record was written, which for a linkblog entry is when it was
+  // shared. `publishedAt` on those mirrors the source article instead.
+  createdAt?: string;
+  // Set on Skyreader linkblog entries: the piece being linked to.
+  sourceUrl?: string;
 };
 
 export type FeedDocument = DocumentSummary & {
@@ -136,9 +151,11 @@ export type PostPageData = {
   rkey: string;
   path: string;
   slug: string;
+  sourceUrl?: string;
   title: string;
   description?: string;
   tags?: string[];
+  createdAt?: string;
   updatedAt?: string;
   publishedAt: string;
   html: string;

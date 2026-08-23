@@ -30,8 +30,11 @@
         name="description"
         content="Articles, posts, and pieces I've shared recently, with notes."
     />
-    {#each data.shares as share (share.uri)}
-        <meta name="at:alternate" content={share.uri} />
+    {#each data.entries as entry (entry.kind === "share" ? entry.share.uri : entry.post.uri)}
+        <meta
+            name="at:alternate"
+            content={entry.kind === "share" ? entry.share.uri : entry.post.uri}
+        />
     {/each}
 </svelte:head>
 
@@ -41,55 +44,80 @@
     <p class="page-lede">
         Things I've read and wanted to keep, shared via
         <a href="https://skyreader.app">Skyreader</a>. Sometimes with a note,
-        sometimes just the pointer. {data.total} share{data.total === 1 ? "" : "s"}
+        sometimes just the pointer. {data.total} item{data.total === 1 ? "" : "s"}
         so far.
     </p>
 </section>
 
-{#if data.shares.length === 0}
+{#if data.entries.length === 0}
     <p class="empty">
         <span class="empty-prompt">▸</span> nothing shared yet.
     </p>
 {:else}
     <ol class="shares">
-        {#each data.shares as share}
+        {#each data.entries as entry}
             <li class="share">
-                <span class="share-date">{formatDate(share.createdAt)}</span>
+                <span class="share-date">{formatDate(entry.sortedAt)}</span>
                 <div class="share-body">
-                    {#if share.note}
-                        <p class="share-note">{share.note}</p>
-                        <p class="share-cite">
-                            <span class="share-cite-glyph" aria-hidden="true">▸</span>
-                            <a class="share-cite-link" href={share.itemUrl} rel="noopener">
-                                {share.itemTitle || share.itemUrl}
-                            </a>
-                            {#if share.itemAuthor}
-                                <span class="share-cite-sep">·</span>
-                                <span class="share-cite-author">{share.itemAuthor}</span>
-                            {/if}
-                            <span class="share-cite-sep">·</span>
-                            <span class="share-cite-host">{hostOf(share.itemUrl)}</span>
-                        </p>
-                    {:else}
+                    {#if entry.kind === "post"}
+                        {@const post = entry.post}
                         <h2 class="share-title">
-                            <a href={share.itemUrl} rel="noopener">
-                                {share.itemTitle || share.itemUrl}
-                            </a>
+                            <a href={post.path}>{post.title}</a>
                         </h2>
+                        {#if post.description}
+                            <p class="share-note">{post.description}</p>
+                        {/if}
                         <p class="share-meta">
-                            {#if share.itemAuthor}
-                                <span>{share.itemAuthor}</span>
+                            {#if post.sourceUrl}
+                                <span class="share-cite-host">{hostOf(post.sourceUrl)}</span>
                                 <span class="share-cite-sep">·</span>
                             {/if}
-                            <span class="share-cite-host">{hostOf(share.itemUrl)}</span>
+                            <a class="share-more" href={post.path}>notes ▸</a>
                         </p>
-                    {/if}
-                    {#if share.tags?.length}
-                        <p class="share-tags">
-                            {#each share.tags as tag, i}
-                                <span>{tag}</span>{#if i < share.tags.length - 1}<span class="share-cite-sep"> · </span>{/if}
-                            {/each}
-                        </p>
+                        {#if post.tags?.length}
+                            <p class="share-tags">
+                                {#each post.tags as tag, i}
+                                    <span>{tag}</span>{#if i < post.tags.length - 1}<span class="share-cite-sep"> · </span>{/if}
+                                {/each}
+                            </p>
+                        {/if}
+                    {:else}
+                        {@const share = entry.share}
+                        {#if share.note}
+                            <p class="share-note">{share.note}</p>
+                            <p class="share-cite">
+                                <span class="share-cite-glyph" aria-hidden="true">▸</span>
+                                <a class="share-cite-link" href={share.itemUrl} rel="noopener">
+                                    {share.itemTitle || share.itemUrl}
+                                </a>
+                                {#if share.itemAuthor}
+                                    <span class="share-cite-sep">·</span>
+                                    <span class="share-cite-author">{share.itemAuthor}</span>
+                                {/if}
+                                <span class="share-cite-sep">·</span>
+                                <span class="share-cite-host">{hostOf(share.itemUrl)}</span>
+                            </p>
+                        {:else}
+                            <h2 class="share-title">
+                                <a href={share.itemUrl} rel="noopener">
+                                    {share.itemTitle || share.itemUrl}
+                                </a>
+                            </h2>
+                            <p class="share-meta">
+                                {#if share.itemAuthor}
+                                    <span>{share.itemAuthor}</span>
+                                    <span class="share-cite-sep">·</span>
+                                {/if}
+                                <span class="share-cite-host">{hostOf(share.itemUrl)}</span>
+                            </p>
+                        {/if}
+                        {#if share.tags?.length}
+                            <p class="share-tags">
+                                {#each share.tags as tag, i}
+                                    <span>{tag}</span>{#if i < share.tags.length - 1}<span class="share-cite-sep"> · </span>{/if}
+                                {/each}
+                            </p>
+                        {/if}
                     {/if}
                 </div>
             </li>
@@ -266,6 +294,20 @@
         flex-wrap: wrap;
         align-items: baseline;
         gap: 0.5ch;
+    }
+
+    .share-more {
+        font-family: var(--font-meta);
+        font-size: var(--type-sm);
+        letter-spacing: 0.04em;
+        color: var(--ink-text-soft);
+        text-decoration: none;
+        transition: color 120ms ease-out;
+    }
+
+    .share-more:hover,
+    .share-more:focus-visible {
+        color: var(--ink-accent-hover);
     }
 
     .share-tags {

@@ -5,13 +5,21 @@
     post,
     returnHref = '/blog',
     returnLabel = '◂ back to index',
-    statusPath = ''
+    statusPath = '',
+    dateLabel = 'published',
+    dateIso = ''
   }: {
     post: PostPageData;
     returnHref?: string;
     returnLabel?: string;
     statusPath?: string;
+    // A link post's `publishedAt` belongs to the piece it points at, so the
+    // page that owns it can supply the date it actually wants to show.
+    dateLabel?: string;
+    dateIso?: string;
   } = $props();
+
+  const shownDate = $derived(dateIso || post.publishedAt);
 
   function formatDate(iso: string) {
     const d = new Date(iso);
@@ -39,10 +47,10 @@
   <aside class="post-margin" aria-label="Post metadata">
     <dl class="post-margin-list">
       <div class="post-margin-item">
-        <dt>published</dt>
+        <dt>{dateLabel}</dt>
         <dd>
-          <time datetime={post.publishedAt}>
-            {formatDate(post.publishedAt)}
+          <time datetime={shownDate}>
+            {formatDate(shownDate)}
           </time>
         </dd>
       </div>
