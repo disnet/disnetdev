@@ -89,8 +89,8 @@
 
     const recentPosts = $derived(data.posts.slice(0, 3));
     const hasMorePosts = $derived(data.posts.length > 3);
-    const recentShares = $derived(data.shares);
-    const hasMoreShares = $derived(data.sharesTotal > data.shares.length);
+    const recentReading = $derived(data.reading);
+    const hasMoreReading = $derived(data.readingTotal > data.reading.length);
     const recentCards = $derived(data.cards);
     const hasMoreCards = $derived(data.cardsTotal > data.cards.length);
     const recentPhotos = $derived(data.photos);
@@ -240,65 +240,82 @@
     </section>
 {/if}
 
-{#if recentShares.length > 0}
+{#if recentReading.length > 0}
     <section aria-labelledby="shared-heading" class="band">
         <header class="band-header">
             <h2 id="shared-heading" class="band-title">
                 Recently shared via <a href="https://skyreader.app">Skyreader</a>
             </h2>
-            {#if hasMoreShares}
+            {#if hasMoreReading}
                 <a href="/reading" class="read-more">all shares</a>
             {/if}
         </header>
 
         <ol class="shares">
-            {#each recentShares as share}
+            {#each recentReading as entry}
                 <li class="share">
                     <span class="share-date">
-                        {new Date(share.createdAt).toLocaleDateString("en-US", {
+                        {new Date(entry.sortedAt).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
                         })}
                     </span>
                     <div class="share-body">
-                        {#if share.note}
-                            <p class="share-note">{share.note}</p>
-                            <p class="share-cite">
-                                <span class="share-cite-glyph" aria-hidden="true">▸</span>
-                                <a
-                                    class="share-cite-link"
-                                    href={share.itemUrl}
-                                    rel="noopener"
-                                >
-                                    {share.itemTitle || share.itemUrl}
-                                </a>
-                                {#if share.itemAuthor}
-                                    <span class="share-cite-sep">·</span>
-                                    <span class="share-cite-author"
-                                        >{share.itemAuthor}</span
+                        {#if entry.kind === "post"}
+                            {@const post = entry.post}
+                            <h3 class="share-title">
+                                <a href={post.path}>{post.title}</a>
+                            </h3>
+                            <p class="share-meta">
+                                {#if post.sourceUrl}
+                                    <span class="share-cite-host"
+                                        >{hostOf(post.sourceUrl)}</span
                                     >
-                                {:else}
                                     <span class="share-cite-sep">·</span>
+                                {/if}
+                                <a class="share-more" href={post.path}>notes ▸</a>
+                            </p>
+                        {:else}
+                            {@const share = entry.share}
+                            {#if share.note}
+                                <p class="share-note">{share.note}</p>
+                                <p class="share-cite">
+                                    <span class="share-cite-glyph" aria-hidden="true">▸</span>
+                                    <a
+                                        class="share-cite-link"
+                                        href={share.itemUrl}
+                                        rel="noopener"
+                                    >
+                                        {share.itemTitle || share.itemUrl}
+                                    </a>
+                                    {#if share.itemAuthor}
+                                        <span class="share-cite-sep">·</span>
+                                        <span class="share-cite-author"
+                                            >{share.itemAuthor}</span
+                                        >
+                                    {:else}
+                                        <span class="share-cite-sep">·</span>
+                                        <span class="share-cite-host"
+                                            >{hostOf(share.itemUrl)}</span
+                                        >
+                                    {/if}
+                                </p>
+                            {:else}
+                                <h3 class="share-title">
+                                    <a href={share.itemUrl} rel="noopener">
+                                        {share.itemTitle || share.itemUrl}
+                                    </a>
+                                </h3>
+                                <p class="share-meta">
+                                    {#if share.itemAuthor}
+                                        <span>{share.itemAuthor}</span>
+                                        <span class="share-cite-sep">·</span>
+                                    {/if}
                                     <span class="share-cite-host"
                                         >{hostOf(share.itemUrl)}</span
                                     >
-                                {/if}
-                            </p>
-                        {:else}
-                            <h3 class="share-title">
-                                <a href={share.itemUrl} rel="noopener">
-                                    {share.itemTitle || share.itemUrl}
-                                </a>
-                            </h3>
-                            <p class="share-meta">
-                                {#if share.itemAuthor}
-                                    <span>{share.itemAuthor}</span>
-                                    <span class="share-cite-sep">·</span>
-                                {/if}
-                                <span class="share-cite-host"
-                                    >{hostOf(share.itemUrl)}</span
-                                >
-                            </p>
+                                </p>
+                            {/if}
                         {/if}
                     </div>
                 </li>
@@ -717,6 +734,20 @@
         flex-wrap: wrap;
         align-items: baseline;
         gap: 0.5ch;
+    }
+
+    .share-more {
+        font-family: var(--font-meta);
+        font-size: var(--type-sm);
+        letter-spacing: 0.04em;
+        color: var(--ink-text-soft);
+        text-decoration: none;
+        transition: color 120ms ease-out;
+    }
+
+    .share-more:hover,
+    .share-more:focus-visible {
+        color: var(--ink-accent-hover);
     }
 
     /* ——— filed (recently filed library cards) ——— */

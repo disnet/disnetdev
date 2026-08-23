@@ -1,6 +1,6 @@
 import { listPublishedDocuments } from '$lib/atproto/documents';
 import { getPublication } from '$lib/atproto/publication';
-import { listShares } from '$lib/atproto/shares';
+import { listReadingEntries } from '$lib/atproto/reading';
 import { listCards, listCollections } from '$lib/atproto/library';
 import { listPhotoPosts } from '$lib/atproto/photos';
 
@@ -9,10 +9,10 @@ export async function load({ setHeaders }) {
     'cache-control': 'public, max-age=0, s-maxage=300, stale-while-revalidate=300'
   });
 
-  const [publication, posts, shares, cards, collections, photos] = await Promise.all([
+  const [publication, posts, reading, cards, collections, photos] = await Promise.all([
     getPublication(),
     listPublishedDocuments(),
-    listShares(),
+    listReadingEntries(),
     listCards(),
     listCollections(),
     listPhotoPosts(3)
@@ -21,8 +21,8 @@ export async function load({ setHeaders }) {
   return {
     publication,
     posts: posts.slice(0, 5),
-    shares: shares.slice(0, 5),
-    sharesTotal: shares.length,
+    reading: reading.slice(0, 5),
+    readingTotal: reading.length,
     cards: cards.slice(0, 5),
     cardsTotal: cards.length,
     photos,
