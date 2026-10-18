@@ -34,7 +34,6 @@
   {/if}
 
   <p class="lens-status">
-    <span class="lens-prompt">$</span>
     <span>at://{identity.did}</span>
     <span class="lens-sep">·</span>
     <span>{new URL(identity.pds).host}</span>

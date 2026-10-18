@@ -72,7 +72,7 @@
 {:else if typeof value === 'string'}
   {@const href = lensHrefForUri(value, own)}
   {#if href}
-    <a class="ft-ref" {href}><span aria-hidden="true">▸</span> {value}</a>
+    <a class="ft-ref" {href}><span aria-hidden="true">→</span> {value}</a>
   {:else if /^https?:\/\//.test(value) && !/\s/.test(value)}
     <a class="ft-url" href={value} rel="noopener nofollow">{value}</a>
   {:else if ISO_DATE.test(value)}

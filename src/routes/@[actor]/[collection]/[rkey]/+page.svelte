@@ -15,7 +15,7 @@
 
 <nav class="lens-crumbs" aria-label="Breadcrumb">
   <a href={lensHref(repo)}>@{repo}</a>
-  <span aria-hidden="true">▸</span>
+  <span aria-hidden="true">→</span>
   <a href={lensHref(repo, data.collection)}>{data.collection}</a>
 </nav>
 
@@ -24,7 +24,6 @@
     {#if s.title}<h1 class="lens-specimen-title">{s.title}</h1>{/if}
     {#if s.text}<p class="page-lede">{s.text}</p>{/if}
     <p class="lens-status">
-      <span class="lens-prompt">$</span>
       <span class="lens-uri">{data.record.uri}</span>
     </p>
     {#if data.record.cid}

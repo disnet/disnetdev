@@ -1,30 +1,33 @@
 /*
- * Cathode paper — public site global stylesheet.
- * Warm ecru by day, warm umber by night. Amber is signal.
+ * Blue pencil — public site global stylesheet.
+ * Bond paper by day, blue-black ink by night. Ultramarine is the editor's
+ * mark: links, current state, the occasional margin note.
  * See .impeccable.md › "Public Site" for the full design context.
  */
 
 :root {
   color-scheme: light dark;
 
-  --font-display: 'Young Serif', 'Alegreya', ui-serif, Georgia, serif;
-  --font-body:
-    'Alegreya', ui-serif, Georgia, 'Times New Roman', serif;
-  --font-meta: 'Alegreya Sans SC', 'Alegreya', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'Commit Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-display: 'Schibsted Grotesk Variable', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: 'Piazzolla Variable', ui-serif, Georgia, 'Times New Roman', serif;
+  --font-meta: 'Schibsted Grotesk Variable', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Martian Mono Variable', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Light mode — warm ecru / deep ink / phosphor amber */
-  --ink-page: oklch(0.965 0.008 78);
-  --ink-surface: oklch(0.94 0.012 78);
-  --ink-surface-sunken: oklch(0.92 0.012 78);
-  --ink-text: oklch(0.22 0.012 60);
-  --ink-text-soft: oklch(0.36 0.01 65);
-  --ink-muted: oklch(0.55 0.008 70);
-  --ink-rule: oklch(0.85 0.008 75);
-  --ink-rule-soft: oklch(0.9 0.008 75);
-  --ink-accent: oklch(0.66 0.15 75);
-  --ink-accent-hover: oklch(0.55 0.17 55);
-  --ink-selection: oklch(0.88 0.1 85 / 0.5);
+  --weight-display: 720;
+  --weight-meta: 560;
+
+  /* Light mode — bond paper / blue-black ink / ultramarine pencil */
+  --ink-page: oklch(0.982 0.003 250);
+  --ink-surface: oklch(0.955 0.007 255);
+  --ink-surface-sunken: oklch(0.935 0.009 255);
+  --ink-text: oklch(0.2 0.03 268);
+  --ink-text-soft: oklch(0.38 0.025 266);
+  --ink-muted: oklch(0.53 0.02 262);
+  --ink-rule: oklch(0.86 0.012 258);
+  --ink-rule-soft: oklch(0.915 0.008 258);
+  --ink-accent: oklch(0.49 0.22 270);
+  --ink-accent-hover: oklch(0.4 0.2 272);
+  --ink-selection: oklch(0.86 0.08 268 / 0.55);
 
   --measure: 68ch;
   --measure-wide: 92ch;
@@ -46,7 +49,7 @@
   /* Fixed rem scale for UI (nav, meta). Fluid clamp for content headings. */
   --type-xs: 0.75rem;
   --type-sm: 0.8125rem;
-  --type-base: 1.125rem; /* 18px — long-form default */
+  --type-base: 1.1875rem; /* 19px — Piazzolla sets small */
   --type-lg: 1.25rem;
   --type-xl: 1.5rem;
 
@@ -59,18 +62,18 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    /* Dark mode — warm workshop at night. Not navy. Not pure black. */
-    --ink-page: oklch(0.195 0.015 55);
-    --ink-surface: oklch(0.16 0.014 55);
-    --ink-surface-sunken: oklch(0.14 0.014 55);
-    --ink-text: oklch(0.88 0.018 80);
-    --ink-text-soft: oklch(0.76 0.014 78);
-    --ink-muted: oklch(0.6 0.012 70);
-    --ink-rule: oklch(0.32 0.015 60);
-    --ink-rule-soft: oklch(0.26 0.015 60);
-    --ink-accent: oklch(0.78 0.15 78);
-    --ink-accent-hover: oklch(0.86 0.13 80);
-    --ink-selection: oklch(0.55 0.13 75 / 0.4);
+    /* Dark mode — blue-black ink well. Graphite, not neon. */
+    --ink-page: oklch(0.175 0.014 268);
+    --ink-surface: oklch(0.215 0.018 268);
+    --ink-surface-sunken: oklch(0.15 0.012 268);
+    --ink-text: oklch(0.93 0.006 255);
+    --ink-text-soft: oklch(0.8 0.012 258);
+    --ink-muted: oklch(0.63 0.016 262);
+    --ink-rule: oklch(0.34 0.02 266);
+    --ink-rule-soft: oklch(0.265 0.018 266);
+    --ink-accent: oklch(0.74 0.14 270);
+    --ink-accent-hover: oklch(0.85 0.09 270);
+    --ink-selection: oklch(0.5 0.15 270 / 0.45);
   }
 }
 
@@ -94,7 +97,10 @@ body {
   color: var(--ink-text);
   font-family: var(--font-body);
   font-size: var(--type-base);
-  line-height: 1.65;
+  line-height: 1.62;
+  font-optical-sizing: auto;
+  /* Only Martian Mono has a width axis; this narrows it everywhere it appears. */
+  font-stretch: 87.5%;
   font-feature-settings: 'kern', 'liga', 'onum';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -102,7 +108,9 @@ body {
 
 @media (prefers-color-scheme: dark) {
   body {
-    line-height: 1.72;
+    line-height: 1.68;
+    /* Light text on dark reads heavier; pull the weight back a touch. */
+    font-weight: 370;
   }
 }
 
@@ -110,10 +118,12 @@ body {
   background: var(--ink-selection);
 }
 
-/* ——— cathode paper shell ——— */
+/* ——— page shell ——— */
 
 .cathode {
   min-height: 100vh;
+  /* The pencil stripe: one bar of the accent across the top edge. */
+  border-top: 5px solid var(--ink-accent);
   display: grid;
   grid-template-rows: auto 1fr auto;
   /* Keep a wide grid inside main (the lens cabinet) from widening the page. */
@@ -131,28 +141,31 @@ body {
 /* ——— masthead ——— */
 
 .masthead {
+  width: 100%;
   max-width: var(--shell-max);
   margin: 0 auto;
   padding: var(--space-lg) clamp(var(--space-md), 4vw, var(--space-xl))
     var(--space-md);
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'mark nav subscribe';
   gap: var(--space-md) var(--space-lg);
   align-items: baseline;
-  border-bottom: var(--rule) solid var(--ink-rule);
+  border-bottom: 2px solid var(--ink-text);
 }
 
 .masthead-mark {
+  grid-area: mark;
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-  letter-spacing: -0.01em;
+  font-weight: var(--weight-display);
+  font-weight: 820;
+  font-size: clamp(1.6rem, 1.25rem + 1.2vw, 2.25rem);
+  letter-spacing: -0.045em;
   color: var(--ink-text);
   text-decoration: none;
   line-height: 1;
   display: inline-flex;
   align-items: baseline;
-  gap: 0.35ch;
 }
 
 .masthead-mark-dot {
@@ -160,14 +173,15 @@ body {
 }
 
 .masthead-nav {
+  grid-area: nav;
   display: flex;
   flex-wrap: wrap;
   gap: clamp(var(--space-sm), 2vw, var(--space-lg));
   justify-content: flex-end;
   font-family: var(--font-meta);
-  font-size: var(--type-sm);
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
+  font-weight: var(--weight-meta);
+  font-size: 0.9375rem;
+  letter-spacing: -0.005em;
 }
 
 .masthead-nav a {
@@ -176,6 +190,10 @@ body {
   padding: 0.25rem 0;
   position: relative;
   transition: color 150ms ease-out;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.4em;
 }
 
 .masthead-nav a:hover,
@@ -184,40 +202,77 @@ body {
 }
 
 .masthead-nav a[aria-current='page'] {
-  color: var(--ink-accent);
+  color: var(--ink-text);
+  text-decoration-color: var(--ink-accent);
 }
 
-.masthead-nav a[aria-current='page']::before {
-  content: '▸';
-  position: absolute;
-  left: -1ch;
-  color: var(--ink-accent);
+/* Phones: mark and subscribe share the top line; the nav runs edge to edge beneath a hairline. */
+@media (max-width: 40rem) {
+  .masthead {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'mark subscribe'
+      'nav  nav';
+    row-gap: var(--space-sm);
+    align-items: center;
+    padding-top: var(--space-md);
+    padding-bottom: 0;
+  }
+
+  .masthead-nav {
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    padding: var(--space-2xs) 0;
+    border-top: var(--rule) solid var(--ink-rule-soft);
+    font-size: 0.9375rem;
+    /* Six short labels fit at 360px+; narrower screens scroll rather than wrap. */
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .masthead-nav a {
+    padding: var(--space-2xs) 0;
+    white-space: nowrap;
+  }
+
+  .subscribe-summary {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 24rem) {
+  .masthead-nav {
+    font-size: 0.8125rem;
+  }
 }
 
 /* ——— subscribe widget ——— */
 
 .subscribe {
+  grid-area: subscribe;
   position: relative;
 }
 
-/* A bordered chip sets the control apart from the plain text nav links. */
+/* A solid block of pencil sets the control apart from the plain text nav links. */
 .subscribe-summary {
   display: inline-flex;
   align-items: center;
   align-self: center;
   font-family: var(--font-meta);
-  font-size: var(--type-sm);
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
-  color: var(--ink-text-soft);
-  padding: 0.18rem 0.7rem;
-  border: var(--rule) solid var(--ink-rule);
-  border-radius: 999px;
+  font-weight: var(--weight-meta);
+  font-size: 0.9375rem;
+  letter-spacing: -0.005em;
+  color: var(--ink-page);
+  background: var(--ink-accent);
+  padding: 0.2rem 0.65rem;
+  border: 2px solid var(--ink-accent);
+  border-radius: 0;
   cursor: pointer;
   list-style: none;
   white-space: nowrap;
   transition:
-    color 150ms ease-out,
+    background-color 150ms ease-out,
     border-color 150ms ease-out;
 }
 
@@ -228,13 +283,14 @@ body {
 .subscribe-summary:hover,
 .subscribe[open] .subscribe-summary,
 .subscribe-summary:focus-visible {
-  color: var(--ink-accent-hover);
+  background: var(--ink-accent-hover);
   border-color: var(--ink-accent-hover);
 }
 
 .subscribe.is-subscribed .subscribe-summary {
   color: var(--ink-accent);
-  border-color: color-mix(in oklch, var(--ink-accent) 55%, var(--ink-rule));
+  background: transparent;
+  border-color: var(--ink-accent);
 }
 
 .subscribe-check {
@@ -245,6 +301,7 @@ body {
 .subscribe-status {
   margin: 0;
   font-family: var(--font-meta);
+  font-weight: var(--weight-meta);
   font-size: var(--type-sm);
   letter-spacing: 0.04em;
   color: var(--ink-text-soft);
@@ -257,9 +314,10 @@ body {
 .subscribe-unsub-button {
   padding: 0;
   font-family: var(--font-meta);
+  font-weight: var(--weight-meta);
   font-size: var(--type-sm);
   letter-spacing: 0.06em;
-  text-transform: lowercase;
+  text-transform: uppercase;
   color: var(--ink-muted);
   background: none;
   border: 0;
@@ -283,8 +341,9 @@ body {
   width: min(20rem, calc(100vw - 2 * var(--space-md)));
   padding: var(--space-sm);
   background: var(--ink-surface);
-  border: var(--rule) solid var(--ink-rule);
-  border-radius: 0.5rem;
+  border: 2px solid var(--ink-text);
+  border-radius: 0;
+  box-shadow: 6px 6px 0 var(--ink-accent);
   text-transform: none;
   letter-spacing: normal;
 }
@@ -292,6 +351,7 @@ body {
 .subscribe-mini-label {
   display: block;
   font-family: var(--font-meta);
+  font-weight: var(--weight-meta);
   font-size: var(--type-sm);
   letter-spacing: 0.04em;
   color: var(--ink-muted);
@@ -313,7 +373,7 @@ body {
   color: var(--ink-page);
   background: var(--ink-accent);
   border: var(--rule) solid var(--ink-accent);
-  border-radius: 0.35rem;
+  border-radius: 0;
   cursor: pointer;
   transition:
     background-color 150ms ease-out,
@@ -332,9 +392,10 @@ body {
   padding-top: var(--space-2xs);
   border-top: var(--rule) solid var(--ink-rule);
   font-family: var(--font-meta);
+  font-weight: var(--weight-meta);
   font-size: var(--type-sm);
   letter-spacing: 0.06em;
-  text-transform: lowercase;
+  text-transform: uppercase;
   color: var(--ink-text-soft);
   text-decoration: none;
   transition: color 150ms ease-out;
@@ -356,9 +417,9 @@ body {
 .prose a {
   color: var(--ink-text);
   text-decoration: underline;
-  text-decoration-color: var(--ink-rule);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in oklch, var(--ink-accent) 55%, transparent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.2em;
   transition:
     color 120ms ease-out,
     text-decoration-color 120ms ease-out;
@@ -368,7 +429,7 @@ body {
 .cathode-main a:focus-visible,
 .prose a:hover,
 .prose a:focus-visible {
-  color: var(--ink-accent-hover);
+  color: var(--ink-accent);
   text-decoration-color: currentColor;
 }
 
@@ -380,38 +441,62 @@ body {
 
 /* ——— headings (used outside .prose) ——— */
 
+/* Page head: the title at poster scale, the lede set beside it, closed by an ink rule. */
+.heading-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md) var(--space-xl);
+  padding-bottom: var(--space-lg);
+  margin-bottom: var(--space-xl);
+  border-bottom: 2px solid var(--ink-text);
+}
+
+@media (min-width: 64rem) {
+  /* Title fills the left column; the lede and any meta sit at the foot of the right one. */
+  .heading-block {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: end;
+  }
+}
+
+.page-head-aside {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
 .page-heading {
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: var(--type-h1);
-  letter-spacing: -0.015em;
-  line-height: 1.1;
-  margin: 0 0 var(--space-md);
+  font-weight: 830;
+  font-size: clamp(3.2rem, 1.4rem + 7vw, 6rem);
+  letter-spacing: -0.04em;
+  line-height: 0.88;
+  margin: 0;
   color: var(--ink-text);
-}
-
-.page-eyebrow {
-  font-family: var(--font-meta);
-  font-size: var(--type-sm);
-  letter-spacing: 0.18em;
-  text-transform: lowercase;
-  color: var(--ink-accent);
-  margin: 0 0 var(--space-xs);
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.5ch;
-}
-
-.page-eyebrow::before {
-  content: '▸';
+  text-wrap: balance;
 }
 
 .page-lede {
-  max-width: var(--measure);
+  max-width: 40ch;
   font-size: var(--type-lg);
   color: var(--ink-text-soft);
-  line-height: 1.55;
-  margin: 0 0 var(--space-xl);
+  line-height: 1.45;
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* State flag (draft preview): a solid block of pencil, impossible to miss. */
+.state-flag {
+  display: inline-block;
+  font-family: var(--font-meta);
+  font-weight: var(--weight-meta);
+  font-size: var(--type-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-page);
+  background: var(--ink-accent);
+  padding: 0.3rem 0.6rem;
+  margin: 0 0 var(--space-lg);
 }
 
 /* ——— index list (blog, home) ——— */
@@ -425,26 +510,33 @@ body {
 
 .index-entry {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
   column-gap: var(--space-md);
-  padding: var(--space-md) 0;
+  padding: var(--space-md) 0 var(--space-lg);
   border-top: var(--rule) solid var(--ink-rule-soft);
 }
 
-.index-entry:last-child {
-  border-bottom: var(--rule) solid var(--ink-rule-soft);
+.index-entry:first-child {
+  border-top: 0;
+}
+
+@media (max-width: 40rem) {
+  .index-entry {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    column-gap: var(--space-sm);
+  }
 }
 
 .index-num {
   font-family: var(--font-mono);
   font-size: var(--type-sm);
-  font-weight: 400;
+  font-weight: 300;
   color: var(--ink-muted);
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
   font-variant-numeric: tabular-nums;
-  padding-top: 0.4em;
+  padding-top: 0.55em;
   white-space: nowrap;
-  min-width: 5ch;
 }
 
 .index-body {
@@ -454,11 +546,12 @@ body {
 
 .index-title {
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: var(--type-lg);
-  line-height: 1.25;
-  letter-spacing: -0.005em;
+  font-weight: 750;
+  font-size: clamp(1.3rem, 1.15rem + 0.5vw, 1.6rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
   margin: 0;
+  text-wrap: balance;
 }
 
 .index-title a {
@@ -473,7 +566,7 @@ body {
 
 .index-desc {
   color: var(--ink-text-soft);
-  font-size: 1rem;
+  font-size: 1.0625rem;
   line-height: 1.55;
   margin: 0;
   max-width: var(--measure);
@@ -544,10 +637,10 @@ body {
 .prose h3,
 .prose h4 {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: var(--weight-display);
   color: var(--ink-text);
-  letter-spacing: -0.01em;
-  line-height: 1.2;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
   margin: var(--space-xl) 0 var(--space-sm);
 }
 
@@ -572,14 +665,14 @@ body {
 .prose a {
   color: var(--ink-text);
   text-decoration: underline;
-  text-decoration-color: var(--ink-rule);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.22em;
+  text-decoration-color: color-mix(in oklch, var(--ink-accent) 55%, transparent);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.2em;
 }
 
 .prose a:hover,
 .prose a:focus-visible {
-  color: var(--ink-accent-hover);
+  color: var(--ink-accent);
   text-decoration-color: currentColor;
 }
 
@@ -594,16 +687,16 @@ body {
 .prose blockquote {
   margin: var(--space-lg) 0;
   padding: 0 0 0 var(--space-md);
-  border-inline-start: var(--rule) solid var(--ink-rule);
+  border-inline-start: 3px solid var(--ink-accent);
   color: var(--ink-text-soft);
   font-style: italic;
 }
 
 .prose hr {
   border: 0;
-  border-top: var(--rule) solid var(--ink-rule);
-  margin: var(--space-xl) auto;
-  width: 8ch;
+  border-top: 2px solid var(--ink-text);
+  margin: var(--space-xl) 0;
+  width: 4ch;
 }
 
 .prose ul,
@@ -630,27 +723,28 @@ body {
 /* Inline code — quiet badge, no boxy chrome */
 .prose code {
   font-family: var(--font-mono);
-  font-size: 0.92em;
+  font-size: 0.84em;
   color: var(--ink-text);
   background: var(--ink-surface);
-  padding: 0.08em 0.35em;
-  border-radius: 2px;
+  padding: 0.1em 0.35em;
+  border-radius: 0;
 }
 
 /* Block code — tinted paper, no frame, subordinate to prose */
 .prose pre {
   font-family: var(--font-mono);
-  font-size: 0.875em;
-  line-height: 1.6;
+  font-size: 0.8em;
+  line-height: 1.65;
   background: var(--ink-surface);
   color: var(--ink-text);
   padding: var(--space-sm) var(--space-md);
+  border-top: 2px solid var(--ink-text);
   margin: var(--space-md) 0;
   overflow-x: auto;
   max-width: 100%;
   /* Let code break out of the measure very slightly so it breathes */
   margin-inline: calc(var(--space-sm) * -1);
-  border-radius: 2px;
+  border-radius: 0;
   font-feature-settings: 'liga' 0;
 }
 
@@ -764,7 +858,8 @@ body {
   display: grid;
   grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
   grid-template-areas:
-    "header margin"
+    "header header"
+    "margin margin"
     "body   ."
     "footer footer";
   column-gap: var(--post-column-gap);
@@ -779,7 +874,7 @@ body {
 
 .post-header {
   grid-area: header;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-lg);
 }
 
 .post-cover {
@@ -797,38 +892,43 @@ body {
 
 .post-title {
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: var(--type-h1);
-  letter-spacing: -0.015em;
-  line-height: 1.1;
+  font-weight: 830;
+  font-size: clamp(2.6rem, 1.3rem + 5vw, 5.5rem);
+  letter-spacing: -0.04em;
+  line-height: 0.92;
   margin: 0 0 var(--space-md);
   color: var(--ink-text);
+  max-width: 20ch;
+  text-wrap: balance;
 }
 
 .post-description {
-  font-size: var(--type-lg);
-  line-height: 1.5;
+  font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+  line-height: 1.4;
   color: var(--ink-text-soft);
   margin: 0;
-  max-width: var(--measure);
+  max-width: 48ch;
+  text-wrap: pretty;
 }
 
 .post > .prose {
   grid-area: body;
 }
 
+/* Dateline: published / updated / tags in one strip between ink rules. */
 .post-margin {
   grid-area: margin;
-  align-self: start;
-  padding-top: 0.55rem;
+  margin-bottom: var(--space-xl);
+  padding: var(--space-xs) 0;
+  border-top: 2px solid var(--ink-text);
+  border-bottom: var(--rule) solid var(--ink-rule);
 }
 
 .post-margin-list {
   margin: 0;
-  padding-inline-start: var(--space-sm);
-  border-inline-start: var(--rule) solid var(--ink-rule-soft);
-  display: grid;
-  gap: var(--space-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm) var(--space-xl);
 }
 
 .post-margin-item {
@@ -838,18 +938,21 @@ body {
 
 .post-margin-item dt {
   font-family: var(--font-meta);
+  font-weight: var(--weight-meta);
   font-size: var(--type-xs);
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--ink-muted);
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.6ch;
+  align-items: center;
+  gap: 0.8ch;
 }
 
 .post-margin-item dt::before {
-  content: '▸';
-  color: var(--ink-accent);
-  font-size: 0.9em;
+  content: '';
+  width: 0.55em;
+  height: 0.55em;
+  background: var(--ink-accent);
 }
 
 .post-margin-item dd {
@@ -899,21 +1002,23 @@ body {
 
 .post-footnotes-title {
   font-family: var(--font-meta);
+  font-weight: var(--weight-meta);
   font-size: var(--type-xs);
   font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: lowercase;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--ink-muted);
   margin: 0 0 var(--space-xs);
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.6ch;
+  align-items: center;
+  gap: 0.8ch;
 }
 
 .post-footnotes-title::before {
-  content: '▸';
-  color: var(--ink-accent);
-  font-size: 0.9em;
+  content: '';
+  width: 0.55em;
+  height: 0.55em;
+  background: var(--ink-accent);
 }
 
 .post-footnotes-list {
@@ -965,7 +1070,7 @@ body {
   grid-area: footer;
   margin-top: var(--space-2xl);
   padding-top: var(--space-md);
-  border-top: var(--rule) solid var(--ink-rule);
+  border-top: 2px solid var(--ink-text);
   font-family: var(--font-mono);
   font-size: var(--type-xs);
   color: var(--ink-muted);
@@ -986,7 +1091,10 @@ body {
 }
 
 .post-statusline-prompt {
-  color: var(--ink-accent);
+  width: 0.6em;
+  height: 0.6em;
+  background: var(--ink-accent);
+  align-self: center;
 }
 
 .post-statusline-return {
@@ -1006,8 +1114,8 @@ body {
   .post {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "margin"
       "header"
+      "margin"
       "body"
       "footnotes"
       "footer";
@@ -1020,16 +1128,11 @@ body {
   }
 
   .post-margin {
-    position: static;
-    padding-top: 0;
+    margin-bottom: 0;
   }
 
   .post-margin-list {
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    gap: var(--space-lg);
-    padding-inline-start: 0;
-    border-inline-start: 0;
+    gap: var(--space-sm) var(--space-lg);
   }
 
   .post-footnotes {
@@ -1118,21 +1221,27 @@ body {
 /* ——— footer colophon ——— */
 
 .colophon {
+  width: 100%;
   max-width: var(--shell-max);
   margin: 0 auto;
   padding: var(--space-xl) clamp(var(--space-md), 4vw, var(--space-xl))
     var(--space-xl);
-  border-top: var(--rule) solid var(--ink-rule);
-  font-family: var(--font-meta);
-  font-size: var(--type-sm);
-  letter-spacing: 0.08em;
+  border-top: 2px solid var(--ink-text);
   color: var(--ink-muted);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-md);
   justify-content: space-between;
   align-items: baseline;
-  text-transform: lowercase;
+}
+
+/* Type lives on the children so the container's ch-based width matches the masthead. */
+.colophon > * {
+  font-family: var(--font-meta);
+  font-weight: var(--weight-meta);
+  font-size: var(--type-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .colophon a {
@@ -1156,8 +1265,11 @@ body {
 }
 
 .colophon-prompt {
-  color: var(--ink-accent);
-  margin-inline-end: 0.5ch;
+  display: inline-block;
+  width: 0.6em;
+  height: 0.6em;
+  background: var(--ink-accent);
+  margin-inline-end: 0.8ch;
 }
 
 /* ——— continue reading affordance ——— */
@@ -1167,16 +1279,18 @@ body {
   align-items: baseline;
   gap: 0.5ch;
   font-family: var(--font-meta);
-  font-size: var(--type-sm);
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
+  font-weight: var(--weight-meta);
+  font-size: var(--type-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--ink-accent);
   text-decoration: none;
   margin-top: var(--space-xs);
+  white-space: nowrap;
 }
 
 .read-more::after {
-  content: '▸';
+  content: '→';
   transition: transform 200ms ease-out;
 }
 

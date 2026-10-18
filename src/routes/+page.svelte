@@ -1,8 +1,5 @@
 <script lang="ts">
     import { page } from "$app/state";
-    import { invalidateAll } from "$app/navigation";
-    import { lensHref } from "$lib/lens/paths";
-    import RepoScope from "$lib/components/lens/RepoScope.svelte";
 
     let { data } = $props();
 
@@ -25,64 +22,77 @@
     ];
 
     const projects = [
-        { name: "Radial", href: "https://radl.app", blurb: "Agent orchestration on the Atmosphere." },
-        { name: "Skyreader", href: "https://skyreader.app", blurb: "An RSS reader on the Atmosphere." },
-        { name: "Skyboard", href: "https://skyboard.dev", blurb: "A Kanban board on the Atmosphere." },
-        { name: "SembleIt", href: "https://sembleit.dev", blurb: "An alternative client for Semble." },
-        { name: "Flint", href: "https://www.flintnote.com", blurb: "A note-taking app." },
-        { name: "Sweet.js", href: "https://sweetjs.org", blurb: "Hygienic macros for JavaScript." },
+        {
+            name: "Skyreader",
+            href: "https://skyreader.app",
+            blurb: "An RSS reader on the Atmosphere",
+        },
+        {
+            name: "Skyboard",
+            href: "https://skyboard.dev",
+            blurb: "A Kanban board on the Atmosphere",
+        },
+        {
+            name: "SembleIt",
+            href: "https://sembleit.dev",
+            blurb: "An alternative client for Semble",
+        },
+        {
+            name: "Flint",
+            href: "https://www.flintnote.com",
+            blurb: "A note-taking app.",
+        },
+        {
+            name: "Sweet.js",
+            href: "https://sweetjs.org",
+            blurb: "Hygienic macros for JavaScript.",
+        },
+        {
+            name: "Contracts.coffee",
+            href: "http://disnet.github.io/contracts.coffee/",
+            blurb: "Higher-order contracts for CoffeeScript.",
+        },
     ];
 
-    const flight = $derived(data.inFlight);
-    const me = "disnetdev.com";
+    const featuredPapers = [
+        {
+            slug: "thesis",
+            title: "Hygienic Macros for JavaScript",
+            venue: "Thesis",
+            year: 2015,
+            blurb: "My doctoral dissertation showing how to adapt a hygienic macro system to JavaScript.",
+        },
+        {
+            slug: "virtual-values-for-language-extension",
+            title: "Virtual Values for Language Extension",
+            venue: "OOPSLA",
+            year: 2011,
+            blurb: "A generalization and formalization of existing meta-object systems, with an application to JavaScript.",
+        },
+        {
+            slug: "temporal-higher-order-contracts",
+            title: "Temporal Higher-Order Contracts",
+            venue: "ICFP",
+            year: 2011,
+            blurb: "Bringing temporal assertions to higher-order contracts.",
+        },
+    ];
 
-    // The board is live: re-read the repo every minute while the tab is
-    // visible, and mark anything that wasn't there on the last read.
-    let seen: Set<string> | null = null;
-    let fresh = $state<Set<string>>(new Set());
-    let focused = $state<string | null>(null);
+    const recentPosts = $derived(data.posts.slice(0, 3));
+    const hasMorePosts = $derived(data.posts.length > 3);
+    const recentReading = $derived(data.reading);
+    const hasMoreReading = $derived(data.readingTotal > data.reading.length);
+    const recentCards = $derived(data.cards);
+    const hasMoreCards = $derived(data.cardsTotal > data.cards.length);
+    const recentPhotos = $derived(data.photos);
 
-    $effect(() => {
-        const uris = [...flight.underway, ...flight.landed].map((f) => f.uri);
-        const before = seen;
-        if (before) fresh = new Set(uris.filter((u) => !before.has(u)));
-        seen = new Set(uris);
-    });
-
-    $effect(() => {
-        const timer = setInterval(() => {
-            if (document.visibilityState === "visible") invalidateAll();
-        }, 60_000);
-        return () => clearInterval(timer);
-    });
-
-    function day(iso: string) {
-        const d = new Date(iso);
-        if (Number.isNaN(d.getTime())) return "";
-        const sameYear = d.getFullYear() === new Date().getFullYear();
-        return d.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: sameYear ? undefined : "numeric",
-        });
+    function hostOf(url: string) {
+        try {
+            return new URL(url).hostname.replace(/^www\./, "");
+        } catch {
+            return url;
+        }
     }
-
-
-    // A plan's progress as a row of type: ■ done, ▸ active or next, · waiting.
-    const METER_WIDTH = 32;
-    function meter(h: (typeof flight.horizon)[number]) {
-        const moving = h.counts[0]?.n ?? 0;
-        const waiting = h.total - h.done - moving;
-        const scale = h.total > METER_WIDTH ? METER_WIDTH / h.total : 1;
-        const cells = (n: number) => (n > 0 ? Math.max(1, Math.round(n * scale)) : 0);
-        return {
-            done: "■".repeat(cells(h.done)),
-            moving: "▸".repeat(cells(moving)),
-            waiting: "·".repeat(cells(waiting)),
-        };
-    }
-
-    const isExternal = (href: string) => /^https?:\/\//.test(href);
 </script>
 
 <svelte:head>
@@ -118,157 +128,238 @@
     <meta name="twitter:image" content={ogImage} />
 </svelte:head>
 
-<section class="hero" aria-labelledby="hero-heading">
-    {#if data.scope}
-        <div class="hero-scope">
-            <RepoScope
-                did={data.scope.did}
-                pds={data.scope.pds}
-                repo={data.scope.repo}
-                collections={data.scope.collections}
-                highlights={flight.underway.map((f) => ({
-                    uri: f.uri,
-                    label: f.callsign,
-                    title: f.title,
-                }))}
-                bind:focused
-                label="A radar of every record in my repo: bearing is the app, distance is age."
-            />
-        </div>
-    {/if}
+<section class="intro">
+    <h1 class="intro-name">Tim Disney</h1>
+    <p class="intro-lede">
+        I make code and things. Programming languages, the web, and the <a
+            href="https://atproto.com/">Atmosphere</a
+        > bring me joy.
+    </p>
 
-    <div class="hero-text">
-        <h1 id="hero-heading" class="page-heading">Tim Disney</h1>
-        <p class="page-lede">
-            I make code and things. Programming languages, the web, and the <a
-                href="https://atproto.com/">Atmosphere</a
-            > bring me joy. The scope is my repo, read live from my PDS: every
-            blip is a record, and the boxed ones are work in flight.
-        </p>
+    <ul class="signals" aria-label="Reach me">
+        {#each socials as s}
+            <li class="signal">
+                <span class="signal-label">{s.label}</span>
+                <a
+                    class="signal-link"
+                    href={s.href}
+                    rel={s.label === "bluesky" || s.label === "mastodon"
+                        ? "me"
+                        : undefined}
+                >
+                    {s.handle}
+                </a>
+            </li>
+        {/each}
+    </ul>
+</section>
 
-        <h2 class="flights-heading">In flight</h2>
-        {#if flight.underway.length === 0}
-            <p class="empty">
-                <span class="empty-prompt">▸</span> nothing in the air right now.
-            </p>
-        {:else}
-            <ol class="flights">
-                {#each flight.underway as f (f.uri)}
-                    <li
-                        class="flight"
-                        class:is-focused={focused === f.uri}
-                        class:is-fresh={fresh.has(f.uri)}
-                        onpointerenter={() => (focused = f.uri)}
-                    >
-                        <span class="flight-sign">{f.callsign}</span>
-                        <a class="flight-title" href={f.href} onfocus={() => (focused = f.uri)}
-                            >{f.title}</a
-                        >
-                        <span class="flight-where">
-                            {f.where}<span class="board-sep">·</span>{f.status}
-                        </span>
-                    </li>
-                {/each}
-            </ol>
+<div class="home-grid">
+<section aria-labelledby="recent-heading" class="band band--posts">
+    <header class="band-header">
+        <h2 id="recent-heading" class="band-title">Recent posts</h2>
+        {#if hasMorePosts}
+            <a href="/blog" class="read-more">all posts</a>
         {/if}
+    </header>
 
-        <ul class="signals" aria-label="Reach me">
-            {#each socials as s}
-                <li class="signal">
-                    <span class="signal-label">{s.label}</span>
-                    <a
-                        class="signal-link"
-                        href={s.href}
-                        rel={s.label === "bluesky" || s.label === "mastodon"
-                            ? "me"
-                            : undefined}
-                    >
-                        {s.handle}
+    {#if recentPosts.length === 0}
+        <p class="empty">
+            <span class="empty-prompt">→</span> the transmitter is warm but quiet. the first
+            post from the new stack is on its way.
+        </p>
+    {:else}
+        <ol class="lead">
+            {#each recentPosts as post}
+                <li class="lead-entry">
+                    <time class="lead-date" datetime={post.publishedAt}>
+                        <span class="lead-day"
+                            >{new Date(post.publishedAt).getDate()}</span
+                        >
+                        <span class="lead-month">
+                            {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                year: "numeric",
+                            })}
+                        </span>
+                    </time>
+                    <div class="lead-body">
+                        <h3 class="lead-title">
+                            <a href={post.path}>{post.title}</a>
+                        </h3>
+                        {#if post.description}
+                            <p class="lead-desc">{post.description}</p>
+                        {/if}
+                        {#if post.tags?.length}
+                            <p class="lead-tags">{post.tags.slice(0, 3).join(" · ")}</p>
+                        {/if}
+                    </div>
+                </li>
+            {/each}
+        </ol>
+    {/if}
+</section>
+
+{#if recentPhotos.length > 0}
+    <section aria-labelledby="photos-heading" class="band band--photos">
+        <header class="band-header">
+            <h2 id="photos-heading" class="band-title">
+                Recent photos
+            </h2>
+            <a href="/photos" class="read-more">all photos</a>
+        </header>
+
+        <ol class="photo-strip">
+            {#each recentPhotos as photo}
+                <li class="photo-strip-item">
+                    <a class="photo-strip-link" href={photo.url} rel="noopener">
+                        <img
+                            src={photo.images[0].thumb}
+                            alt={photo.images[0].alt}
+                            loading="lazy"
+                            decoding="async"
+                        />
+                        <span class="photo-strip-date">
+                            {new Date(photo.createdAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                            })}
+                        </span>
                     </a>
                 </li>
             {/each}
-        </ul>
-    </div>
-</section>
-
-{#if flight.horizon.length > 0}
-    <section aria-labelledby="horizon-heading" class="band">
-        <header class="band-header">
-            <h2 id="horizon-heading" class="band-title">On the horizon</h2>
-            <span class="band-sublabel">
-                <span class="meter-key">■</span> done
-                <span class="meter-key meter-key--moving">▸</span> moving
-                <span class="meter-key">·</span> waiting
-            </span>
-        </header>
-
-        <ul class="horizon">
-            {#each flight.horizon as h}
-                {@const m = meter(h)}
-                <li class="horizon-row">
-                    <h3 class="horizon-name"><a href={h.href}>{h.name}</a></h3>
-                    <p class="horizon-meter" aria-label={`${h.done} of ${h.total} done`}>
-                        <span class="meter-done">{m.done}</span><span class="meter-moving"
-                            >{m.moving}</span
-                        ><span class="meter-waiting">{m.waiting}</span>
-                    </p>
-                    <p class="horizon-counts">
-                        {h.done}/{h.total} done{#each h.counts.filter((c) => c.n > 0) as c}
-                            <span class="board-sep">·</span>{c.n} {c.label}{/each}
-                    </p>
-                </li>
-            {/each}
-        </ul>
+        </ol>
     </section>
 {/if}
 
-<section aria-labelledby="landed-heading" class="band">
-    <header class="band-header">
-        <h2 id="landed-heading" class="band-title">Landed</h2>
-        <a href="/blog" class="read-more">all posts</a>
-    </header>
+{#if recentReading.length > 0}
+    <section aria-labelledby="shared-heading" class="band band--shares">
+        <header class="band-header">
+            <h2 id="shared-heading" class="band-title">
+                Recently shared via <a href="https://skyreader.app">Skyreader</a>
+            </h2>
+            {#if hasMoreReading}
+                <a href="/reading" class="read-more">all shares</a>
+            {/if}
+        </header>
 
-    <ol class="log">
-        {#each flight.landed as f (f.uri)}
-            <li class="log-row" class:is-fresh={fresh.has(f.uri)}>
-                <span class="log-when">{day(f.at)}</span>
-                <span class="log-verb">{f.status}</span>
-                <div class="log-body">
-                    <a
-                        class="log-title"
-                        href={f.href}
-                        rel={isExternal(f.href) ? "noopener" : undefined}>{f.title}</a
-                    >
-                    <span class="log-where">
-                        {f.where}{#if f.via}<span class="board-sep">·</span>{f.via}{/if}
+        <ol class="shares">
+            {#each recentReading as entry}
+                <li class="share">
+                    <span class="share-date">
+                        {new Date(entry.sortedAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                        })}
                     </span>
-                </div>
-                {#if f.image}
-                    <img class="log-thumb" src={f.image} alt="" loading="lazy" decoding="async" />
-                {/if}
-            </li>
-        {/each}
-    </ol>
-</section>
+                    <div class="share-body">
+                        {#if entry.kind === "post"}
+                            {@const post = entry.post}
+                            <h3 class="share-title">
+                                <a href={post.path}>{post.title}</a>
+                            </h3>
+                            <p class="share-meta">
+                                {#if post.sourceUrl}
+                                    <span class="share-cite-host"
+                                        >{hostOf(post.sourceUrl)}</span
+                                    >
+                                    <span class="share-cite-sep">·</span>
+                                {/if}
+                                <a class="share-more" href={post.path}>notes →</a>
+                            </p>
+                        {:else}
+                            {@const share = entry.share}
+                            {#if share.note}
+                                <p class="share-note">{share.note}</p>
+                                <p class="share-cite">
+                                    <span class="share-cite-glyph" aria-hidden="true">→</span>
+                                    <a
+                                        class="share-cite-link"
+                                        href={share.itemUrl}
+                                        rel="noopener"
+                                    >
+                                        {share.itemTitle || share.itemUrl}
+                                    </a>
+                                    {#if share.itemAuthor}
+                                        <span class="share-cite-sep">·</span>
+                                        <span class="share-cite-author"
+                                            >{share.itemAuthor}</span
+                                        >
+                                    {:else}
+                                        <span class="share-cite-sep">·</span>
+                                        <span class="share-cite-host"
+                                            >{hostOf(share.itemUrl)}</span
+                                        >
+                                    {/if}
+                                </p>
+                            {:else}
+                                <h3 class="share-title">
+                                    <a href={share.itemUrl} rel="noopener">
+                                        {share.itemTitle || share.itemUrl}
+                                    </a>
+                                </h3>
+                                <p class="share-meta">
+                                    {#if share.itemAuthor}
+                                        <span>{share.itemAuthor}</span>
+                                        <span class="share-cite-sep">·</span>
+                                    {/if}
+                                    <span class="share-cite-host"
+                                        >{hostOf(share.itemUrl)}</span
+                                    >
+                                </p>
+                            {/if}
+                        {/if}
+                    </div>
+                </li>
+            {/each}
+        </ol>
+    </section>
+{/if}
 
-<section aria-labelledby="lens-heading" class="band lens-invite">
-    <header class="band-header">
-        <h2 id="lens-heading" class="band-title">The whole repo</h2>
-    </header>
-    <p class="lens-invite-copy">
-        Everything on this page is read from public records in my repo. You
-        can <a href={lensHref(me)}>browse all of it</a>, every collection from
-        every app I use, down to the raw fields of each record.
-    </p>
-</section>
+{#if recentCards.length > 0}
+    <section aria-labelledby="filed-heading" class="band band--filed">
+        <header class="band-header">
+            <h2 id="filed-heading" class="band-title">
+                Recently filed in the <a href="/library">library</a>
+            </h2>
+            {#if hasMoreCards}
+                <a href="/library" class="read-more">all cards</a>
+            {/if}
+        </header>
 
-<section aria-labelledby="workshop-heading" class="band">
+        <ol class="filed">
+            {#each recentCards as card}
+                <li class="filed-item">
+                    <span class="filed-mark" aria-hidden="true">■</span>
+                    <div class="filed-body">
+                        <h3 class="filed-title">
+                            <a href={card.url} rel="noopener">
+                                {card.title || card.url}
+                            </a>
+                        </h3>
+                        <p class="filed-meta">
+                            <span class="filed-meta-host">
+                                {card.siteName || hostOf(card.url)}
+                            </span>
+                            {#if card.author}
+                                <span class="filed-meta-sep">·</span>
+                                <span class="filed-meta-author">{card.author}</span>
+                            {/if}
+                        </p>
+                    </div>
+                </li>
+            {/each}
+        </ol>
+    </section>
+{/if}
+
+<section aria-labelledby="workshop-heading" class="band band--workshop">
     <header class="band-header">
         <h2 id="workshop-heading" class="band-title">Workshop</h2>
-        <a href="/papers" class="read-more">papers</a>
+        <span class="band-sublabel">things I've made</span>
     </header>
 
-    <ul class="stack">
+    <ul class="stack stack--grid">
         {#each projects as project}
             <li class="stack-item">
                 <h3 class="stack-name">
@@ -280,82 +371,290 @@
     </ul>
 </section>
 
-<style>
+<section aria-labelledby="papers-heading" class="band band--papers">
+    <header class="band-header">
+        <h2 id="papers-heading" class="band-title">Papers</h2>
+        <a href="/papers" class="read-more">all papers</a>
+    </header>
 
-    /* ——— signals (social contact table) ——— */
+    <ul class="stack">
+        {#each featuredPapers as paper}
+            <li class="stack-item">
+                <h3 class="stack-name">
+                    <a href={`/papers/${paper.slug}`}>{paper.title}</a>
+                </h3>
+                <p class="stack-blurb">{paper.blurb}</p>
+                <p class="stack-venue">
+                    <span class="stack-venue-name">{paper.venue}</span>
+                    <span class="stack-venue-sep" aria-hidden="true">·</span>
+                    <span>{paper.year}</span>
+                </p>
+            </li>
+        {/each}
+    </ul>
+</section>
+</div>
+
+<style>
+    /* ——— intro: the name set at poster scale, lede beside it ——— */
+    .intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-md);
+        margin-bottom: var(--space-2xl);
+    }
+
+    .intro-name {
+        font-family: var(--font-display);
+        font-weight: 830;
+        font-size: clamp(3.4rem, 1.2rem + 8.4vw, 6rem);
+        letter-spacing: -0.04em;
+        line-height: 0.88;
+        margin: 0;
+        color: var(--ink-text);
+    }
+
+    .intro-lede {
+        font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+        line-height: 1.4;
+        color: var(--ink-text-soft);
+        margin: 0;
+        max-width: 34ch;
+        text-wrap: pretty;
+    }
+
+    /* ——— signals (contact dateline) ——— */
     .signals {
         list-style: none;
-        padding: 0;
-        margin: 0;
-        max-width: var(--measure);
+        padding: var(--space-sm) 0 0;
+        margin: var(--space-sm) 0 0;
+        border-top: var(--rule) solid var(--ink-rule);
         display: grid;
-        gap: var(--space-2xs) var(--space-md);
-        grid-template-columns: max-content 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+        gap: var(--space-sm) var(--space-lg);
         font-family: var(--font-mono);
         font-size: var(--type-sm);
-        font-variant-numeric: tabular-nums;
     }
 
     .signal {
-        display: contents;
+        display: grid;
+        gap: var(--space-3xs);
+        min-width: 0;
     }
 
     .signal-label {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-xs);
-        letter-spacing: 0.14em;
-        text-transform: lowercase;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
         color: var(--ink-muted);
-        padding-top: 0.18em;
-        align-self: baseline;
     }
 
     .signal-link {
         color: var(--ink-text);
         text-decoration: none;
-        padding-bottom: 1px;
-        border-bottom: 1px dotted var(--ink-rule);
-        transition:
-            color 120ms ease-out,
-            border-color 120ms ease-out;
         justify-self: start;
+        overflow-wrap: anywhere;
+        transition: color 120ms ease-out;
     }
 
     .signal-link:hover,
     .signal-link:focus-visible {
         color: var(--ink-accent-hover);
-        border-bottom-color: currentColor;
     }
 
-    /* ——— band (home section rhythm) ——— */
-    .band {
-        margin-bottom: var(--space-2xl);
-        max-width: var(--measure-wide);
+    @media (min-width: 64rem) {
+        .intro {
+            grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+            column-gap: var(--space-xl);
+            align-items: end;
+        }
+
+        .intro-lede {
+            padding-bottom: 0.4rem;
+        }
+
+        .signals {
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
     }
 
+    /* ——— home grid: a lead column and a narrower side column, newspaper-style ——— */
+    .home-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-2xl) var(--space-xl);
+    }
+
+    @media (min-width: 64rem) {
+        .home-grid {
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            row-gap: var(--space-3xl);
+        }
+
+        .band--posts,
+        .band--shares,
+        .band--workshop {
+            grid-column: 1 / span 8;
+        }
+
+        .band--photos,
+        .band--filed,
+        .band--papers {
+            grid-column: 9 / span 4;
+        }
+    }
+
+    /* Section heads hang off a heavy ink rule. */
     .band-header {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
         gap: var(--space-md);
-        margin-bottom: var(--space-md);
+        margin-bottom: var(--space-xs);
+        padding-top: var(--space-xs);
+        border-top: 2px solid var(--ink-text);
     }
 
     .band-title {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-h2);
-        letter-spacing: -0.01em;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
         margin: 0;
         color: var(--ink-text);
     }
 
+    /* The side column speaks a size down. */
+    .band--photos .band-title,
+    .band--filed .band-title,
+    .band--papers .band-title {
+        font-size: var(--type-xl);
+    }
+
+    /* The lead section carries the heaviest rule on the page. */
+    .band--posts .band-header {
+        border-top-width: 5px;
+    }
+
     .band-sublabel {
         font-family: var(--font-meta);
-        font-size: var(--type-sm);
+        font-weight: var(--weight-meta);
+        font-size: var(--type-xs);
         letter-spacing: 0.08em;
-        text-transform: lowercase;
+        text-transform: uppercase;
         color: var(--ink-muted);
+    }
+
+    /* ——— lead (recent posts as a dated ledger) ——— */
+    .lead {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .lead-entry {
+        display: grid;
+        grid-template-columns: 4.5rem minmax(0, 1fr);
+        column-gap: var(--space-md);
+        padding: var(--space-md) 0 var(--space-lg);
+        border-top: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .lead-entry:first-child {
+        border-top: 0;
+    }
+
+    .lead-date {
+        display: grid;
+        align-content: start;
+        gap: var(--space-3xs);
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+        color: var(--ink-muted);
+    }
+
+    .lead-day {
+        font-size: 2.5rem;
+        font-weight: 300;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        color: var(--ink-text);
+    }
+
+    .lead-month {
+        font-size: var(--type-xs);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .lead-body {
+        display: grid;
+        gap: var(--space-2xs);
+        max-width: var(--measure);
+    }
+
+    .lead-title {
+        font-family: var(--font-display);
+        font-weight: 760;
+        font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.5rem);
+        line-height: 1.02;
+        letter-spacing: -0.035em;
+        margin: 0;
+        text-wrap: balance;
+    }
+
+    .lead-title a {
+        color: var(--ink-text);
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        text-decoration-thickness: 3px;
+        text-underline-offset: 0.12em;
+        transition:
+            color 150ms ease-out,
+            text-decoration-color 150ms ease-out;
+    }
+
+    .lead-title a:hover,
+    .lead-title a:focus-visible {
+        color: var(--ink-text);
+        text-decoration-color: var(--ink-accent);
+    }
+
+    .lead-desc {
+        font-size: var(--type-lg);
+        line-height: 1.45;
+        color: var(--ink-text-soft);
+        margin: 0;
+    }
+
+    .lead-tags {
+        font-family: var(--font-mono);
+        font-size: var(--type-xs);
+        color: var(--ink-muted);
+        letter-spacing: 0.04em;
+        margin: 0;
+    }
+
+    @media (max-width: 40rem) {
+        .lead-entry {
+            grid-template-columns: minmax(0, 1fr);
+            row-gap: var(--space-2xs);
+        }
+
+        .lead-date {
+            display: flex;
+            align-items: baseline;
+            gap: 1ch;
+        }
+
+        .lead-day {
+            font-size: 1.5rem;
+        }
     }
 
     /* ——— stack (project / featured paper list) ——— */
@@ -372,13 +671,35 @@
         gap: var(--space-3xs);
     }
 
-    .stack-item:last-child {
-        border-bottom: var(--rule) solid var(--ink-rule-soft);
+    .stack-item:first-child {
+        border-top: 0;
+    }
+
+    /* Workshop: two columns of projects, names set a size up. */
+    .stack--grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+        column-gap: var(--space-xl);
+    }
+
+    .stack--grid .stack-item:nth-child(2) {
+        border-top: 0;
+    }
+
+    @media (max-width: 40rem) {
+        .stack--grid .stack-item:nth-child(2) {
+            border-top: var(--rule) solid var(--ink-rule-soft);
+        }
+    }
+
+    .stack--grid .stack-name {
+        font-size: var(--type-xl);
+        letter-spacing: -0.025em;
     }
 
     .stack-name {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-lg);
         line-height: 1.25;
         letter-spacing: -0.005em;
@@ -403,6 +724,27 @@
         max-width: var(--measure);
     }
 
+    .stack-venue {
+        font-family: var(--font-mono);
+        font-size: var(--type-xs);
+        color: var(--ink-muted);
+        letter-spacing: 0.04em;
+        font-variant-numeric: tabular-nums;
+        margin: var(--space-3xs) 0 0;
+        display: inline-flex;
+        gap: 0.8ch;
+        align-items: baseline;
+    }
+
+    .stack-venue-name {
+        color: var(--ink-accent);
+        text-transform: uppercase;
+    }
+
+    .stack-venue-sep {
+        color: var(--ink-rule);
+    }
+
     .empty {
         font-style: italic;
         color: var(--ink-text-soft);
@@ -416,329 +758,283 @@
         margin-right: 0.3ch;
     }
 
-    /* ——— hero: the scope beside the name and the work in flight ——— */
-    .hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-        gap: var(--space-lg);
-        align-items: start;
-        margin: 0 0 var(--space-3xl);
-    }
-
-    .hero-scope {
-        position: sticky;
-        top: var(--space-lg);
-    }
-
-    .hero-text .page-lede {
-        font-size: var(--type-base);
-        margin-bottom: var(--space-lg);
-    }
-
-    .flights-heading {
-        font-family: var(--font-meta);
-        font-weight: 500;
-        font-size: var(--type-sm);
-        letter-spacing: 0.14em;
-        text-transform: lowercase;
-        color: var(--ink-muted);
-        margin: 0 0 var(--space-2xs);
-    }
-
-    .flights {
+    /* ——— photos: one large frame over two small ones ——— */
+    .photo-strip {
         list-style: none;
-        margin: 0 0 var(--space-lg);
         padding: 0;
-        border-top: var(--rule) solid var(--ink-rule);
-    }
-
-    .flight {
+        margin: var(--space-xs) 0 0;
         display: grid;
-        grid-template-columns: 9ch minmax(0, 1fr);
-        grid-template-areas:
-            "sign title"
-            ". where";
-        column-gap: var(--space-sm);
-        padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) 0;
-        border-bottom: var(--rule) solid var(--ink-rule-soft);
-        transition: background-color 160ms ease-out;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-sm) var(--space-xs);
     }
 
-    .flight-sign {
-        grid-area: sign;
+    .photo-strip-item {
+        min-width: 0;
+    }
+
+    .photo-strip-item:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .photo-strip-link {
+        display: grid;
+        gap: var(--space-3xs);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .photo-strip-link img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        background: var(--ink-surface);
+        transition: filter 200ms ease-out;
+    }
+
+    .photo-strip-item:first-child img {
+        aspect-ratio: 4 / 3;
+    }
+
+    .photo-strip-date {
         font-family: var(--font-mono);
         font-size: var(--type-xs);
+        color: var(--ink-muted);
         letter-spacing: 0.04em;
-        color: var(--ink-muted);
-        padding-top: 0.3em;
-        transition: color 160ms ease-out;
+        font-variant-numeric: tabular-nums;
     }
 
-    :global(.cathode-main) .flight-title {
-        grid-area: title;
-        color: var(--ink-text);
-        text-decoration: none;
-        line-height: 1.35;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .flight-where {
-        grid-area: where;
-        font-family: var(--font-meta);
-        font-size: var(--type-xs);
-        letter-spacing: 0.06em;
-        text-transform: lowercase;
-        color: var(--ink-muted);
-    }
-
-    /* The row the scope is tracking. */
-    .flight.is-focused {
-        background: linear-gradient(
-            to right,
-            oklch(from var(--ink-accent) l c h / 0.12),
-            transparent 70%
-        );
-    }
-
-    .flight.is-focused .flight-sign {
-        color: var(--ink-accent);
-    }
-
-    :global(.cathode-main) .flight.is-focused .flight-title,
-    :global(.cathode-main) .flight-title:hover,
-    :global(.cathode-main) .flight-title:focus-visible {
+    .photo-strip-link:hover .photo-strip-date,
+    .photo-strip-link:focus-visible .photo-strip-date {
         color: var(--ink-accent-hover);
     }
 
-    @media (max-width: 56rem) {
-        .hero {
-            grid-template-columns: minmax(0, 1fr);
-            gap: var(--space-lg);
-        }
-
-        .hero-scope {
-            position: static;
-            max-width: 34rem;
-            width: 100%;
-            justify-self: center;
-        }
+    .photo-strip-link:hover img,
+    .photo-strip-link:focus-visible img {
+        filter: contrast(1.06) saturate(1.1);
     }
 
-    .board-sep {
-        color: var(--ink-rule);
-        margin: 0 0.6ch;
-    }
-
-    /* A row that appeared since the last read glows once, like a phosphor. */
-    .is-fresh {
-        animation: fresh-glow 2.8s ease-out;
-    }
-
-    @keyframes fresh-glow {
-        from {
-            background: oklch(from var(--ink-accent) l c h / 0.18);
-        }
-        to {
-            background: transparent;
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .is-fresh {
-            animation: none;
-        }
-    }
-
-    /* ——— horizon (plans as meters) ——— */
-    .horizon {
+    /* ——— shares (marginalia band) ——— */
+    .shares {
         list-style: none;
-        margin: 0;
         padding: 0;
+        margin: 0;
+        max-width: var(--measure-wide);
     }
 
-    .horizon-row {
+    .share {
         display: grid;
-        grid-template-columns: minmax(12rem, 1fr) auto;
-        grid-template-areas:
-            'name counts'
-            'meter meter';
-        gap: var(--space-3xs) var(--space-md);
+        grid-template-columns: 4.5rem minmax(0, 1fr);
+        column-gap: var(--space-md);
+        padding: var(--space-md) 0;
+        border-top: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .share:first-child {
+        border-top: 0;
+    }
+
+    .share-date {
+        font-family: var(--font-mono);
+        font-size: var(--type-sm);
+        color: var(--ink-muted);
+        letter-spacing: 0.02em;
+        font-variant-numeric: tabular-nums;
+        padding-top: 0.4em;
+        white-space: nowrap;
+    }
+
+    .share-body {
+        display: grid;
+        gap: var(--space-2xs);
+        max-width: var(--measure);
+    }
+
+    .share-note {
+        font-family: var(--font-body);
+        font-size: var(--type-lg);
+        line-height: 1.5;
+        color: var(--ink-text);
+        margin: 0;
+    }
+
+    .share-cite {
+        font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
+        font-size: var(--type-sm);
+        letter-spacing: 0.04em;
+        color: var(--ink-text-soft);
+        margin: 0;
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.5ch;
+        line-height: 1.5;
+    }
+
+    .share-cite-glyph {
+        color: var(--ink-accent);
+    }
+
+    .share-cite-link {
+        color: var(--ink-text);
+        text-decoration: none;
+        padding-bottom: 1px;
+        border-bottom: 1px dotted var(--ink-rule);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        letter-spacing: 0;
+        font-style: italic;
+        transition:
+            color 120ms ease-out,
+            border-color 120ms ease-out;
+    }
+
+    .share-cite-link:hover,
+    .share-cite-link:focus-visible {
+        color: var(--ink-accent-hover);
+        border-bottom-color: currentColor;
+    }
+
+    .share-cite-sep {
+        color: var(--ink-rule);
+    }
+
+    .share-cite-author {
+        color: var(--ink-text-soft);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        letter-spacing: 0;
+    }
+
+    .share-cite-host {
+        font-family: var(--font-mono);
+        font-size: var(--type-xs);
+        color: var(--ink-muted);
+        letter-spacing: 0.04em;
+    }
+
+    .share-title {
+        font-family: var(--font-display);
+        font-weight: var(--weight-display);
+        font-size: var(--type-lg);
+        line-height: 1.3;
+        letter-spacing: -0.005em;
+        margin: 0;
+    }
+
+    .share-title a {
+        color: var(--ink-text);
+        text-decoration: none;
+    }
+
+    .share-title a:hover,
+    .share-title a:focus-visible {
+        color: var(--ink-accent-hover);
+    }
+
+    .share-meta {
+        font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
+        font-size: var(--type-sm);
+        letter-spacing: 0.04em;
+        color: var(--ink-muted);
+        margin: 0;
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.5ch;
+    }
+
+    .share-more {
+        font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
+        font-size: var(--type-sm);
+        letter-spacing: 0.04em;
+        color: var(--ink-text-soft);
+        text-decoration: none;
+        transition: color 120ms ease-out;
+    }
+
+    .share-more:hover,
+    .share-more:focus-visible {
+        color: var(--ink-accent-hover);
+    }
+
+    /* ——— filed (recently filed library cards) ——— */
+    .filed {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-width: var(--measure-wide);
+    }
+
+    .filed-item {
+        display: grid;
+        grid-template-columns: 1.5ch 1fr;
+        column-gap: var(--space-sm);
         padding: var(--space-sm) 0;
         border-top: var(--rule) solid var(--ink-rule-soft);
     }
 
-    .horizon-row:last-child {
-        border-bottom: var(--rule) solid var(--ink-rule-soft);
+    .filed-item:first-child {
+        border-top: 0;
     }
 
-    .horizon-name {
-        grid-area: name;
-        font-family: var(--font-body);
-        font-weight: 500;
-        font-size: 1.05rem;
-        margin: 0;
-    }
-
-    .horizon-name a {
-        color: var(--ink-text);
-        text-decoration: none;
-    }
-
-    .horizon-name a:hover,
-    .horizon-name a:focus-visible {
-        color: var(--ink-accent-hover);
-    }
-
-    .horizon-counts {
-        grid-area: counts;
-        margin: 0;
-        font-family: var(--font-mono);
-        font-size: var(--type-xs);
-        color: var(--ink-muted);
-        font-variant-numeric: tabular-nums;
-        align-self: baseline;
-    }
-
-    .horizon-meter {
-        grid-area: meter;
-        margin: 0;
-        font-family: var(--font-mono);
-        font-size: var(--type-sm);
-        letter-spacing: 0.18em;
+    .filed-mark {
+        color: var(--ink-accent);
+        font-size: 0.7em;
+        padding-top: 0.75em;
         line-height: 1;
-        overflow: hidden;
-        white-space: nowrap;
+        user-select: none;
     }
 
-    .meter-done {
-        color: var(--ink-text-soft);
-    }
-
-    .meter-moving,
-    .meter-key--moving {
-        color: var(--ink-accent);
-    }
-
-    .meter-waiting {
-        color: var(--ink-muted);
-    }
-
-    .meter-key {
-        font-family: var(--font-mono);
-        margin-left: 0.8ch;
-    }
-
-    /* ——— log (landed) ——— */
-    .log {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    .log-row {
+    .filed-body {
         display: grid;
-        grid-template-columns: 7ch 11ch 1fr auto;
-        gap: var(--space-sm);
-        align-items: baseline;
-        padding: var(--space-xs) 0;
-        border-top: var(--rule) solid var(--ink-rule-soft);
-    }
-
-    .log-row:last-child {
-        border-bottom: var(--rule) solid var(--ink-rule-soft);
-    }
-
-    .log-when {
-        font-family: var(--font-mono);
-        font-size: var(--type-xs);
-        color: var(--ink-muted);
-        font-variant-numeric: tabular-nums;
-    }
-
-    .log-verb {
-        font-family: var(--font-meta);
-        font-size: var(--type-sm);
-        letter-spacing: 0.08em;
-        color: var(--ink-accent);
-    }
-
-    .log-body {
+        gap: var(--space-3xs);
+        max-width: var(--measure);
         min-width: 0;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0 var(--space-xs);
-        align-items: baseline;
     }
 
-    :global(.cathode-main) .log-title {
+    .filed-title {
+        font-family: var(--font-display);
+        font-weight: var(--weight-display);
+        font-size: var(--type-lg);
+        line-height: 1.3;
+        letter-spacing: -0.005em;
+        margin: 0;
+    }
+
+    .filed-title a {
         color: var(--ink-text);
         text-decoration: none;
-        line-height: 1.4;
         overflow-wrap: anywhere;
     }
 
-    :global(.cathode-main) .log-title:hover,
-    :global(.cathode-main) .log-title:focus-visible {
+    .filed-title a:hover,
+    .filed-title a:focus-visible {
         color: var(--ink-accent-hover);
     }
 
-    .log-where {
-        font-family: var(--font-meta);
+    .filed-meta {
+        font-family: var(--font-mono);
         font-size: var(--type-xs);
-        letter-spacing: 0.08em;
-        text-transform: lowercase;
         color: var(--ink-muted);
+        letter-spacing: 0.04em;
+        margin: 0;
+        display: inline-flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.5ch;
+        font-variant-numeric: tabular-nums;
     }
 
-    .log-thumb {
-        width: 2.5rem;
-        height: 2.5rem;
-        object-fit: cover;
-        border-radius: 2px;
-        align-self: center;
+    .filed-meta-sep {
+        color: var(--ink-rule);
     }
 
-    @media (max-width: 40rem) {
-
-        .log-row {
-            grid-template-columns: 7ch 1fr auto;
-            grid-template-areas:
-                'when verb thumb'
-                'body body thumb';
-            gap: var(--space-3xs) var(--space-sm);
-        }
-
-        .log-when {
-            grid-area: when;
-        }
-
-        .log-verb {
-            grid-area: verb;
-        }
-
-        .log-body {
-            grid-area: body;
-        }
-
-        .log-thumb {
-            grid-area: thumb;
-        }
-
-        .horizon-row {
-            grid-template-columns: 1fr;
-            grid-template-areas:
-                'name'
-                'meter'
-                'counts';
-        }
-    }
-
-    /* ——— lens invite ——— */
-    .lens-invite-copy {
-        max-width: var(--measure);
-        margin: 0 0 var(--space-md);
+    .filed-meta-author {
         color: var(--ink-text-soft);
     }
+
 </style>

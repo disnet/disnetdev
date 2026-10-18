@@ -34,7 +34,7 @@
 
 <nav class="lens-crumbs" aria-label="Breadcrumb">
   <a href={lensHref(repo)}>@{repo}</a>
-  <span aria-hidden="true">▸</span>
+  <span aria-hidden="true">→</span>
   <span>{data.app.name}</span>
 </nav>
 
@@ -43,7 +43,7 @@
 </header>
 
 {#if data.records.length === 0}
-  <p class="empty"><span class="empty-prompt">▸</span> nothing left in this collection.</p>
+  <p class="empty">nothing left in this collection.</p>
 {:else}
   <ol class="lens-records">
     {#each data.records as record}
@@ -60,7 +60,7 @@
           <p class="lens-record-meta">
             {#if s.status}<span class="flight-status">{s.status}</span>{/if}
             {#if s.url}<a href={s.url} rel="noopener nofollow">{hostOf(s.url)}</a>{/if}
-            {#if s.ref}<a href={s.ref}>▸ follows a reference</a>{/if}
+            {#if s.ref}<a href={s.ref}>follows a reference →</a>{/if}
             <span class="lens-rkey">{record.rkey}</span>
           </p>
         </div>
@@ -74,6 +74,6 @@
     <a href={page.url.pathname}>newest</a>
   {/if}
   {#if data.cursor}
-    <a href={`?cursor=${encodeURIComponent(data.cursor)}`}>older ▸</a>
+    <a href={`?cursor=${encodeURIComponent(data.cursor)}`}>older →</a>
   {/if}
 </p>

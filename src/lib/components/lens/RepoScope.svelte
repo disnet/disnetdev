@@ -476,7 +476,6 @@
     {/if}
   </div>
   <figcaption class="scope-readout">
-    <span class="scope-prompt">$</span>
     {#if scanned < targets.length}
       scanning {scanned}/{targets.length} collections
     {:else}

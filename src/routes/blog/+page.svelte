@@ -27,12 +27,13 @@
 </svelte:head>
 
 <section class="heading-block">
-  <p class="page-eyebrow">log</p>
   <h1 class="page-heading">Blog</h1>
-  <p class="page-lede">
-    {total} post{total === 1 ? '' : 's'} on programming languages, macros, type
-    systems, local-first software, and whatever else has held attention.
-  </p>
+  <div class="page-head-aside">
+    <p class="page-lede">
+      {total} post{total === 1 ? '' : 's'} on programming languages, macros, type
+      systems, local-first software, and whatever else has held attention.
+    </p>
+  </div>
 </section>
 
 {#if data.posts.length === 0}
@@ -63,10 +64,6 @@
 {/if}
 
 <style>
-  .heading-block {
-    margin-bottom: var(--space-2xl);
-  }
-
   .empty {
     color: var(--ink-text-soft);
     font-style: italic;

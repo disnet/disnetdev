@@ -19,33 +19,30 @@ Typical reading moment: a PR is building, a test is running, or it's a slow even
 
 ### Brand Personality
 
-Three words: **rigorous, warm-lit, patient.**
+Three words: **rigorous, direct, personal.**
 
-Emotional goal: the reader has found a private workshop with the lights on, coffee nearby, the smell of warm electronics. Not a portfolio site, not a startup blog. The author takes ideas seriously and expects the reader to as well. No newsletter hooks, no engagement bait, no social proof in the margins. The work is the work.
+Emotional goal: a working researcher's marked-up proof sheet. Bold heads, sturdy text, the occasional stroke of an editor's blue pencil. Deliberately not the warm-cream-and-amber look AI-generated blogs default to. No newsletter hooks, no engagement bait. The work is the work.
 
 ### Aesthetic Direction
 
-**Cathode paper.** A warm off-white reading surface, deep warm ink, and a single phosphor-amber accent that behaves like signal. Laid out with the structural rigor of an engineering notebook and the textual care of a literary journal. A deliberate contrast with the admin's writer's-studio stack.
+**Blue pencil.** Bright bond paper, blue-black ink, one ultramarine accent used like an editor's mark (macros rewrite code; the blue pencil rewrites prose).
 
-- **Theme**: Light mode first (warm ecru/cream). Dark mode is warm umber, like a workshop at night, never a terminal bleeding onto black. `prefers-color-scheme` is respected end-to-end. Both modes must feel equally considered, not one as an afterthought.
-- **Typography**: Serif-forward but distinct from the admin's Vollkorn/Literata. A display serif with a slight engineered edge paired with a warm humanist body serif. Monospace reserved for code and terminal-style meta (dates, line counts, prompt glyphs), never used for running text.
-- **Hacker signal (slight, not shouted)**: The phosphor amber accent, the ▸ glyph used semantically (current page, continue reading, state markers), small-caps numerals in meta, hairline rules as structure, a compiler-status-line footer on long posts. No neon, no scanlines, no terminal-window chrome, no monospace-everywhere cosplay.
-- **References**: Gwern.net's structural rigor, Fabien Sanglard's warm technical essays, Tufte's layout discipline, an amber CRT on a wood desk, Granta/The Baffler typographic care applied to PL writing.
-- **Anti-references**: Cyberpunk dark themes (cyan-on-black, magenta glow), Medium/Substack templated posts, terminal-cosplay blogs, startup "what we're up to" pages, glassmorphic portfolio sites, newsletter-first reading surfaces.
+- **Theme**: Light first (cool bond paper, never cream). Dark mode is a blue-black ink well, never pure black or neon. `prefers-color-scheme` respected end-to-end.
+- **Marks**: 5px pencil stripe across the top, 2px ink rules over section heads, small solid accent squares as markers, a solid accent block for subscribe, plain arrows (→ ←). Square corners. No ▸ glyphs, no `$` prompts, no terminal cosplay.
+- **Anti-references**: cream + amber/terracotta "AI default" blogs, cyberpunk dark themes, Medium/Substack templates, glassmorphic portfolios.
 
 ### Design Principles
 
-1. **Signal, not chrome.** The amber accent is rare and meaningful. When it appears, it marks a link, a state, a prompt. Overuse destroys its power.
-2. **Structure is the ornament.** Hairline rules, aligned numerals, a visible typographic grid at section breaks, carefully set meta bars. Decoration comes from architectural precision, not applied texture.
-3. **Prose is sovereign.** Long technical paragraphs read beautifully at ~68ch with generous leading. Code blocks sit in a quietly tinted surface but don't interrupt the voice. No framed terminals, no traffic-light buttons, no window chrome.
-4. **Warm, even at night.** Dark mode preserves the warm hue so the site doesn't lose its personality in the switch. Surfaces stay umber and tobacco, never steel or navy.
-5. **Respect the reader.** No modal captures, no newsletter popovers, no cookie theater beyond what's required. If they're here, they're here to read.
+1. **One pencil.** Ultramarine is the only color: link underlines, current page, markers, subscribe. Never body text.
+2. **Structure is the ornament.** Heavy ink rules at section breaks, hairlines between entries, aligned mono numerals.
+3. **Prose is sovereign.** ~68ch, generous leading, code on a tinted surface under an ink rule.
+4. **Respect the reader.** No modals, no popovers beyond the subscribe control.
 
 ### Palette & Typography
 
-- **Palette**: warm ecru surface, deep warm ink, warm gray mid-tones, phosphor-amber accent. All neutrals tinted toward the same warm hue (~70–80°). OKLCH only. Dark mode is warm umber, never navy or pure black.
-- **Display**: Young Serif (Vinicius Aoqui). **Body/reading**: Alegreya variable. **Small UI / meta**: Alegreya Sans SC. **Code & terminal meta**: Commit Mono variable.
-- All from Google Fonts / open source, self-hosted via `@fontsource`. No Inter, no IBM Plex.
+- **Palette**: bond paper, blue-black ink, blue-tinted grays (~255–268°), ultramarine `oklch(0.49 0.22 270)` accent. OKLCH only.
+- **Display / UI**: Schibsted Grotesk variable. **Body/reading**: Piazzolla variable. **Code & machine meta**: Martian Mono variable (87.5% width).
+- All self-hosted via `@fontsource-variable`. No Inter, no IBM Plex.
 
 ---
 

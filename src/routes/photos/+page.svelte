@@ -33,18 +33,19 @@
 </svelte:head>
 
 <section class="heading-block">
-  <p class="page-eyebrow">photolog</p>
   <h1 class="page-heading">Photos</h1>
-  <p class="page-lede">
-    Images posted from
-    <a href="https://bsky.app/profile/photos.disnetdev.com" rel="me">@photos.disnetdev.com</a>
-    on Bluesky. {data.total} post{data.total === 1 ? '' : 's'} so far.
-  </p>
+  <div class="page-head-aside">
+    <p class="page-lede">
+      Images posted from
+      <a href="https://bsky.app/profile/photos.disnetdev.com" rel="me">@photos.disnetdev.com</a>
+      on Bluesky. {data.total} post{data.total === 1 ? '' : 's'} so far.
+    </p>
+  </div>
 </section>
 
 {#if data.photos.length === 0}
   <p class="empty">
-    <span class="empty-prompt">▸</span> no photos have come through yet.
+    <span class="empty-prompt">→</span> no photos have come through yet.
   </p>
 {:else}
   <ol class="photo-feed">
@@ -87,7 +88,7 @@
     <nav class="pager" aria-label="Pagination">
       {#if hasPrev}
         <a class="pager-link pager-link--prev" href={prevHref} rel="prev">
-          ◂ newer
+          ← newer
         </a>
       {:else}
         <span class="pager-gap"></span>
@@ -99,7 +100,7 @@
 
       {#if hasNext}
         <a class="pager-link pager-link--next" href={nextHref} rel="next">
-          older ▸
+          older →
         </a>
       {:else}
         <span class="pager-gap"></span>
@@ -109,10 +110,6 @@
 {/if}
 
 <style>
-  .heading-block {
-    margin-bottom: var(--space-2xl);
-  }
-
   .empty {
     font-style: italic;
     color: var(--ink-text-soft);
@@ -212,9 +209,10 @@
     align-items: baseline;
     gap: var(--space-md);
     font-family: var(--font-meta);
+    font-weight: var(--weight-meta);
     font-size: var(--type-sm);
     letter-spacing: 0.08em;
-    text-transform: lowercase;
+    text-transform: uppercase;
   }
 
   .pager-link {

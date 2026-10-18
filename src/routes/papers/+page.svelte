@@ -29,13 +29,14 @@
 </svelte:head>
 
 <section class="heading-block">
-  <p class="page-eyebrow">bibliography</p>
   <h1 class="page-heading">Papers</h1>
-  <p class="page-lede">
-    Work from a decade of programming-language research, mostly at UC Santa Cruz.
-    Hygienic macros for JavaScript, higher-order contracts, information flow,
-    and type soundness via trace semantics.
-  </p>
+  <div class="page-head-aside">
+    <p class="page-lede">
+      Work from a decade of programming-language research, mostly at UC Santa Cruz.
+      Hygienic macros for JavaScript, higher-order contracts, information flow,
+      and type soundness via trace semantics.
+    </p>
+  </div>
 </section>
 
 <div class="papers">
@@ -95,15 +96,11 @@
 </div>
 
 <p class="papers-footer">
-  <span class="papers-footer-prompt">▸</span>
+  <span class="papers-footer-prompt">→</span>
   {total} paper{total === 1 ? '' : 's'} in total.
 </p>
 
 <style>
-  .heading-block {
-    margin-bottom: var(--space-2xl);
-  }
-
   .papers {
     max-width: var(--measure-wide);
   }
@@ -127,7 +124,7 @@
 
   .paper-title {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: var(--weight-display);
     font-size: var(--type-lg);
     line-height: 1.25;
     letter-spacing: -0.005em;
@@ -201,7 +198,7 @@
 
   .paper-venue-name {
     color: var(--ink-accent);
-    text-transform: lowercase;
+    text-transform: uppercase;
   }
 
   .paper-venue-file {
