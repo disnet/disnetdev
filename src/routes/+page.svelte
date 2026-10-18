@@ -174,7 +174,7 @@
 
     {#if recentPosts.length === 0}
         <p class="empty">
-            <span class="empty-prompt">▸</span> the transmitter is warm but quiet. the first
+            <span class="empty-prompt">→</span> the transmitter is warm but quiet. the first
             post from the new stack is on its way.
         </p>
     {:else}
@@ -273,14 +273,14 @@
                                     >
                                     <span class="share-cite-sep">·</span>
                                 {/if}
-                                <a class="share-more" href={post.path}>notes ▸</a>
+                                <a class="share-more" href={post.path}>notes →</a>
                             </p>
                         {:else}
                             {@const share = entry.share}
                             {#if share.note}
                                 <p class="share-note">{share.note}</p>
                                 <p class="share-cite">
-                                    <span class="share-cite-glyph" aria-hidden="true">▸</span>
+                                    <span class="share-cite-glyph" aria-hidden="true">→</span>
                                     <a
                                         class="share-cite-link"
                                         href={share.itemUrl}
@@ -338,7 +338,7 @@
         <ol class="filed">
             {#each recentCards as card}
                 <li class="filed-item">
-                    <span class="filed-mark" aria-hidden="true">◆</span>
+                    <span class="filed-mark" aria-hidden="true">■</span>
                     <div class="filed-body">
                         <h3 class="filed-title">
                             <a href={card.url} rel="noopener">
@@ -427,9 +427,10 @@
 
     .signal-label {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-xs);
-        letter-spacing: 0.14em;
-        text-transform: lowercase;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
         color: var(--ink-muted);
         padding-top: 0.18em;
         align-self: baseline;
@@ -458,28 +459,32 @@
         max-width: var(--measure-wide);
     }
 
+    /* Section heads hang off a heavy ink rule, newspaper-style. */
     .band-header {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
         gap: var(--space-md);
-        margin-bottom: var(--space-md);
+        margin-bottom: var(--space-sm);
+        padding-top: var(--space-xs);
+        border-top: 2px solid var(--ink-text);
     }
 
     .band-title {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-h2);
-        letter-spacing: -0.01em;
+        letter-spacing: -0.03em;
         margin: 0;
         color: var(--ink-text);
     }
 
     .band-sublabel {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-sm);
         letter-spacing: 0.08em;
-        text-transform: lowercase;
+        text-transform: uppercase;
         color: var(--ink-muted);
     }
 
@@ -503,7 +508,7 @@
 
     .stack-name {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-lg);
         line-height: 1.25;
         letter-spacing: -0.005em;
@@ -542,7 +547,7 @@
 
     .stack-venue-name {
         color: var(--ink-accent);
-        text-transform: lowercase;
+        text-transform: uppercase;
     }
 
     .stack-venue-sep {
@@ -652,6 +657,7 @@
 
     .share-cite {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-sm);
         letter-spacing: 0.04em;
         color: var(--ink-text-soft);
@@ -707,7 +713,7 @@
 
     .share-title {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-lg);
         line-height: 1.3;
         letter-spacing: -0.005em;
@@ -726,6 +732,7 @@
 
     .share-meta {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-sm);
         letter-spacing: 0.04em;
         color: var(--ink-muted);
@@ -738,6 +745,7 @@
 
     .share-more {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-sm);
         letter-spacing: 0.04em;
         color: var(--ink-text-soft);
@@ -787,7 +795,7 @@
 
     .filed-title {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-lg);
         line-height: 1.3;
         letter-spacing: -0.005em;

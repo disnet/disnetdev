@@ -44,7 +44,7 @@
 
 {#if data.photos.length === 0}
   <p class="empty">
-    <span class="empty-prompt">▸</span> no photos have come through yet.
+    <span class="empty-prompt">→</span> no photos have come through yet.
   </p>
 {:else}
   <ol class="photo-feed">
@@ -87,7 +87,7 @@
     <nav class="pager" aria-label="Pagination">
       {#if hasPrev}
         <a class="pager-link pager-link--prev" href={prevHref} rel="prev">
-          ◂ newer
+          ← newer
         </a>
       {:else}
         <span class="pager-gap"></span>
@@ -99,7 +99,7 @@
 
       {#if hasNext}
         <a class="pager-link pager-link--next" href={nextHref} rel="next">
-          older ▸
+          older →
         </a>
       {:else}
         <span class="pager-gap"></span>
@@ -212,9 +212,10 @@
     align-items: baseline;
     gap: var(--space-md);
     font-family: var(--font-meta);
+    font-weight: var(--weight-meta);
     font-size: var(--type-sm);
     letter-spacing: 0.08em;
-    text-transform: lowercase;
+    text-transform: uppercase;
   }
 
   .pager-link {

@@ -4,7 +4,7 @@
   let {
     post,
     returnHref = '/blog',
-    returnLabel = '◂ back to index',
+    returnLabel = '← back to index',
     statusPath = '',
     dateLabel = 'published',
     dateIso = ''
@@ -103,7 +103,7 @@
 
   <footer class="post-statusline">
     <span class="post-statusline-path">
-      <span class="post-statusline-prompt">$</span>
+      <span class="post-statusline-prompt" aria-hidden="true"></span>
       {statusPath || `~/blog/${post.slug}`}
     </span>
     <a class="post-statusline-return" href={returnHref}>{returnLabel}</a>

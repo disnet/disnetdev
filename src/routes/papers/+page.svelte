@@ -95,7 +95,7 @@
 </div>
 
 <p class="papers-footer">
-  <span class="papers-footer-prompt">▸</span>
+  <span class="papers-footer-prompt">→</span>
   {total} paper{total === 1 ? '' : 's'} in total.
 </p>
 
@@ -127,7 +127,7 @@
 
   .paper-title {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: var(--weight-display);
     font-size: var(--type-lg);
     line-height: 1.25;
     letter-spacing: -0.005em;
@@ -201,7 +201,7 @@
 
   .paper-venue-name {
     color: var(--ink-accent);
-    text-transform: lowercase;
+    text-transform: uppercase;
   }
 
   .paper-venue-file {

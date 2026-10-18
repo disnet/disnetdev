@@ -100,13 +100,13 @@
 
     {#if data.cards.length === 0}
         <p class="empty">
-            <span class="empty-prompt">▸</span> nothing in the stacks yet.
+            <span class="empty-prompt">→</span> nothing in the stacks yet.
         </p>
     {:else}
         <ol class="cards">
             {#each data.cards as card}
                 <li class="card">
-                    <span class="card-mark" aria-hidden="true">◆</span>
+                    <span class="card-mark" aria-hidden="true">■</span>
                     <div class="card-body">
                         <h3 class="card-title">
                             <a href={card.url} rel="noopener">
@@ -138,7 +138,7 @@
             <nav class="pager" aria-label="Pagination">
                 {#if hasPrev}
                     <a class="pager-link pager-link--prev" href={prevHref} rel="prev"
-                        >◂ newer</a
+                        >← newer</a
                     >
                 {:else}
                     <span class="pager-gap"></span>
@@ -150,7 +150,7 @@
 
                 {#if hasNext}
                     <a class="pager-link pager-link--next" href={nextHref} rel="next"
-                        >older ▸</a
+                        >older →</a
                     >
                 {:else}
                     <span class="pager-gap"></span>
@@ -196,7 +196,7 @@
 
     .catalog-title {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-h2);
         letter-spacing: -0.01em;
         margin: 0;
@@ -269,9 +269,10 @@
 
     .shelf-label {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-xs);
         letter-spacing: 0.18em;
-        text-transform: lowercase;
+        text-transform: uppercase;
         color: var(--ink-muted);
     }
 
@@ -292,7 +293,7 @@
 
     .shelf-name {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-lg);
         line-height: 1.2;
         letter-spacing: -0.005em;
@@ -346,7 +347,7 @@
 
     .card-title {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-lg);
         line-height: 1.3;
         letter-spacing: -0.005em;
@@ -415,9 +416,10 @@
         align-items: baseline;
         gap: var(--space-md);
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-sm);
         letter-spacing: 0.08em;
-        text-transform: lowercase;
+        text-transform: uppercase;
     }
 
     .pager-link {

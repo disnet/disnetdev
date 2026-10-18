@@ -51,7 +51,7 @@
 
 {#if data.entries.length === 0}
     <p class="empty">
-        <span class="empty-prompt">▸</span> nothing shared yet.
+        <span class="empty-prompt">→</span> nothing shared yet.
     </p>
 {:else}
     <ol class="shares">
@@ -72,7 +72,7 @@
                                 <span class="share-cite-host">{hostOf(post.sourceUrl)}</span>
                                 <span class="share-cite-sep">·</span>
                             {/if}
-                            <a class="share-more" href={post.path}>notes ▸</a>
+                            <a class="share-more" href={post.path}>notes →</a>
                         </p>
                         {#if post.tags?.length}
                             <p class="share-tags">
@@ -86,7 +86,7 @@
                         {#if share.note}
                             <p class="share-note">{share.note}</p>
                             <p class="share-cite">
-                                <span class="share-cite-glyph" aria-hidden="true">▸</span>
+                                <span class="share-cite-glyph" aria-hidden="true">→</span>
                                 <a class="share-cite-link" href={share.itemUrl} rel="noopener">
                                     {share.itemTitle || share.itemUrl}
                                 </a>
@@ -128,7 +128,7 @@
         <nav class="pager" aria-label="Pagination">
             {#if hasPrev}
                 <a class="pager-link pager-link--prev" href={prevHref} rel="prev">
-                    ◂ newer
+                    ← newer
                 </a>
             {:else}
                 <span class="pager-gap"></span>
@@ -140,7 +140,7 @@
 
             {#if hasNext}
                 <a class="pager-link pager-link--next" href={nextHref} rel="next">
-                    older ▸
+                    older →
                 </a>
             {:else}
                 <span class="pager-gap"></span>
@@ -212,6 +212,7 @@
 
     .share-cite {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-sm);
         letter-spacing: 0.04em;
         color: var(--ink-text-soft);
@@ -267,7 +268,7 @@
 
     .share-title {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-xl);
         line-height: 1.25;
         letter-spacing: -0.005em;
@@ -286,6 +287,7 @@
 
     .share-meta {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-sm);
         letter-spacing: 0.04em;
         color: var(--ink-muted);
@@ -298,6 +300,7 @@
 
     .share-more {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-sm);
         letter-spacing: 0.04em;
         color: var(--ink-text-soft);
@@ -327,9 +330,10 @@
         align-items: baseline;
         gap: var(--space-md);
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-sm);
         letter-spacing: 0.08em;
-        text-transform: lowercase;
+        text-transform: uppercase;
     }
 
     .pager-link {

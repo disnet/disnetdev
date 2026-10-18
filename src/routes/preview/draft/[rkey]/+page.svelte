@@ -13,5 +13,5 @@
 <PostArticle
   post={data.post}
   returnHref={data.editorHref}
-  returnLabel="◂ back to editor"
+  returnLabel="← back to editor"
   statusPath={`~/draft-preview/${data.post.slug}`} />

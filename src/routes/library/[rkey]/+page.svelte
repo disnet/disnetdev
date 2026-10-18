@@ -37,7 +37,7 @@
 
 <nav class="crumbs" aria-label="Breadcrumb">
     <a class="crumbs-link" href="/library">
-        <span class="crumbs-glyph" aria-hidden="true">◂</span>
+        <span class="crumbs-glyph" aria-hidden="true">←</span>
         library
     </a>
     <span class="crumbs-sep" aria-hidden="true">/</span>
@@ -70,7 +70,7 @@
 
 {#if data.cards.length === 0}
     <p class="empty">
-        <span class="empty-prompt">▸</span> this shelf is empty.
+        <span class="empty-prompt">→</span> this shelf is empty.
     </p>
 {:else}
     <ol class="cards">
@@ -110,9 +110,10 @@
 <style>
     .crumbs {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-sm);
         letter-spacing: 0.08em;
-        text-transform: lowercase;
+        text-transform: uppercase;
         color: var(--ink-muted);
         margin-bottom: var(--space-md);
         display: inline-flex;
@@ -167,9 +168,10 @@
 
     .meta-item dt {
         font-family: var(--font-meta);
+        font-weight: var(--weight-meta);
         font-size: var(--type-xs);
         letter-spacing: 0.14em;
-        text-transform: lowercase;
+        text-transform: uppercase;
         color: var(--ink-muted);
         margin: 0;
     }
@@ -234,7 +236,7 @@
 
     .card-title {
         font-family: var(--font-display);
-        font-weight: 400;
+        font-weight: var(--weight-display);
         font-size: var(--type-lg);
         line-height: 1.3;
         letter-spacing: -0.005em;
