@@ -116,6 +116,8 @@ body {
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  /* Keep a wide grid inside main (the lens cabinet) from widening the page. */
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .cathode-main {
@@ -1192,4 +1194,498 @@ body {
     transition-duration: 0ms !important;
     animation-duration: 0ms !important;
   }
+}
+
+/* ——— flight status (shared by the front page and the lens) ———
+ * A state marker, set like a small-caps stamp. Amber only for what is moving.
+ */
+
+.flight-status {
+  display: inline-block;
+  font-family: var(--font-meta);
+  font-size: var(--type-xs);
+  letter-spacing: 0.1em;
+  text-transform: lowercase;
+  line-height: 1;
+  padding: 0.3em 0.55em 0.35em;
+  border: var(--rule) solid var(--ink-rule);
+  border-radius: 2px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+}
+
+.flight-status--active,
+.flight-status--next {
+  color: var(--ink-accent);
+  border-color: currentColor;
+}
+
+/* ——— lens (any repo, read through the site's type) ——— */
+
+.lens-intro {
+  margin-bottom: var(--space-xl);
+}
+
+.lens-who {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.lens-who .page-heading {
+  margin-bottom: var(--space-3xs);
+}
+
+.lens-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: none;
+}
+
+.lens-handle {
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  color: var(--ink-muted);
+}
+
+.lens-warn {
+  color: var(--ink-accent-hover);
+}
+
+.lens-status {
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  color: var(--ink-muted);
+  letter-spacing: 0.02em;
+  margin: 0 0 var(--space-2xs);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.8ch;
+  overflow-wrap: anywhere;
+}
+
+.lens-status--quiet {
+  color: var(--ink-rule);
+}
+
+.lens-prompt {
+  color: var(--ink-accent);
+}
+
+.lens-sep {
+  color: var(--ink-rule);
+}
+
+.lens-aim {
+  margin-top: var(--space-lg);
+  max-width: 28rem;
+}
+
+.lens-aim label {
+  display: block;
+  font-family: var(--font-meta);
+  font-size: var(--type-sm);
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  color: var(--ink-muted);
+  margin-bottom: var(--space-2xs);
+}
+
+.lens-aim-row {
+  display: flex;
+  border-bottom: var(--rule) solid var(--ink-rule);
+}
+
+.lens-aim-row:focus-within {
+  border-bottom-color: var(--ink-accent);
+}
+
+.lens-aim input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  padding: var(--space-2xs) 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  color: var(--ink-text);
+}
+
+.lens-aim input:focus {
+  outline: none;
+}
+
+.lens-aim input::placeholder {
+  color: var(--ink-rule);
+}
+
+.lens-aim button {
+  background: transparent;
+  border: 0;
+  padding: 0 var(--space-2xs);
+  font-size: var(--type-base);
+  color: var(--ink-accent);
+  cursor: pointer;
+}
+
+.lens-aim button:hover,
+.lens-aim button:focus-visible {
+  color: var(--ink-accent-hover);
+}
+
+/* The repo overview: one drawer per app, a cabinet of drawers. */
+.lens-cabinet {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: var(--space-lg) var(--space-xl);
+  max-width: var(--measure-wide);
+}
+
+.lens-drawer {
+  border-top: var(--rule) solid var(--ink-rule);
+  padding-top: var(--space-xs);
+}
+
+.lens-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-2xs);
+}
+
+.lens-drawer-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-lg);
+  margin: 0;
+}
+
+.cathode-main .lens-drawer-title a {
+  text-decoration: none;
+}
+
+.lens-drawer-count {
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.lens-drawer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  line-height: 1.8;
+}
+
+.cathode-main .lens-drawer-list a {
+  color: var(--ink-text-soft);
+  text-decoration: none;
+}
+
+.cathode-main .lens-drawer-list a::before {
+  content: '▸ ';
+  color: var(--ink-rule);
+}
+
+.cathode-main .lens-drawer-list a:hover,
+.cathode-main .lens-drawer-list a:focus-visible {
+  color: var(--ink-accent-hover);
+}
+
+.cathode-main .lens-drawer-list a:hover::before {
+  color: currentColor;
+}
+
+/* Collection and record pages */
+.lens-crumbs {
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  color: var(--ink-muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.8ch;
+  margin-bottom: var(--space-sm);
+}
+
+.lens-crumbs [aria-hidden] {
+  color: var(--ink-rule);
+}
+
+.lens-nsid {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(1.1rem, 0.9rem + 1.2vw, 1.75rem);
+  letter-spacing: -0.01em;
+  margin: 0 0 var(--space-lg);
+  overflow-wrap: anywhere;
+}
+
+.lens-records {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: var(--measure-wide);
+}
+
+.lens-record {
+  display: grid;
+  grid-template-columns: 8ch 1fr;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+  border-top: var(--rule) solid var(--ink-rule-soft);
+}
+
+.lens-record:last-child {
+  border-bottom: var(--rule) solid var(--ink-rule-soft);
+}
+
+.lens-record-when {
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 0.3em;
+}
+
+.lens-record-body {
+  min-width: 0;
+}
+
+.cathode-main .lens-record-title {
+  color: var(--ink-text);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.cathode-main .lens-record-title:hover,
+.cathode-main .lens-record-title:focus-visible {
+  color: var(--ink-accent-hover);
+}
+
+.lens-record-text {
+  margin: var(--space-3xs) 0 0;
+  color: var(--ink-text-soft);
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: var(--measure);
+  overflow-wrap: anywhere;
+}
+
+.lens-record-meta {
+  margin: var(--space-2xs) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-sm);
+  align-items: baseline;
+  font-family: var(--font-meta);
+  font-size: var(--type-xs);
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
+
+.cathode-main .lens-record-meta a {
+  color: var(--ink-muted);
+}
+
+.lens-rkey {
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+  color: var(--ink-rule);
+}
+
+.lens-paging {
+  display: flex;
+  justify-content: space-between;
+  max-width: var(--measure-wide);
+  font-family: var(--font-meta);
+  font-size: var(--type-sm);
+  letter-spacing: 0.08em;
+  margin-top: var(--space-md);
+}
+
+.lens-paging a:last-child {
+  margin-left: auto;
+}
+
+@media (max-width: 40rem) {
+  .lens-record {
+    grid-template-columns: 1fr;
+    gap: var(--space-3xs);
+  }
+}
+
+/* A single record, laid out as a specimen sheet. */
+.lens-specimen {
+  max-width: var(--measure-wide);
+}
+
+.lens-specimen-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--type-h2);
+  line-height: 1.2;
+  margin: 0 0 var(--space-sm);
+  overflow-wrap: anywhere;
+}
+
+.lens-specimen-head .page-lede {
+  margin-bottom: var(--space-md);
+}
+
+.lens-uri {
+  overflow-wrap: anywhere;
+}
+
+.lens-fields {
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: var(--rule) solid var(--ink-rule);
+}
+
+.ft-object dl {
+  margin: 0;
+}
+
+.ft-type {
+  margin: 0 0 var(--space-2xs);
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  color: var(--ink-accent);
+}
+
+.ft-nested {
+  padding-left: var(--space-sm);
+  border-left: var(--rule) solid var(--ink-rule-soft);
+}
+
+.ft-field {
+  display: grid;
+  grid-template-columns: minmax(6rem, 12rem) 1fr;
+  gap: var(--space-sm);
+  padding: var(--space-3xs) 0;
+}
+
+.ft-field dt {
+  font-family: var(--font-meta);
+  font-size: var(--type-sm);
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  overflow-wrap: anywhere;
+}
+
+.ft-field dd {
+  margin: 0;
+  min-width: 0;
+}
+
+.ft-atom,
+.ft-cid,
+.ft-index {
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  color: var(--ink-text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.ft-null,
+.ft-cid,
+.ft-index {
+  color: var(--ink-muted);
+}
+
+.ft-string {
+  overflow-wrap: anywhere;
+}
+
+.ft-text {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: var(--measure);
+}
+
+.ft-long summary {
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: var(--measure);
+}
+
+.ft-more {
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  color: var(--ink-muted);
+}
+
+.cathode-main .ft-ref,
+.cathode-main .ft-url {
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  overflow-wrap: anywhere;
+}
+
+.cathode-main .ft-ref span {
+  color: var(--ink-accent);
+}
+
+.ft-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ft-list > li {
+  display: grid;
+  grid-template-columns: 3ch 1fr;
+  gap: var(--space-2xs);
+  padding: var(--space-3xs) 0;
+}
+
+.ft-cell {
+  min-width: 0;
+}
+
+.ft-blob {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-sm);
+  align-items: center;
+}
+
+.ft-blob img {
+  display: block;
+  max-width: 12rem;
+  max-height: 9rem;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+@media (max-width: 40rem) {
+  .ft-field {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+.lens-status > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.lens-drawer-more summary {
+  cursor: pointer;
+  font-family: var(--font-meta);
+  font-size: var(--type-xs);
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+  margin-top: var(--space-3xs);
 }

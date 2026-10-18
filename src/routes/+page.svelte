@@ -1,19 +1,12 @@
 <script lang="ts">
     import { page } from "$app/state";
+    import { invalidateAll } from "$app/navigation";
+    import { lensHref } from "$lib/lens/paths";
 
     let { data } = $props();
 
     const ogImage = $derived(new URL("/og", page.url.origin).toString());
     const pageUrl = $derived(new URL("/", page.url.origin).toString());
-
-    function formatDate(iso: string) {
-        const d = new Date(iso);
-        return d.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
-    }
 
     const socials = [
         {
@@ -31,77 +24,71 @@
     ];
 
     const projects = [
-        {
-            name: "Skyreader",
-            href: "https://skyreader.app",
-            blurb: "An RSS reader on the Atmosphere",
-        },
-        {
-            name: "Skyboard",
-            href: "https://skyboard.dev",
-            blurb: "A Kanban board on the Atmosphere",
-        },
-        {
-            name: "SembleIt",
-            href: "https://sembleit.dev",
-            blurb: "An alternative client for Semble",
-        },
-        {
-            name: "Flint",
-            href: "https://www.flintnote.com",
-            blurb: "A note-taking app.",
-        },
-        {
-            name: "Sweet.js",
-            href: "https://sweetjs.org",
-            blurb: "Hygienic macros for JavaScript.",
-        },
-        {
-            name: "Contracts.coffee",
-            href: "http://disnet.github.io/contracts.coffee/",
-            blurb: "Higher-order contracts for CoffeeScript.",
-        },
+        { name: "Radial", href: "https://radl.app", blurb: "Agent orchestration on the Atmosphere." },
+        { name: "Skyreader", href: "https://skyreader.app", blurb: "An RSS reader on the Atmosphere." },
+        { name: "Skyboard", href: "https://skyboard.dev", blurb: "A Kanban board on the Atmosphere." },
+        { name: "SembleIt", href: "https://sembleit.dev", blurb: "An alternative client for Semble." },
+        { name: "Flint", href: "https://www.flintnote.com", blurb: "A note-taking app." },
+        { name: "Sweet.js", href: "https://sweetjs.org", blurb: "Hygienic macros for JavaScript." },
     ];
 
-    const featuredPapers = [
-        {
-            slug: "thesis",
-            title: "Hygienic Macros for JavaScript",
-            venue: "Thesis",
-            year: 2015,
-            blurb: "My doctoral dissertation showing how to adapt a hygienic macro system to JavaScript.",
-        },
-        {
-            slug: "virtual-values-for-language-extension",
-            title: "Virtual Values for Language Extension",
-            venue: "OOPSLA",
-            year: 2011,
-            blurb: "A generalization and formalization of existing meta-object systems, with an application to JavaScript.",
-        },
-        {
-            slug: "temporal-higher-order-contracts",
-            title: "Temporal Higher-Order Contracts",
-            venue: "ICFP",
-            year: 2011,
-            blurb: "Bringing temporal assertions to higher-order contracts.",
-        },
-    ];
+    const flight = $derived(data.inFlight);
+    const me = "disnetdev.com";
 
-    const recentPosts = $derived(data.posts.slice(0, 3));
-    const hasMorePosts = $derived(data.posts.length > 3);
-    const recentReading = $derived(data.reading);
-    const hasMoreReading = $derived(data.readingTotal > data.reading.length);
-    const recentCards = $derived(data.cards);
-    const hasMoreCards = $derived(data.cardsTotal > data.cards.length);
-    const recentPhotos = $derived(data.photos);
+    // The board is live: re-read the repo every minute while the tab is
+    // visible, and mark anything that wasn't there on the last read.
+    let seen: Set<string> | null = null;
+    let fresh = $state<Set<string>>(new Set());
 
-    function hostOf(url: string) {
-        try {
-            return new URL(url).hostname.replace(/^www\./, "");
-        } catch {
-            return url;
-        }
+    $effect(() => {
+        const uris = [...flight.underway, ...flight.landed].map((f) => f.uri);
+        const before = seen;
+        if (before) fresh = new Set(uris.filter((u) => !before.has(u)));
+        seen = new Set(uris);
+    });
+
+    $effect(() => {
+        const timer = setInterval(() => {
+            if (document.visibilityState === "visible") invalidateAll();
+        }, 60_000);
+        return () => clearInterval(timer);
+    });
+
+    function day(iso: string) {
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return "";
+        const sameYear = d.getFullYear() === new Date().getFullYear();
+        return d.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: sameYear ? undefined : "numeric",
+        });
     }
+
+    function clock(iso: string) {
+        return new Date(iso).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: "UTC",
+            hour12: false,
+        });
+    }
+
+    // A plan's progress as a row of type: ■ done, ▸ active or next, · waiting.
+    const METER_WIDTH = 32;
+    function meter(h: (typeof flight.horizon)[number]) {
+        const moving = h.counts[0]?.n ?? 0;
+        const waiting = h.total - h.done - moving;
+        const scale = h.total > METER_WIDTH ? METER_WIDTH / h.total : 1;
+        const cells = (n: number) => (n > 0 ? Math.max(1, Math.round(n * scale)) : 0);
+        return {
+            done: "■".repeat(cells(h.done)),
+            moving: "▸".repeat(cells(moving)),
+            waiting: "·".repeat(cells(waiting)),
+        };
+    }
+
+    const isExternal = (href: string) => /^https?:\/\//.test(href);
 </script>
 
 <svelte:head>
@@ -138,12 +125,13 @@
 </svelte:head>
 
 <section class="intro">
-    <p class="page-eyebrow">dispatch</p>
+    <p class="page-eyebrow">in flight</p>
     <h1 class="page-heading">Tim Disney</h1>
     <p class="page-lede">
         I make code and things. Programming languages, the web, and the <a
             href="https://atproto.com/">Atmosphere</a
-        > bring me joy.
+        > bring me joy. This page is a live reading of my repo: what's moving
+        now, what's on the horizon, and what just landed.
     </p>
 
     <ul class="signals" aria-label="Reach me">
@@ -164,43 +152,38 @@
     </ul>
 </section>
 
-<section aria-labelledby="recent-heading" class="band">
+<p class="readout" aria-live="polite">
+    <span class="readout-prompt">$</span>
+    read <a href={lensHref(me)}>at://{me}</a>
+    {#if flight.pdsHost}<span class="readout-sep">on</span> {flight.pdsHost}{/if}
+    <span class="readout-sep">·</span> {clock(flight.asOf)} utc
+    <span class="readout-live"><span aria-hidden="true">▸</span> live</span>
+</p>
+
+<section aria-labelledby="underway-heading" class="band">
     <header class="band-header">
-        <h2 id="recent-heading" class="band-title">Recent posts</h2>
-        {#if hasMorePosts}
-            <a href="/blog" class="read-more">all posts</a>
-        {/if}
+        <h2 id="underway-heading" class="band-title">Under way</h2>
+        <span class="band-sublabel">goals marked active or next</span>
     </header>
 
-    {#if recentPosts.length === 0}
+    {#if flight.underway.length === 0}
         <p class="empty">
-            <span class="empty-prompt">▸</span> the transmitter is warm but quiet. the first
-            post from the new stack is on its way.
+            <span class="empty-prompt">▸</span> nothing in the air right now. the
+            hangar is quiet.
         </p>
     {:else}
-        <ol class="index">
-            {#each recentPosts as post}
-                <li class="index-entry">
-                    <span class="index-num">
-                        {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                        })}
-                    </span>
-                    <div class="index-body">
-                        <h3 class="index-title">
-                            <a href={post.path}>{post.title}</a>
-                        </h3>
-                        {#if post.description}
-                            <p class="index-desc">{post.description}</p>
-                        {/if}
-                        <div class="index-meta">
-                            <span>{formatDate(post.publishedAt)}</span>
-                            {#if post.tags?.length}
-                                <span class="index-meta-sep">·</span>
-                                <span>{post.tags.slice(0, 3).join(" · ")}</span>
-                            {/if}
-                        </div>
+        <ol class="board">
+            {#each flight.underway as f (f.uri)}
+                <li class="board-row" class:is-fresh={fresh.has(f.uri)}>
+                    <span class="flight-status flight-status--{f.status}">{f.status}</span>
+                    <div class="board-body">
+                        <h3 class="board-title"><a href={f.href}>{f.title}</a></h3>
+                        {#if f.detail}<p class="board-detail">{f.detail}</p>{/if}
+                        <p class="board-meta">
+                            <span>{f.where}</span>
+                            {#if f.via}<span class="board-sep">·</span><span>via {f.via}</span>{/if}
+                            <span class="board-sep">·</span><span>{day(f.at)}</span>
+                        </p>
                     </div>
                 </li>
             {/each}
@@ -208,163 +191,94 @@
     {/if}
 </section>
 
-{#if recentPhotos.length > 0}
-    <section aria-labelledby="photos-heading" class="band">
+{#if flight.horizon.length > 0}
+    <section aria-labelledby="horizon-heading" class="band">
         <header class="band-header">
-            <h2 id="photos-heading" class="band-title">
-                Recent photos
-            </h2>
-            <a href="/photos" class="read-more">all photos</a>
+            <h2 id="horizon-heading" class="band-title">On the horizon</h2>
+            <span class="band-sublabel">
+                <span class="meter-key">■</span> done
+                <span class="meter-key meter-key--moving">▸</span> moving
+                <span class="meter-key">·</span> waiting
+            </span>
         </header>
 
-        <ol class="photo-strip">
-            {#each recentPhotos as photo}
-                <li class="photo-strip-item">
-                    <a class="photo-strip-link" href={photo.url} rel="noopener">
-                        <img
-                            src={photo.images[0].thumb}
-                            alt={photo.images[0].alt}
-                            loading="lazy"
-                            decoding="async"
-                        />
-                        <span class="photo-strip-date">
-                            {new Date(photo.createdAt).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                            })}
-                        </span>
-                    </a>
+        <ul class="horizon">
+            {#each flight.horizon as h}
+                {@const m = meter(h)}
+                <li class="horizon-row">
+                    <h3 class="horizon-name"><a href={h.href}>{h.name}</a></h3>
+                    <p class="horizon-meter" aria-label={`${h.done} of ${h.total} done`}>
+                        <span class="meter-done">{m.done}</span><span class="meter-moving"
+                            >{m.moving}</span
+                        ><span class="meter-waiting">{m.waiting}</span>
+                    </p>
+                    <p class="horizon-counts">
+                        {h.done}/{h.total} done{#each h.counts.filter((c) => c.n > 0) as c}
+                            <span class="board-sep">·</span>{c.n} {c.label}{/each}
+                    </p>
                 </li>
             {/each}
-        </ol>
+        </ul>
     </section>
 {/if}
 
-{#if recentReading.length > 0}
-    <section aria-labelledby="shared-heading" class="band">
-        <header class="band-header">
-            <h2 id="shared-heading" class="band-title">
-                Recently shared via <a href="https://skyreader.app">Skyreader</a>
-            </h2>
-            {#if hasMoreReading}
-                <a href="/reading" class="read-more">all shares</a>
-            {/if}
-        </header>
+<section aria-labelledby="landed-heading" class="band">
+    <header class="band-header">
+        <h2 id="landed-heading" class="band-title">Landed</h2>
+        <a href="/blog" class="read-more">all posts</a>
+    </header>
 
-        <ol class="shares">
-            {#each recentReading as entry}
-                <li class="share">
-                    <span class="share-date">
-                        {new Date(entry.sortedAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                        })}
+    <ol class="log">
+        {#each flight.landed as f (f.uri)}
+            <li class="log-row" class:is-fresh={fresh.has(f.uri)}>
+                <span class="log-when">{day(f.at)}</span>
+                <span class="log-verb">{f.status}</span>
+                <div class="log-body">
+                    <a
+                        class="log-title"
+                        href={f.href}
+                        rel={isExternal(f.href) ? "noopener" : undefined}>{f.title}</a
+                    >
+                    <span class="log-where">
+                        {f.where}{#if f.via}<span class="board-sep">·</span>{f.via}{/if}
                     </span>
-                    <div class="share-body">
-                        {#if entry.kind === "post"}
-                            {@const post = entry.post}
-                            <h3 class="share-title">
-                                <a href={post.path}>{post.title}</a>
-                            </h3>
-                            <p class="share-meta">
-                                {#if post.sourceUrl}
-                                    <span class="share-cite-host"
-                                        >{hostOf(post.sourceUrl)}</span
-                                    >
-                                    <span class="share-cite-sep">·</span>
-                                {/if}
-                                <a class="share-more" href={post.path}>notes ▸</a>
-                            </p>
-                        {:else}
-                            {@const share = entry.share}
-                            {#if share.note}
-                                <p class="share-note">{share.note}</p>
-                                <p class="share-cite">
-                                    <span class="share-cite-glyph" aria-hidden="true">▸</span>
-                                    <a
-                                        class="share-cite-link"
-                                        href={share.itemUrl}
-                                        rel="noopener"
-                                    >
-                                        {share.itemTitle || share.itemUrl}
-                                    </a>
-                                    {#if share.itemAuthor}
-                                        <span class="share-cite-sep">·</span>
-                                        <span class="share-cite-author"
-                                            >{share.itemAuthor}</span
-                                        >
-                                    {:else}
-                                        <span class="share-cite-sep">·</span>
-                                        <span class="share-cite-host"
-                                            >{hostOf(share.itemUrl)}</span
-                                        >
-                                    {/if}
-                                </p>
-                            {:else}
-                                <h3 class="share-title">
-                                    <a href={share.itemUrl} rel="noopener">
-                                        {share.itemTitle || share.itemUrl}
-                                    </a>
-                                </h3>
-                                <p class="share-meta">
-                                    {#if share.itemAuthor}
-                                        <span>{share.itemAuthor}</span>
-                                        <span class="share-cite-sep">·</span>
-                                    {/if}
-                                    <span class="share-cite-host"
-                                        >{hostOf(share.itemUrl)}</span
-                                    >
-                                </p>
-                            {/if}
-                        {/if}
-                    </div>
-                </li>
-            {/each}
-        </ol>
-    </section>
-{/if}
+                </div>
+                {#if f.image}
+                    <img class="log-thumb" src={f.image} alt="" loading="lazy" decoding="async" />
+                {/if}
+            </li>
+        {/each}
+    </ol>
+</section>
 
-{#if recentCards.length > 0}
-    <section aria-labelledby="filed-heading" class="band">
-        <header class="band-header">
-            <h2 id="filed-heading" class="band-title">
-                Recently filed in the <a href="/library">library</a>
-            </h2>
-            {#if hasMoreCards}
-                <a href="/library" class="read-more">all cards</a>
-            {/if}
-        </header>
-
-        <ol class="filed">
-            {#each recentCards as card}
-                <li class="filed-item">
-                    <span class="filed-mark" aria-hidden="true">◆</span>
-                    <div class="filed-body">
-                        <h3 class="filed-title">
-                            <a href={card.url} rel="noopener">
-                                {card.title || card.url}
-                            </a>
-                        </h3>
-                        <p class="filed-meta">
-                            <span class="filed-meta-host">
-                                {card.siteName || hostOf(card.url)}
-                            </span>
-                            {#if card.author}
-                                <span class="filed-meta-sep">·</span>
-                                <span class="filed-meta-author">{card.author}</span>
-                            {/if}
-                        </p>
-                    </div>
-                </li>
-            {/each}
-        </ol>
-    </section>
-{/if}
+<section aria-labelledby="lens-heading" class="band lens-invite">
+    <header class="band-header">
+        <h2 id="lens-heading" class="band-title">Through the lens</h2>
+    </header>
+    <p class="lens-invite-copy">
+        Everything above is read from public records in my repo. You can
+        <a href={lensHref(me)}>browse all of it</a>, every collection from every
+        app, or point the same lens at your own.
+    </p>
+    <form class="lens-aim" method="GET" action="/lens">
+        <label for="home-lens-actor">Your handle</label>
+        <div class="lens-aim-row">
+            <input
+                id="home-lens-actor"
+                name="actor"
+                placeholder="you.bsky.social"
+                autocomplete="off"
+                spellcheck="false"
+            />
+            <button type="submit" aria-label="Look">▸</button>
+        </div>
+    </form>
+</section>
 
 <section aria-labelledby="workshop-heading" class="band">
     <header class="band-header">
         <h2 id="workshop-heading" class="band-title">Workshop</h2>
-        <span class="band-sublabel">things I've made</span>
+        <a href="/papers" class="read-more">papers</a>
     </header>
 
     <ul class="stack">
@@ -374,29 +288,6 @@
                     <a href={project.href}>{project.name}</a>
                 </h3>
                 <p class="stack-blurb">{project.blurb}</p>
-            </li>
-        {/each}
-    </ul>
-</section>
-
-<section aria-labelledby="papers-heading" class="band">
-    <header class="band-header">
-        <h2 id="papers-heading" class="band-title">Papers</h2>
-        <a href="/papers" class="read-more">all papers</a>
-    </header>
-
-    <ul class="stack">
-        {#each featuredPapers as paper}
-            <li class="stack-item">
-                <h3 class="stack-name">
-                    <a href={`/papers/${paper.slug}`}>{paper.title}</a>
-                </h3>
-                <p class="stack-blurb">{paper.blurb}</p>
-                <p class="stack-venue">
-                    <span class="stack-venue-name">{paper.venue}</span>
-                    <span class="stack-venue-sep" aria-hidden="true">·</span>
-                    <span>{paper.year}</span>
-                </p>
             </li>
         {/each}
     </ul>
@@ -562,273 +453,331 @@
         margin-right: 0.3ch;
     }
 
-    /* ——— photos (latest from Bluesky photo account) ——— */
-    .photo-strip {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: var(--space-sm);
-        max-width: var(--measure-wide);
-    }
-
-    .photo-strip-item {
-        min-width: 0;
-    }
-
-    .photo-strip-link {
-        display: grid;
-        gap: var(--space-2xs);
-        color: inherit;
-        text-decoration: none;
-    }
-
-    .photo-strip-link img {
-        display: block;
-        width: 100%;
-        aspect-ratio: 1;
-        object-fit: cover;
-        background: var(--ink-surface);
-        border: var(--rule) solid var(--ink-rule-soft);
-    }
-
-    .photo-strip-date {
+    /* ——— readout (what the page just read, compiler-status style) ——— */
+    .readout {
         font-family: var(--font-mono);
         font-size: var(--type-xs);
         color: var(--ink-muted);
-        letter-spacing: 0.04em;
+        letter-spacing: 0.02em;
         font-variant-numeric: tabular-nums;
-    }
-
-    .photo-strip-link:hover .photo-strip-date,
-    .photo-strip-link:focus-visible .photo-strip-date {
-        color: var(--ink-accent-hover);
-    }
-
-    /* ——— shares (marginalia band) ——— */
-    .shares {
-        list-style: none;
-        padding: 0;
-        margin: 0;
+        margin: calc(var(--space-lg) * -1) 0 var(--space-2xl);
+        padding: var(--space-2xs) 0;
+        border-top: var(--rule) solid var(--ink-rule-soft);
+        border-bottom: var(--rule) solid var(--ink-rule-soft);
         max-width: var(--measure-wide);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 0.8ch;
+        overflow-wrap: anywhere;
     }
 
-    .share {
+    .readout-prompt {
+        color: var(--ink-accent);
+    }
+
+    .readout-sep {
+        color: var(--ink-rule);
+    }
+
+    .readout a {
+        color: var(--ink-text-soft);
+    }
+
+    .readout-live {
+        margin-left: auto;
+        color: var(--ink-accent);
+        animation: readout-pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes readout-pulse {
+        50% {
+            opacity: 0.45;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .readout-live {
+            animation: none;
+        }
+    }
+
+    /* ——— board (under way) ——— */
+    .board {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .board-row {
         display: grid;
-        grid-template-columns: 5ch 1fr;
-        column-gap: var(--space-md);
+        grid-template-columns: 7.5ch 1fr;
+        gap: var(--space-md);
         padding: var(--space-md) 0;
         border-top: var(--rule) solid var(--ink-rule-soft);
     }
 
-    .share:last-child {
+    .board-row:last-child {
         border-bottom: var(--rule) solid var(--ink-rule-soft);
     }
 
-    .share-date {
-        font-family: var(--font-mono);
-        font-size: var(--type-sm);
-        color: var(--ink-muted);
-        letter-spacing: 0.02em;
-        font-variant-numeric: tabular-nums;
-        padding-top: 0.4em;
-        white-space: nowrap;
+    .board-row > .flight-status {
+        justify-self: start;
+        align-self: start;
+        margin-top: 0.35em;
     }
 
-    .share-body {
-        display: grid;
-        gap: var(--space-2xs);
-        max-width: var(--measure);
-    }
-
-    .share-note {
-        font-family: var(--font-body);
-        font-size: var(--type-lg);
-        line-height: 1.5;
-        color: var(--ink-text);
-        margin: 0;
-    }
-
-    .share-cite {
-        font-family: var(--font-meta);
-        font-size: var(--type-sm);
-        letter-spacing: 0.04em;
-        color: var(--ink-text-soft);
-        margin: 0;
-        display: inline-flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        gap: 0.5ch;
-        line-height: 1.5;
-    }
-
-    .share-cite-glyph {
-        color: var(--ink-accent);
-    }
-
-    .share-cite-link {
-        color: var(--ink-text);
-        text-decoration: none;
-        padding-bottom: 1px;
-        border-bottom: 1px dotted var(--ink-rule);
-        font-family: var(--font-body);
-        font-size: 1rem;
-        letter-spacing: 0;
-        font-style: italic;
-        transition:
-            color 120ms ease-out,
-            border-color 120ms ease-out;
-    }
-
-    .share-cite-link:hover,
-    .share-cite-link:focus-visible {
-        color: var(--ink-accent-hover);
-        border-bottom-color: currentColor;
-    }
-
-    .share-cite-sep {
-        color: var(--ink-rule);
-    }
-
-    .share-cite-author {
-        color: var(--ink-text-soft);
-        font-family: var(--font-body);
-        font-size: 1rem;
-        letter-spacing: 0;
-    }
-
-    .share-cite-host {
-        font-family: var(--font-mono);
-        font-size: var(--type-xs);
-        color: var(--ink-muted);
-        letter-spacing: 0.04em;
-    }
-
-    .share-title {
+    .board-title {
         font-family: var(--font-display);
         font-weight: 400;
         font-size: var(--type-lg);
         line-height: 1.3;
-        letter-spacing: -0.005em;
         margin: 0;
     }
 
-    .share-title a {
+    .board-title a {
         color: var(--ink-text);
         text-decoration: none;
     }
 
-    .share-title a:hover,
-    .share-title a:focus-visible {
+    .board-title a:hover,
+    .board-title a:focus-visible {
         color: var(--ink-accent-hover);
     }
 
-    .share-meta {
-        font-family: var(--font-meta);
-        font-size: var(--type-sm);
-        letter-spacing: 0.04em;
-        color: var(--ink-muted);
-        margin: 0;
-        display: inline-flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        gap: 0.5ch;
-    }
-
-    .share-more {
-        font-family: var(--font-meta);
-        font-size: var(--type-sm);
-        letter-spacing: 0.04em;
+    .board-detail {
+        margin: var(--space-3xs) 0 0;
         color: var(--ink-text-soft);
-        text-decoration: none;
-        transition: color 120ms ease-out;
+        font-size: 1rem;
+        line-height: 1.55;
+        max-width: var(--measure);
     }
 
-    .share-more:hover,
-    .share-more:focus-visible {
-        color: var(--ink-accent-hover);
+    .board-meta {
+        margin: var(--space-2xs) 0 0;
+        font-family: var(--font-meta);
+        font-size: var(--type-sm);
+        letter-spacing: 0.06em;
+        text-transform: lowercase;
+        color: var(--ink-muted);
     }
 
-    /* ——— filed (recently filed library cards) ——— */
-    .filed {
+    .board-sep {
+        color: var(--ink-rule);
+        margin: 0 0.6ch;
+    }
+
+    /* A row that appeared since the last read glows once, like a phosphor. */
+    .is-fresh {
+        animation: fresh-glow 2.8s ease-out;
+    }
+
+    @keyframes fresh-glow {
+        from {
+            background: oklch(from var(--ink-accent) l c h / 0.18);
+        }
+        to {
+            background: transparent;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .is-fresh {
+            animation: none;
+        }
+    }
+
+    /* ——— horizon (plans as meters) ——— */
+    .horizon {
         list-style: none;
-        padding: 0;
         margin: 0;
-        max-width: var(--measure-wide);
+        padding: 0;
     }
 
-    .filed-item {
+    .horizon-row {
         display: grid;
-        grid-template-columns: 1.5ch 1fr;
-        column-gap: var(--space-sm);
+        grid-template-columns: minmax(12rem, 1fr) auto;
+        grid-template-areas:
+            'name counts'
+            'meter meter';
+        gap: var(--space-3xs) var(--space-md);
         padding: var(--space-sm) 0;
         border-top: var(--rule) solid var(--ink-rule-soft);
     }
 
-    .filed-item:last-child {
+    .horizon-row:last-child {
         border-bottom: var(--rule) solid var(--ink-rule-soft);
     }
 
-    .filed-mark {
-        color: var(--ink-accent);
-        font-size: 0.7em;
-        padding-top: 0.75em;
-        line-height: 1;
-        user-select: none;
-    }
-
-    .filed-body {
-        display: grid;
-        gap: var(--space-3xs);
-        max-width: var(--measure);
-        min-width: 0;
-    }
-
-    .filed-title {
-        font-family: var(--font-display);
-        font-weight: 400;
-        font-size: var(--type-lg);
-        line-height: 1.3;
-        letter-spacing: -0.005em;
+    .horizon-name {
+        grid-area: name;
+        font-family: var(--font-body);
+        font-weight: 500;
+        font-size: 1.05rem;
         margin: 0;
     }
 
-    .filed-title a {
+    .horizon-name a {
         color: var(--ink-text);
         text-decoration: none;
-        overflow-wrap: anywhere;
     }
 
-    .filed-title a:hover,
-    .filed-title a:focus-visible {
+    .horizon-name a:hover,
+    .horizon-name a:focus-visible {
         color: var(--ink-accent-hover);
     }
 
-    .filed-meta {
+    .horizon-counts {
+        grid-area: counts;
+        margin: 0;
         font-family: var(--font-mono);
         font-size: var(--type-xs);
         color: var(--ink-muted);
-        letter-spacing: 0.04em;
-        margin: 0;
-        display: inline-flex;
-        flex-wrap: wrap;
-        align-items: baseline;
-        gap: 0.5ch;
         font-variant-numeric: tabular-nums;
+        align-self: baseline;
     }
 
-    .filed-meta-sep {
-        color: var(--ink-rule);
+    .horizon-meter {
+        grid-area: meter;
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: var(--type-sm);
+        letter-spacing: 0.18em;
+        line-height: 1;
+        overflow: hidden;
+        white-space: nowrap;
     }
 
-    .filed-meta-author {
+    .meter-done {
         color: var(--ink-text-soft);
     }
 
-    @media (max-width: 42rem) {
-        .photo-strip {
+    .meter-moving,
+    .meter-key--moving {
+        color: var(--ink-accent);
+    }
+
+    .meter-waiting {
+        color: var(--ink-muted);
+    }
+
+    .meter-key {
+        font-family: var(--font-mono);
+        margin-left: 0.8ch;
+    }
+
+    /* ——— log (landed) ——— */
+    .log {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .log-row {
+        display: grid;
+        grid-template-columns: 7ch 11ch 1fr auto;
+        gap: var(--space-sm);
+        align-items: baseline;
+        padding: var(--space-xs) 0;
+        border-top: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .log-row:last-child {
+        border-bottom: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .log-when {
+        font-family: var(--font-mono);
+        font-size: var(--type-xs);
+        color: var(--ink-muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .log-verb {
+        font-family: var(--font-meta);
+        font-size: var(--type-sm);
+        letter-spacing: 0.08em;
+        color: var(--ink-accent);
+    }
+
+    .log-body {
+        min-width: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0 var(--space-xs);
+        align-items: baseline;
+    }
+
+    :global(.cathode-main) .log-title {
+        color: var(--ink-text);
+        text-decoration: none;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+    }
+
+    :global(.cathode-main) .log-title:hover,
+    :global(.cathode-main) .log-title:focus-visible {
+        color: var(--ink-accent-hover);
+    }
+
+    .log-where {
+        font-family: var(--font-meta);
+        font-size: var(--type-xs);
+        letter-spacing: 0.08em;
+        text-transform: lowercase;
+        color: var(--ink-muted);
+    }
+
+    .log-thumb {
+        width: 2.5rem;
+        height: 2.5rem;
+        object-fit: cover;
+        border-radius: 2px;
+        align-self: center;
+    }
+
+    @media (max-width: 40rem) {
+        .board-row {
             grid-template-columns: 1fr;
+            gap: var(--space-2xs);
         }
+
+        .log-row {
+            grid-template-columns: 7ch 1fr auto;
+            grid-template-areas:
+                'when verb thumb'
+                'body body thumb';
+            gap: var(--space-3xs) var(--space-sm);
+        }
+
+        .log-when {
+            grid-area: when;
+        }
+
+        .log-verb {
+            grid-area: verb;
+        }
+
+        .log-body {
+            grid-area: body;
+        }
+
+        .log-thumb {
+            grid-area: thumb;
+        }
+
+        .horizon-row {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                'name'
+                'meter'
+                'counts';
+        }
+    }
+
+    /* ——— lens invite ——— */
+    .lens-invite-copy {
+        max-width: var(--measure);
+        margin: 0 0 var(--space-md);
+        color: var(--ink-text-soft);
     }
 </style>
