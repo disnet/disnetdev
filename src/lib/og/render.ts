@@ -14,11 +14,9 @@ import { buildOgTree, type OgInputs, OG_WIDTH, OG_HEIGHT } from './template';
 // during SvelteKit's build-time manifest/prerender pass — the endpoints that
 // call into this file are not prerendered.
 function loadYogaModule(): Promise<WebAssembly.Module> {
-  // @ts-expect-error resolved by Wrangler at upload time
   return import('./wasm/yoga.wasm').then((m) => m.default);
 }
 function loadResvgModule(): Promise<WebAssembly.Module> {
-  // @ts-expect-error resolved by Wrangler at upload time
   return import('./wasm/resvg.wasm').then((m) => m.default);
 }
 
