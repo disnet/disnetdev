@@ -1846,3 +1846,51 @@ body {
     justify-self: center;
   }
 }
+
+/* ——— prototype pages (the dial, the neighbourhood) ———
+ * The same poster-scale intro as the front page: heading left, lede beside
+ * it on wide screens, an eyebrow with the accent square above.
+ */
+
+.page-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.55em;
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.page-eyebrow::before {
+  content: '';
+  width: 0.6em;
+  height: 0.6em;
+  background: var(--ink-accent);
+}
+
+.proto-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.proto-intro .page-eyebrow {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+@media (min-width: 64rem) {
+  .proto-intro {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    column-gap: var(--space-xl);
+    align-items: end;
+  }
+
+  .proto-intro .page-lede {
+    padding-bottom: 0.4rem;
+  }
+}
