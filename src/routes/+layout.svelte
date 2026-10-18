@@ -86,39 +86,39 @@
             {item.label}
           </a>
         {/each}
-
-        <details class="subscribe" class:is-subscribed={subscribed} bind:this={subscribeEl}>
-          <summary class="subscribe-summary">
-            {#if subscribed}<span class="subscribe-check" aria-hidden="true">→</span
-              >subscribed{:else}subscribe{/if}
-          </summary>
-          <div class="subscribe-popover">
-            {#if subscribed}
-              <p class="subscribe-status">
-                <span class="subscribe-check" aria-hidden="true">→</span> Following over ATProto.
-              </p>
-              <form class="subscribe-unsub" method="POST" action="/subscribe?/unsubscribe">
-                <input type="hidden" name="redirectTo" value={pathname} />
-                <button type="submit" class="subscribe-unsub-button">unsubscribe</button>
-              </form>
-            {:else}
-              <form class="subscribe-mini" method="POST" action="/subscribe?/subscribe">
-                <input type="hidden" name="redirectTo" value={pathname} />
-                <label class="subscribe-mini-label" for="masthead-handle">
-                  Subscribe with your Atmosphere Account
-                </label>
-                <div class="subscribe-mini-row">
-                  <HandleField id="masthead-handle" placeholder="you.bsky.social" />
-                  <button type="submit" aria-label="Subscribe with your Atmosphere account">→</button>
-                </div>
-              </form>
-            {/if}
-            <a class="subscribe-rss" href="/feed.xml">
-              <span class="subscribe-rss-glyph" aria-hidden="true">→</span> rss feed
-            </a>
-          </div>
-        </details>
       </nav>
+
+      <details class="subscribe" class:is-subscribed={subscribed} bind:this={subscribeEl}>
+        <summary class="subscribe-summary">
+          {#if subscribed}<span class="subscribe-check" aria-hidden="true">→</span
+            >subscribed{:else}subscribe{/if}
+        </summary>
+        <div class="subscribe-popover">
+          {#if subscribed}
+            <p class="subscribe-status">
+              <span class="subscribe-check" aria-hidden="true">→</span> Following over ATProto.
+            </p>
+            <form class="subscribe-unsub" method="POST" action="/subscribe?/unsubscribe">
+              <input type="hidden" name="redirectTo" value={pathname} />
+              <button type="submit" class="subscribe-unsub-button">unsubscribe</button>
+            </form>
+          {:else}
+            <form class="subscribe-mini" method="POST" action="/subscribe?/subscribe">
+              <input type="hidden" name="redirectTo" value={pathname} />
+              <label class="subscribe-mini-label" for="masthead-handle">
+                Subscribe with your Atmosphere Account
+              </label>
+              <div class="subscribe-mini-row">
+                <HandleField id="masthead-handle" placeholder="you.bsky.social" />
+                <button type="submit" aria-label="Subscribe with your Atmosphere account">→</button>
+              </div>
+            </form>
+          {/if}
+          <a class="subscribe-rss" href="/feed.xml">
+            <span class="subscribe-rss-glyph" aria-hidden="true">→</span> rss feed
+          </a>
+        </div>
+      </details>
     </header>
 
     <main class="cathode-main">

@@ -29,13 +29,14 @@
 </svelte:head>
 
 <section class="heading-block">
-  <p class="page-eyebrow">bibliography</p>
   <h1 class="page-heading">Papers</h1>
-  <p class="page-lede">
-    Work from a decade of programming-language research, mostly at UC Santa Cruz.
-    Hygienic macros for JavaScript, higher-order contracts, information flow,
-    and type soundness via trace semantics.
-  </p>
+  <div class="page-head-aside">
+    <p class="page-lede">
+      Work from a decade of programming-language research, mostly at UC Santa Cruz.
+      Hygienic macros for JavaScript, higher-order contracts, information flow,
+      and type soundness via trace semantics.
+    </p>
+  </div>
 </section>
 
 <div class="papers">
@@ -100,10 +101,6 @@
 </p>
 
 <style>
-  .heading-block {
-    margin-bottom: var(--space-2xl);
-  }
-
   .papers {
     max-width: var(--measure-wide);
   }

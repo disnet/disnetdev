@@ -39,14 +39,15 @@
 </svelte:head>
 
 <section class="heading-block">
-    <p class="page-eyebrow">dispatch</p>
     <h1 class="page-heading">Reading</h1>
-    <p class="page-lede">
-        Things I've read and wanted to keep, shared via
-        <a href="https://skyreader.app">Skyreader</a>. Sometimes with a note,
-        sometimes just the pointer. {data.total} item{data.total === 1 ? "" : "s"}
-        so far.
-    </p>
+    <div class="page-head-aside">
+        <p class="page-lede">
+            Things I've read and wanted to keep, shared via
+            <a href="https://skyreader.app">Skyreader</a>. Sometimes with a note,
+            sometimes just the pointer. {data.total} item{data.total === 1 ? "" : "s"}
+            so far.
+        </p>
+    </div>
 </section>
 
 {#if data.entries.length === 0}
@@ -150,10 +151,6 @@
 {/if}
 
 <style>
-    .heading-block {
-        margin-bottom: var(--space-2xl);
-    }
-
     .empty {
         font-style: italic;
         color: var(--ink-text-soft);

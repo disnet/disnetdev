@@ -45,27 +45,28 @@
 </nav>
 
 <section class="heading-block">
-    <p class="page-eyebrow">collection</p>
     <h1 class="page-heading">{data.collection.name}</h1>
-    {#if data.collection.description}
-        <p class="page-lede">{data.collection.description}</p>
-    {/if}
-    <dl class="meta-bar">
-        <div class="meta-item">
-            <dt>Cards</dt>
-            <dd>{data.cards.length}</dd>
-        </div>
-        <div class="meta-item">
-            <dt>Access</dt>
-            <dd>{data.collection.accessType.toLowerCase()}</dd>
-        </div>
-        {#if data.collection.updatedAt}
-            <div class="meta-item">
-                <dt>Updated</dt>
-                <dd>{formatShortDate(data.collection.updatedAt)}</dd>
-            </div>
+    <div class="page-head-aside">
+        {#if data.collection.description}
+            <p class="page-lede">{data.collection.description}</p>
         {/if}
-    </dl>
+        <dl class="meta-bar">
+            <div class="meta-item">
+                <dt>Cards</dt>
+                <dd>{data.cards.length}</dd>
+            </div>
+            <div class="meta-item">
+                <dt>Access</dt>
+                <dd>{data.collection.accessType.toLowerCase()}</dd>
+            </div>
+            {#if data.collection.updatedAt}
+                <div class="meta-item">
+                    <dt>Updated</dt>
+                    <dd>{formatShortDate(data.collection.updatedAt)}</dd>
+                </div>
+            {/if}
+        </dl>
+    </div>
 </section>
 
 {#if data.cards.length === 0}
@@ -145,10 +146,6 @@
 
     .crumbs-current {
         color: var(--ink-text-soft);
-    }
-
-    .heading-block {
-        margin-bottom: var(--space-2xl);
     }
 
     .meta-bar {

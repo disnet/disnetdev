@@ -9,7 +9,7 @@
   <meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
-<p class="page-eyebrow">draft preview</p>
+<p class="state-flag">Draft preview · not published</p>
 <PostArticle
   post={data.post}
   returnHref={data.editorHref}

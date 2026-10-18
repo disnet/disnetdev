@@ -40,15 +40,16 @@
 </svelte:head>
 
 <section class="heading-block">
-    <p class="page-eyebrow">catalog</p>
     <h1 class="page-heading">Library</h1>
-    <p class="page-lede">
-        Cards and collections from my
-        <a href="https://semble.so/profile/disnetdev.com">Semble</a>
-        library. Pages saved for later, grouped into shelves I return to.
-        {data.totalCards} card{data.totalCards === 1 ? "" : "s"}, {data.totalCollections}
-        shelf{data.totalCollections === 1 ? "" : "ves"}.
-    </p>
+    <div class="page-head-aside">
+        <p class="page-lede">
+            Cards and collections from my
+            <a href="https://semble.so/profile/disnetdev.com">Semble</a>
+            library. Pages saved for later, grouped into shelves I return to.
+            {data.totalCards} card{data.totalCards === 1 ? "" : "s"}, {data.totalCollections}
+            shelf{data.totalCollections === 1 ? "" : "ves"}.
+        </p>
+    </div>
 </section>
 
 {#if data.collections.length > 0}
@@ -161,10 +162,6 @@
 </section>
 
 <style>
-    .heading-block {
-        margin-bottom: var(--space-2xl);
-    }
-
     .empty {
         font-style: italic;
         color: var(--ink-text-soft);

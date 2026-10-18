@@ -33,13 +33,14 @@
 </svelte:head>
 
 <section class="heading-block">
-  <p class="page-eyebrow">photolog</p>
   <h1 class="page-heading">Photos</h1>
-  <p class="page-lede">
-    Images posted from
-    <a href="https://bsky.app/profile/photos.disnetdev.com" rel="me">@photos.disnetdev.com</a>
-    on Bluesky. {data.total} post{data.total === 1 ? '' : 's'} so far.
-  </p>
+  <div class="page-head-aside">
+    <p class="page-lede">
+      Images posted from
+      <a href="https://bsky.app/profile/photos.disnetdev.com" rel="me">@photos.disnetdev.com</a>
+      on Bluesky. {data.total} post{data.total === 1 ? '' : 's'} so far.
+    </p>
+  </div>
 </section>
 
 {#if data.photos.length === 0}
@@ -109,10 +110,6 @@
 {/if}
 
 <style>
-  .heading-block {
-    margin-bottom: var(--space-2xl);
-  }
-
   .empty {
     font-style: italic;
     color: var(--ink-text-soft);

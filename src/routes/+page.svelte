@@ -6,15 +6,6 @@
     const ogImage = $derived(new URL("/og", page.url.origin).toString());
     const pageUrl = $derived(new URL("/", page.url.origin).toString());
 
-    function formatDate(iso: string) {
-        const d = new Date(iso);
-        return d.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-        });
-    }
-
     const socials = [
         {
             label: "bluesky",
@@ -138,9 +129,8 @@
 </svelte:head>
 
 <section class="intro">
-    <p class="page-eyebrow">dispatch</p>
-    <h1 class="page-heading">Tim Disney</h1>
-    <p class="page-lede">
+    <h1 class="intro-name">Tim Disney</h1>
+    <p class="intro-lede">
         I make code and things. Programming languages, the web, and the <a
             href="https://atproto.com/">Atmosphere</a
         > bring me joy.
@@ -164,7 +154,8 @@
     </ul>
 </section>
 
-<section aria-labelledby="recent-heading" class="band">
+<div class="home-grid">
+<section aria-labelledby="recent-heading" class="band band--posts">
     <header class="band-header">
         <h2 id="recent-heading" class="band-title">Recent posts</h2>
         {#if hasMorePosts}
@@ -178,29 +169,30 @@
             post from the new stack is on its way.
         </p>
     {:else}
-        <ol class="index">
+        <ol class="lead">
             {#each recentPosts as post}
-                <li class="index-entry">
-                    <span class="index-num">
-                        {new Date(post.publishedAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                        })}
-                    </span>
-                    <div class="index-body">
-                        <h3 class="index-title">
+                <li class="lead-entry">
+                    <time class="lead-date" datetime={post.publishedAt}>
+                        <span class="lead-day"
+                            >{new Date(post.publishedAt).getDate()}</span
+                        >
+                        <span class="lead-month">
+                            {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                                month: "short",
+                                year: "numeric",
+                            })}
+                        </span>
+                    </time>
+                    <div class="lead-body">
+                        <h3 class="lead-title">
                             <a href={post.path}>{post.title}</a>
                         </h3>
                         {#if post.description}
-                            <p class="index-desc">{post.description}</p>
+                            <p class="lead-desc">{post.description}</p>
                         {/if}
-                        <div class="index-meta">
-                            <span>{formatDate(post.publishedAt)}</span>
-                            {#if post.tags?.length}
-                                <span class="index-meta-sep">·</span>
-                                <span>{post.tags.slice(0, 3).join(" · ")}</span>
-                            {/if}
-                        </div>
+                        {#if post.tags?.length}
+                            <p class="lead-tags">{post.tags.slice(0, 3).join(" · ")}</p>
+                        {/if}
                     </div>
                 </li>
             {/each}
@@ -209,7 +201,7 @@
 </section>
 
 {#if recentPhotos.length > 0}
-    <section aria-labelledby="photos-heading" class="band">
+    <section aria-labelledby="photos-heading" class="band band--photos">
         <header class="band-header">
             <h2 id="photos-heading" class="band-title">
                 Recent photos
@@ -241,7 +233,7 @@
 {/if}
 
 {#if recentReading.length > 0}
-    <section aria-labelledby="shared-heading" class="band">
+    <section aria-labelledby="shared-heading" class="band band--shares">
         <header class="band-header">
             <h2 id="shared-heading" class="band-title">
                 Recently shared via <a href="https://skyreader.app">Skyreader</a>
@@ -325,7 +317,7 @@
 {/if}
 
 {#if recentCards.length > 0}
-    <section aria-labelledby="filed-heading" class="band">
+    <section aria-labelledby="filed-heading" class="band band--filed">
         <header class="band-header">
             <h2 id="filed-heading" class="band-title">
                 Recently filed in the <a href="/library">library</a>
@@ -361,13 +353,13 @@
     </section>
 {/if}
 
-<section aria-labelledby="workshop-heading" class="band">
+<section aria-labelledby="workshop-heading" class="band band--workshop">
     <header class="band-header">
         <h2 id="workshop-heading" class="band-title">Workshop</h2>
         <span class="band-sublabel">things I've made</span>
     </header>
 
-    <ul class="stack">
+    <ul class="stack stack--grid">
         {#each projects as project}
             <li class="stack-item">
                 <h3 class="stack-name">
@@ -379,7 +371,7 @@
     </ul>
 </section>
 
-<section aria-labelledby="papers-heading" class="band">
+<section aria-labelledby="papers-heading" class="band band--papers">
     <header class="band-header">
         <h2 id="papers-heading" class="band-title">Papers</h2>
         <a href="/papers" class="read-more">all papers</a>
@@ -401,28 +393,53 @@
         {/each}
     </ul>
 </section>
+</div>
 
 <style>
+    /* ——— intro: the name set at poster scale, lede beside it ——— */
     .intro {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-md);
         margin-bottom: var(--space-2xl);
     }
 
-    /* ——— signals (social contact table) ——— */
+    .intro-name {
+        font-family: var(--font-display);
+        font-weight: 830;
+        font-size: clamp(3.4rem, 1.2rem + 8.4vw, 6rem);
+        letter-spacing: -0.04em;
+        line-height: 0.88;
+        margin: 0;
+        color: var(--ink-text);
+    }
+
+    .intro-lede {
+        font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+        line-height: 1.4;
+        color: var(--ink-text-soft);
+        margin: 0;
+        max-width: 34ch;
+        text-wrap: pretty;
+    }
+
+    /* ——— signals (contact dateline) ——— */
     .signals {
         list-style: none;
-        padding: 0;
-        margin: 0;
-        max-width: var(--measure);
+        padding: var(--space-sm) 0 0;
+        margin: var(--space-sm) 0 0;
+        border-top: var(--rule) solid var(--ink-rule);
         display: grid;
-        gap: var(--space-2xs) var(--space-md);
-        grid-template-columns: max-content 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+        gap: var(--space-sm) var(--space-lg);
         font-family: var(--font-mono);
         font-size: var(--type-sm);
-        font-variant-numeric: tabular-nums;
     }
 
     .signal {
-        display: contents;
+        display: grid;
+        gap: var(--space-3xs);
+        min-width: 0;
     }
 
     .signal-label {
@@ -432,40 +449,71 @@
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: var(--ink-muted);
-        padding-top: 0.18em;
-        align-self: baseline;
     }
 
     .signal-link {
         color: var(--ink-text);
         text-decoration: none;
-        padding-bottom: 1px;
-        border-bottom: 1px dotted var(--ink-rule);
-        transition:
-            color 120ms ease-out,
-            border-color 120ms ease-out;
         justify-self: start;
+        overflow-wrap: anywhere;
+        transition: color 120ms ease-out;
     }
 
     .signal-link:hover,
     .signal-link:focus-visible {
         color: var(--ink-accent-hover);
-        border-bottom-color: currentColor;
     }
 
-    /* ——— band (home section rhythm) ——— */
-    .band {
-        margin-bottom: var(--space-2xl);
-        max-width: var(--measure-wide);
+    @media (min-width: 64rem) {
+        .intro {
+            grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+            column-gap: var(--space-xl);
+            align-items: end;
+        }
+
+        .intro-lede {
+            padding-bottom: 0.4rem;
+        }
+
+        .signals {
+            grid-column: 1 / -1;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
     }
 
-    /* Section heads hang off a heavy ink rule, newspaper-style. */
+    /* ——— home grid: a lead column and a narrower side column, newspaper-style ——— */
+    .home-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: var(--space-2xl) var(--space-xl);
+    }
+
+    @media (min-width: 64rem) {
+        .home-grid {
+            grid-template-columns: repeat(12, minmax(0, 1fr));
+            row-gap: var(--space-3xl);
+        }
+
+        .band--posts,
+        .band--shares,
+        .band--workshop {
+            grid-column: 1 / span 8;
+        }
+
+        .band--photos,
+        .band--filed,
+        .band--papers {
+            grid-column: 9 / span 4;
+        }
+    }
+
+    /* Section heads hang off a heavy ink rule. */
     .band-header {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
         gap: var(--space-md);
-        margin-bottom: var(--space-sm);
+        margin-bottom: var(--space-xs);
         padding-top: var(--space-xs);
         border-top: 2px solid var(--ink-text);
     }
@@ -475,17 +523,138 @@
         font-weight: var(--weight-display);
         font-size: var(--type-h2);
         letter-spacing: -0.03em;
+        line-height: 1.1;
         margin: 0;
         color: var(--ink-text);
+    }
+
+    /* The side column speaks a size down. */
+    .band--photos .band-title,
+    .band--filed .band-title,
+    .band--papers .band-title {
+        font-size: var(--type-xl);
+    }
+
+    /* The lead section carries the heaviest rule on the page. */
+    .band--posts .band-header {
+        border-top-width: 5px;
     }
 
     .band-sublabel {
         font-family: var(--font-meta);
         font-weight: var(--weight-meta);
-        font-size: var(--type-sm);
+        font-size: var(--type-xs);
         letter-spacing: 0.08em;
         text-transform: uppercase;
         color: var(--ink-muted);
+    }
+
+    /* ——— lead (recent posts as a dated ledger) ——— */
+    .lead {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .lead-entry {
+        display: grid;
+        grid-template-columns: 4.5rem minmax(0, 1fr);
+        column-gap: var(--space-md);
+        padding: var(--space-md) 0 var(--space-lg);
+        border-top: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .lead-entry:first-child {
+        border-top: 0;
+    }
+
+    .lead-date {
+        display: grid;
+        align-content: start;
+        gap: var(--space-3xs);
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+        color: var(--ink-muted);
+    }
+
+    .lead-day {
+        font-size: 2.5rem;
+        font-weight: 300;
+        line-height: 1;
+        letter-spacing: -0.04em;
+        color: var(--ink-text);
+    }
+
+    .lead-month {
+        font-size: var(--type-xs);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .lead-body {
+        display: grid;
+        gap: var(--space-2xs);
+        max-width: var(--measure);
+    }
+
+    .lead-title {
+        font-family: var(--font-display);
+        font-weight: 760;
+        font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.5rem);
+        line-height: 1.02;
+        letter-spacing: -0.035em;
+        margin: 0;
+        text-wrap: balance;
+    }
+
+    .lead-title a {
+        color: var(--ink-text);
+        text-decoration: underline;
+        text-decoration-color: transparent;
+        text-decoration-thickness: 3px;
+        text-underline-offset: 0.12em;
+        transition:
+            color 150ms ease-out,
+            text-decoration-color 150ms ease-out;
+    }
+
+    .lead-title a:hover,
+    .lead-title a:focus-visible {
+        color: var(--ink-text);
+        text-decoration-color: var(--ink-accent);
+    }
+
+    .lead-desc {
+        font-size: var(--type-lg);
+        line-height: 1.45;
+        color: var(--ink-text-soft);
+        margin: 0;
+    }
+
+    .lead-tags {
+        font-family: var(--font-mono);
+        font-size: var(--type-xs);
+        color: var(--ink-muted);
+        letter-spacing: 0.04em;
+        margin: 0;
+    }
+
+    @media (max-width: 40rem) {
+        .lead-entry {
+            grid-template-columns: minmax(0, 1fr);
+            row-gap: var(--space-2xs);
+        }
+
+        .lead-date {
+            display: flex;
+            align-items: baseline;
+            gap: 1ch;
+        }
+
+        .lead-day {
+            font-size: 1.5rem;
+        }
     }
 
     /* ——— stack (project / featured paper list) ——— */
@@ -502,8 +671,30 @@
         gap: var(--space-3xs);
     }
 
-    .stack-item:last-child {
-        border-bottom: var(--rule) solid var(--ink-rule-soft);
+    .stack-item:first-child {
+        border-top: 0;
+    }
+
+    /* Workshop: two columns of projects, names set a size up. */
+    .stack--grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 1fr));
+        column-gap: var(--space-xl);
+    }
+
+    .stack--grid .stack-item:nth-child(2) {
+        border-top: 0;
+    }
+
+    @media (max-width: 40rem) {
+        .stack--grid .stack-item:nth-child(2) {
+            border-top: var(--rule) solid var(--ink-rule-soft);
+        }
+    }
+
+    .stack--grid .stack-name {
+        font-size: var(--type-xl);
+        letter-spacing: -0.025em;
     }
 
     .stack-name {
@@ -567,24 +758,27 @@
         margin-right: 0.3ch;
     }
 
-    /* ——— photos (latest from Bluesky photo account) ——— */
+    /* ——— photos: one large frame over two small ones ——— */
     .photo-strip {
         list-style: none;
         padding: 0;
-        margin: 0;
+        margin: var(--space-xs) 0 0;
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: var(--space-sm);
-        max-width: var(--measure-wide);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--space-sm) var(--space-xs);
     }
 
     .photo-strip-item {
         min-width: 0;
     }
 
+    .photo-strip-item:first-child {
+        grid-column: 1 / -1;
+    }
+
     .photo-strip-link {
         display: grid;
-        gap: var(--space-2xs);
+        gap: var(--space-3xs);
         color: inherit;
         text-decoration: none;
     }
@@ -595,7 +789,11 @@
         aspect-ratio: 1;
         object-fit: cover;
         background: var(--ink-surface);
-        border: var(--rule) solid var(--ink-rule-soft);
+        transition: filter 200ms ease-out;
+    }
+
+    .photo-strip-item:first-child img {
+        aspect-ratio: 4 / 3;
     }
 
     .photo-strip-date {
@@ -611,6 +809,11 @@
         color: var(--ink-accent-hover);
     }
 
+    .photo-strip-link:hover img,
+    .photo-strip-link:focus-visible img {
+        filter: contrast(1.06) saturate(1.1);
+    }
+
     /* ——— shares (marginalia band) ——— */
     .shares {
         list-style: none;
@@ -621,14 +824,14 @@
 
     .share {
         display: grid;
-        grid-template-columns: 5ch 1fr;
+        grid-template-columns: 4.5rem minmax(0, 1fr);
         column-gap: var(--space-md);
         padding: var(--space-md) 0;
         border-top: var(--rule) solid var(--ink-rule-soft);
     }
 
-    .share:last-child {
-        border-bottom: var(--rule) solid var(--ink-rule-soft);
+    .share:first-child {
+        border-top: 0;
     }
 
     .share-date {
@@ -774,8 +977,8 @@
         border-top: var(--rule) solid var(--ink-rule-soft);
     }
 
-    .filed-item:last-child {
-        border-bottom: var(--rule) solid var(--ink-rule-soft);
+    .filed-item:first-child {
+        border-top: 0;
     }
 
     .filed-mark {
@@ -834,9 +1037,4 @@
         color: var(--ink-text-soft);
     }
 
-    @media (max-width: 42rem) {
-        .photo-strip {
-            grid-template-columns: 1fr;
-        }
-    }
 </style>
