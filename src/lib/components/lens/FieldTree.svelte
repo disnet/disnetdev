@@ -1,14 +1,15 @@
 <script lang="ts">
   import FieldTree from './FieldTree.svelte';
-  import { lensHrefForUri } from '$lib/lens/paths';
+  import { lensHrefForUri, type OwnRepo } from '$lib/lens/paths';
 
   // A record laid out as a specimen sheet: every field, typed, with references
-  // turned into lens links so you can walk the graph from here.
+  // into the same repo turned into lens links.
   let {
     value,
     blobBase,
+    own,
     depth = 0
-  }: { value: unknown; blobBase: string; depth?: number } = $props();
+  }: { value: unknown; blobBase: string; own: OwnRepo; depth?: number } = $props();
 
   const ARRAY_LIMIT = 40;
   const LONG_TEXT = 1200;
@@ -69,7 +70,7 @@
 {:else if typeof value === 'boolean' || typeof value === 'number'}
   <span class="ft-atom">{String(value)}</span>
 {:else if typeof value === 'string'}
-  {@const href = lensHrefForUri(value)}
+  {@const href = lensHrefForUri(value, own)}
   {#if href}
     <a class="ft-ref" {href}><span aria-hidden="true">▸</span> {value}</a>
   {:else if /^https?:\/\//.test(value) && !/\s/.test(value)}
@@ -108,7 +109,7 @@
       {#each value.slice(0, ARRAY_LIMIT) as item, i}
         <li>
           <span class="ft-index">{i}</span>
-          <div class="ft-cell"><FieldTree value={item} {blobBase} depth={depth + 1} /></div>
+          <div class="ft-cell"><FieldTree value={item} {blobBase} {own} depth={depth + 1} /></div>
         </li>
       {/each}
       {#if value.length > ARRAY_LIMIT}
@@ -125,7 +126,7 @@
       {#each entries as [key, child]}
         <div class="ft-field">
           <dt>{key}</dt>
-          <dd><FieldTree value={child} {blobBase} depth={depth + 1} /></dd>
+          <dd><FieldTree value={child} {blobBase} {own} depth={depth + 1} /></dd>
         </div>
       {/each}
     </dl>

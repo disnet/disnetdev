@@ -12,13 +12,12 @@
 </script>
 
 <svelte:head>
-  <title>{name} · through the lens · disnetdev</title>
-  <meta name="robots" content="noindex" />
+  <title>My repo · disnetdev</title>
 </svelte:head>
 
 <div class="lens-hero">
 <section class="lens-intro">
-  <p class="page-eyebrow">lens</p>
+  <p class="page-eyebrow">the whole repo</p>
   <div class="lens-who">
     {#if data.profile.avatarUrl}
       <img class="lens-avatar" src={data.profile.avatarUrl} alt="" width="56" height="56" />
@@ -43,13 +42,6 @@
     <span>{shown} collections across {data.groups.length} apps</span>
   </p>
 
-  <form class="lens-aim" method="GET" action="/lens">
-    <label for="lens-actor">Point the lens at another repo</label>
-    <div class="lens-aim-row">
-      <input id="lens-actor" name="actor" placeholder="you.bsky.social" autocomplete="off" spellcheck="false" />
-      <button type="submit" aria-label="Look">▸</button>
-    </div>
-  </form>
 </section>
 
 <div class="lens-scope">

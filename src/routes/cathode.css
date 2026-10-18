@@ -1279,62 +1279,14 @@ body {
   color: var(--ink-rule);
 }
 
-.lens-aim {
-  margin-top: var(--space-lg);
-  max-width: 28rem;
-}
 
-.lens-aim label {
-  display: block;
-  font-family: var(--font-meta);
-  font-size: var(--type-sm);
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
-  color: var(--ink-muted);
-  margin-bottom: var(--space-2xs);
-}
 
-.lens-aim-row {
-  display: flex;
-  border-bottom: var(--rule) solid var(--ink-rule);
-}
 
-.lens-aim-row:focus-within {
-  border-bottom-color: var(--ink-accent);
-}
 
-.lens-aim input {
-  flex: 1;
-  min-width: 0;
-  background: transparent;
-  border: 0;
-  padding: var(--space-2xs) 0;
-  font-family: var(--font-mono);
-  font-size: var(--type-sm);
-  color: var(--ink-text);
-}
 
-.lens-aim input:focus {
-  outline: none;
-}
 
-.lens-aim input::placeholder {
-  color: var(--ink-rule);
-}
 
-.lens-aim button {
-  background: transparent;
-  border: 0;
-  padding: 0 var(--space-2xs);
-  font-size: var(--type-base);
-  color: var(--ink-accent);
-  cursor: pointer;
-}
 
-.lens-aim button:hover,
-.lens-aim button:focus-visible {
-  color: var(--ink-accent-hover);
-}
 
 /* The repo overview: one drawer per app, a cabinet of drawers. */
 .lens-cabinet {

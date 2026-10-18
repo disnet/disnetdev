@@ -20,7 +20,7 @@ export async function load({ params, parent }) {
     rkey,
     app: appFor(collection),
     record,
-    specimen: describeRecord(collection, record.value),
+    specimen: describeRecord(collection, record.value, identity),
     // Blob links in the field tree point straight at the owner's PDS.
     blobBase: blobUrl(identity.pds, identity.did, '')
   };

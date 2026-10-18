@@ -1,4 +1,4 @@
-import { lensHrefForUri } from './paths';
+import { lensHrefForUri, type OwnRepo } from './paths';
 
 // A one-glance reading of an arbitrary record: something to call it, a line of
 // text, when it happened, and where it points. The lens never knows the
@@ -75,7 +75,11 @@ function lastSegment(value: string | undefined) {
 const isHttp = (s: string) => /^https?:\/\//.test(s);
 const isRef = (s: string) => s.startsWith('at://') || s.startsWith('did:');
 
-export function describeRecord(collection: string, value: Record<string, unknown>): Specimen {
+export function describeRecord(
+  collection: string,
+  value: Record<string, unknown>,
+  own: OwnRepo
+): Specimen {
   const specimen: Specimen = {
     title: firstString(value, TITLE_PATHS),
     text: clip(firstString(value, TEXT_PATHS)),
@@ -86,7 +90,7 @@ export function describeRecord(collection: string, value: Record<string, unknown
   };
 
   const ref = firstString(value, REF_PATHS, isRef);
-  if (ref) specimen.ref = lensHrefForUri(ref) ?? undefined;
+  if (ref) specimen.ref = lensHrefForUri(ref, own) ?? undefined;
 
   // Pointer records (likes, follows, reposts) are all reference and no text.
   const verb = POINTER_VERBS[collection.split('.').at(-1) ?? ''];

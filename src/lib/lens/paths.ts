@@ -31,13 +31,17 @@ export function lensHref(repo: string, collection?: string, rkey?: string) {
   return href;
 }
 
-// Turn an at:// uri (or a bare DID) into a path inside the lens, so following
-// a reference in someone's record walks you over to the repo it points at.
-export function lensHrefForUri(value: string) {
-  if (isDid(value)) return lensHref(value);
+export type OwnRepo = { did: string; handle: string };
+
+// Turn an at:// uri (or a bare DID) into a path inside the lens. The lens only
+// shows the site owner's repo, so references into anyone else's repo stay
+// plain text.
+export function lensHrefForUri(value: string, own: OwnRepo) {
+  const repo = own.handle || own.did;
+  if (value === own.did) return lensHref(repo);
   const parsed = parseAtUri(value);
-  if (!parsed) return null;
-  return lensHref(parsed.repo, parsed.collection, parsed.rkey);
+  if (!parsed || (parsed.repo !== own.did && parsed.repo !== own.handle)) return null;
+  return lensHref(repo, parsed.collection, parsed.rkey);
 }
 
 export function rkeyOf(uri: string) {

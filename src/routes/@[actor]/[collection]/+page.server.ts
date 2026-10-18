@@ -30,7 +30,7 @@ export async function load({ params, parent, url }) {
     records: response.records.map((record) => ({
       rkey: rkeyOf(record.uri),
       uri: record.uri,
-      specimen: describeRecord(collection, record.value)
+      specimen: describeRecord(collection, record.value, identity)
     })),
     cursor: response.records.length === PAGE_SIZE ? response.cursor : undefined,
     isFirstPage: !cursor

@@ -253,26 +253,13 @@
 
 <section aria-labelledby="lens-heading" class="band lens-invite">
     <header class="band-header">
-        <h2 id="lens-heading" class="band-title">Through the lens</h2>
+        <h2 id="lens-heading" class="band-title">The whole repo</h2>
     </header>
     <p class="lens-invite-copy">
-        Everything above is read from public records in my repo. You can
-        <a href={lensHref(me)}>browse all of it</a>, every collection from every
-        app, or point the same lens at your own.
+        Everything on this page is read from public records in my repo. You
+        can <a href={lensHref(me)}>browse all of it</a>, every collection from
+        every app I use, down to the raw fields of each record.
     </p>
-    <form class="lens-aim" method="GET" action="/lens">
-        <label for="home-lens-actor">Your handle</label>
-        <div class="lens-aim-row">
-            <input
-                id="home-lens-actor"
-                name="actor"
-                placeholder="you.bsky.social"
-                autocomplete="off"
-                spellcheck="false"
-            />
-            <button type="submit" aria-label="Look">▸</button>
-        </div>
-    </form>
 </section>
 
 <section aria-labelledby="workshop-heading" class="band">

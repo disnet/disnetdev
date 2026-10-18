@@ -65,8 +65,9 @@ const values = <T>(records: LensRecord[]) =>
 
 const newestFirst = (a: { at: string }, b: { at: string }) => b.at.localeCompare(a.at);
 
+// Links come out keyed by DID; loadInFlight swaps in the handle.
 function lensOf(uri: string) {
-  return lensHrefForUri(uri) ?? '/';
+  return lensHrefForUri(uri, { did: AUTHOR_DID, handle: '' }) ?? '/';
 }
 
 async function safeList(pds: string, did: string, collection: string) {
@@ -202,7 +203,7 @@ async function loadRadial(pds: string, did: string) {
     .slice(0, MERGED_PR_LIMIT);
 
   const mergedFlights = await Promise.all(
-    merged.map(async ({ value }): Promise<Flight | null> => {
+    merged.map(async ({ uri: statusUri, value }): Promise<Flight | null> => {
       const pullUri = value.pull!;
       const record = await getRecordByUri(pullUri);
       const author = parseAtUri(pullUri)?.repo;
@@ -217,7 +218,8 @@ async function loadRadial(pds: string, did: string) {
         where: 'Tangled',
         status: 'merged',
         at: value.createdAt ?? '',
-        href: lensOf(pullUri),
+        // The PR itself lives in the agent's repo; link the merge record in ours.
+        href: lensOf(statusUri),
         via: authorHandle && authorHandle !== 'handle.invalid' ? `@${authorHandle}` : undefined
       };
     })

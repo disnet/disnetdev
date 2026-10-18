@@ -33,6 +33,6 @@
   </header>
 
   <div class="lens-fields">
-    <FieldTree value={data.record.value} blobBase={data.blobBase} />
+    <FieldTree value={data.record.value} blobBase={data.blobBase} own={data.identity} />
   </div>
 </article>
