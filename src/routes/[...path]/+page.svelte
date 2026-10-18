@@ -48,7 +48,7 @@
 <PostArticle
   post={data.post}
   returnHref={isReading ? '/reading' : '/blog'}
-  returnLabel={isReading ? '◂ back to reading' : '◂ back to index'}
+  returnLabel={isReading ? '← back to reading' : '← back to index'}
   statusPath={`~${data.post.path}`}
   dateLabel={isReading ? 'shared' : 'published'}
   dateIso={isReading ? (data.post.createdAt ?? data.post.publishedAt) : ''}

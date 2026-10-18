@@ -16,7 +16,7 @@
 
   {#if data.subscribed}
     <p class="subscribe-confirm">
-      <span class="subscribe-confirm-glyph" aria-hidden="true">▸</span>
+      <span class="subscribe-confirm-glyph" aria-hidden="true">→</span>
       You're subscribed. New posts will surface in any standard.site reader you use.
     </p>
     <p>You can remove the subscription record from your repo whenever you like.</p>
@@ -85,9 +85,10 @@
 
   .subscribe-option h2 {
     font-family: var(--font-meta);
+    font-weight: var(--weight-meta);
     font-size: var(--type-sm);
     letter-spacing: 0.08em;
-    text-transform: lowercase;
+    text-transform: uppercase;
     color: var(--ink-muted);
     margin-bottom: var(--space-2xs);
   }
@@ -99,9 +100,10 @@
   .subscribe-label {
     display: block;
     font-family: var(--font-meta);
+    font-weight: var(--weight-meta);
     font-size: var(--type-sm);
     letter-spacing: 0.06em;
-    text-transform: lowercase;
+    text-transform: uppercase;
     color: var(--ink-muted);
     margin-bottom: var(--space-2xs);
   }
@@ -116,9 +118,10 @@
   .subscribe-row button {
     padding: 0.55rem 1rem;
     font-family: var(--font-meta);
+    font-weight: var(--weight-meta);
     font-size: var(--type-sm);
     letter-spacing: 0.06em;
-    text-transform: lowercase;
+    text-transform: uppercase;
     color: var(--ink-page);
     background: var(--ink-accent);
     border: var(--rule) solid var(--ink-accent);
@@ -138,6 +141,7 @@
   .subscribe-error {
     margin-top: var(--space-2xs);
     font-family: var(--font-meta);
+    font-weight: var(--weight-meta);
     font-size: var(--type-sm);
     color: var(--ink-accent-hover);
   }

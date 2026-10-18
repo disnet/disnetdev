@@ -53,7 +53,7 @@
                 {#each venue.files as file}
                   <li>
                     <a class="venue-file" href={file.link}>
-                      <span class="venue-file-glyph" aria-hidden="true">▸</span>
+                      <span class="venue-file-glyph" aria-hidden="true">→</span>
                       {file.name}
                     </a>
                   </li>
@@ -72,10 +72,10 @@
 
   <footer class="post-statusline">
     <span class="post-statusline-path">
-      <span class="post-statusline-prompt">$</span>
+      <span class="post-statusline-prompt" aria-hidden="true"></span>
       ~/papers/{data.paper.slug}
     </span>
-    <a class="post-statusline-return" href="/papers">◂ back to papers</a>
+    <a class="post-statusline-return" href="/papers">← back to papers</a>
   </footer>
 </article>
 

@@ -167,7 +167,7 @@
     border-radius: 0.4rem;
     max-height: 15rem;
     overflow-y: auto;
-    box-shadow: 0 0.5rem 1.5rem -0.75rem oklch(0.2 0.02 60 / 0.35);
+    box-shadow: 0 0.5rem 1.5rem -0.75rem oklch(0.2 0.03 268 / 0.3);
   }
 
   .handle-option {
@@ -195,6 +195,7 @@
 
   .handle-option-name {
     font-family: var(--font-meta);
+    font-weight: var(--weight-meta);
     font-size: var(--type-xs);
     letter-spacing: 0.02em;
     color: var(--ink-muted);

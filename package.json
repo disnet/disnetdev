@@ -21,13 +21,12 @@
     "node": ">=20"
   },
   "devDependencies": {
-    "@fontsource-variable/alegreya": "^5.2.8",
     "@fontsource-variable/literata": "^5.2.8",
+    "@fontsource-variable/martian-mono": "^5.3.0",
+    "@fontsource-variable/piazzolla": "^5.3.0",
+    "@fontsource-variable/schibsted-grotesk": "^5.3.0",
     "@fontsource-variable/vollkorn": "^5.2.10",
-    "@fontsource/alegreya-sans-sc": "^5.2.7",
-    "@fontsource/commit-mono": "^5.2.5",
     "@fontsource/fragment-mono": "^5.2.8",
-    "@fontsource/young-serif": "^5.2.7",
     "@sindresorhus/slugify": "^2.2.1",
     "@sveltejs/adapter-cloudflare": "^7.2.3",
     "@sveltejs/kit": "^2.18.0",
