@@ -2,6 +2,7 @@
     import { page } from "$app/state";
     import { invalidateAll } from "$app/navigation";
     import { lensHref } from "$lib/lens/paths";
+    import RepoScope from "$lib/components/lens/RepoScope.svelte";
 
     let { data } = $props();
 
@@ -39,6 +40,7 @@
     // visible, and mark anything that wasn't there on the last read.
     let seen: Set<string> | null = null;
     let fresh = $state<Set<string>>(new Set());
+    let focused = $state<string | null>(null);
 
     $effect(() => {
         const uris = [...flight.underway, ...flight.landed].map((f) => f.uri);
@@ -65,14 +67,6 @@
         });
     }
 
-    function clock(iso: string) {
-        return new Date(iso).toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            timeZone: "UTC",
-            hour12: false,
-        });
-    }
 
     // A plan's progress as a row of type: ■ done, ▸ active or next, · waiting.
     const METER_WIDTH = 32;
@@ -124,71 +118,77 @@
     <meta name="twitter:image" content={ogImage} />
 </svelte:head>
 
-<section class="intro">
-    <p class="page-eyebrow">in flight</p>
-    <h1 class="page-heading">Tim Disney</h1>
-    <p class="page-lede">
-        I make code and things. Programming languages, the web, and the <a
-            href="https://atproto.com/">Atmosphere</a
-        > bring me joy. This page is a live reading of my repo: what's moving
-        now, what's on the horizon, and what just landed.
-    </p>
+<section class="hero" aria-labelledby="hero-heading">
+    {#if data.scope}
+        <div class="hero-scope">
+            <RepoScope
+                did={data.scope.did}
+                pds={data.scope.pds}
+                repo={data.scope.repo}
+                collections={data.scope.collections}
+                highlights={flight.underway.map((f) => ({
+                    uri: f.uri,
+                    label: f.callsign,
+                    title: f.title,
+                }))}
+                bind:focused
+                label="A radar of every record in my repo: bearing is the app, distance is age."
+            />
+        </div>
+    {/if}
 
-    <ul class="signals" aria-label="Reach me">
-        {#each socials as s}
-            <li class="signal">
-                <span class="signal-label">{s.label}</span>
-                <a
-                    class="signal-link"
-                    href={s.href}
-                    rel={s.label === "bluesky" || s.label === "mastodon"
-                        ? "me"
-                        : undefined}
-                >
-                    {s.handle}
-                </a>
-            </li>
-        {/each}
-    </ul>
-</section>
-
-<p class="readout" aria-live="polite">
-    <span class="readout-prompt">$</span>
-    read <a href={lensHref(me)}>at://{me}</a>
-    {#if flight.pdsHost}<span class="readout-sep">on</span> {flight.pdsHost}{/if}
-    <span class="readout-sep">·</span> {clock(flight.asOf)} utc
-    <span class="readout-live"><span aria-hidden="true">▸</span> live</span>
-</p>
-
-<section aria-labelledby="underway-heading" class="band">
-    <header class="band-header">
-        <h2 id="underway-heading" class="band-title">Under way</h2>
-        <span class="band-sublabel">goals marked active or next</span>
-    </header>
-
-    {#if flight.underway.length === 0}
-        <p class="empty">
-            <span class="empty-prompt">▸</span> nothing in the air right now. the
-            hangar is quiet.
+    <div class="hero-text">
+        <h1 id="hero-heading" class="page-heading">Tim Disney</h1>
+        <p class="page-lede">
+            I make code and things. Programming languages, the web, and the <a
+                href="https://atproto.com/">Atmosphere</a
+            > bring me joy. The scope is my repo, read live from my PDS: every
+            blip is a record, and the boxed ones are work in flight.
         </p>
-    {:else}
-        <ol class="board">
-            {#each flight.underway as f (f.uri)}
-                <li class="board-row" class:is-fresh={fresh.has(f.uri)}>
-                    <span class="flight-status flight-status--{f.status}">{f.status}</span>
-                    <div class="board-body">
-                        <h3 class="board-title"><a href={f.href}>{f.title}</a></h3>
-                        {#if f.detail}<p class="board-detail">{f.detail}</p>{/if}
-                        <p class="board-meta">
-                            <span>{f.where}</span>
-                            {#if f.via}<span class="board-sep">·</span><span>via {f.via}</span>{/if}
-                            <span class="board-sep">·</span><span>{day(f.at)}</span>
-                        </p>
-                    </div>
+
+        <h2 class="flights-heading">In flight</h2>
+        {#if flight.underway.length === 0}
+            <p class="empty">
+                <span class="empty-prompt">▸</span> nothing in the air right now.
+            </p>
+        {:else}
+            <ol class="flights">
+                {#each flight.underway as f (f.uri)}
+                    <li
+                        class="flight"
+                        class:is-focused={focused === f.uri}
+                        class:is-fresh={fresh.has(f.uri)}
+                        onpointerenter={() => (focused = f.uri)}
+                    >
+                        <span class="flight-sign">{f.callsign}</span>
+                        <a class="flight-title" href={f.href} onfocus={() => (focused = f.uri)}
+                            >{f.title}</a
+                        >
+                        <span class="flight-where">
+                            {f.where}<span class="board-sep">·</span>{f.status}
+                        </span>
+                    </li>
+                {/each}
+            </ol>
+        {/if}
+
+        <ul class="signals" aria-label="Reach me">
+            {#each socials as s}
+                <li class="signal">
+                    <span class="signal-label">{s.label}</span>
+                    <a
+                        class="signal-link"
+                        href={s.href}
+                        rel={s.label === "bluesky" || s.label === "mastodon"
+                            ? "me"
+                            : undefined}
+                    >
+                        {s.handle}
+                    </a>
                 </li>
             {/each}
-        </ol>
-    {/if}
+        </ul>
+    </div>
 </section>
 
 {#if flight.horizon.length > 0}
@@ -294,9 +294,6 @@
 </section>
 
 <style>
-    .intro {
-        margin-bottom: var(--space-2xl);
-    }
 
     /* ——— signals (social contact table) ——— */
     .signals {
@@ -419,27 +416,6 @@
         max-width: var(--measure);
     }
 
-    .stack-venue {
-        font-family: var(--font-mono);
-        font-size: var(--type-xs);
-        color: var(--ink-muted);
-        letter-spacing: 0.04em;
-        font-variant-numeric: tabular-nums;
-        margin: var(--space-3xs) 0 0;
-        display: inline-flex;
-        gap: 0.8ch;
-        align-items: baseline;
-    }
-
-    .stack-venue-name {
-        color: var(--ink-accent);
-        text-transform: lowercase;
-    }
-
-    .stack-venue-sep {
-        color: var(--ink-rule);
-    }
-
     .empty {
         font-style: italic;
         color: var(--ink-text-soft);
@@ -453,112 +429,114 @@
         margin-right: 0.3ch;
     }
 
-    /* ——— readout (what the page just read, compiler-status style) ——— */
-    .readout {
+    /* ——— hero: the scope beside the name and the work in flight ——— */
+    .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+        gap: var(--space-lg);
+        align-items: start;
+        margin: 0 0 var(--space-3xl);
+    }
+
+    .hero-scope {
+        position: sticky;
+        top: var(--space-lg);
+    }
+
+    .hero-text .page-lede {
+        font-size: var(--type-base);
+        margin-bottom: var(--space-lg);
+    }
+
+    .flights-heading {
+        font-family: var(--font-meta);
+        font-weight: 500;
+        font-size: var(--type-sm);
+        letter-spacing: 0.14em;
+        text-transform: lowercase;
+        color: var(--ink-muted);
+        margin: 0 0 var(--space-2xs);
+    }
+
+    .flights {
+        list-style: none;
+        margin: 0 0 var(--space-lg);
+        padding: 0;
+        border-top: var(--rule) solid var(--ink-rule);
+    }
+
+    .flight {
+        display: grid;
+        grid-template-columns: 9ch minmax(0, 1fr);
+        grid-template-areas:
+            "sign title"
+            ". where";
+        column-gap: var(--space-sm);
+        padding: var(--space-2xs) var(--space-2xs) var(--space-2xs) 0;
+        border-bottom: var(--rule) solid var(--ink-rule-soft);
+        transition: background-color 160ms ease-out;
+    }
+
+    .flight-sign {
+        grid-area: sign;
         font-family: var(--font-mono);
         font-size: var(--type-xs);
+        letter-spacing: 0.04em;
         color: var(--ink-muted);
-        letter-spacing: 0.02em;
-        font-variant-numeric: tabular-nums;
-        margin: calc(var(--space-lg) * -1) 0 var(--space-2xl);
-        padding: var(--space-2xs) 0;
-        border-top: var(--rule) solid var(--ink-rule-soft);
-        border-bottom: var(--rule) solid var(--ink-rule-soft);
-        max-width: var(--measure-wide);
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0 0.8ch;
-        overflow-wrap: anywhere;
+        padding-top: 0.3em;
+        transition: color 160ms ease-out;
     }
 
-    .readout-prompt {
-        color: var(--ink-accent);
-    }
-
-    .readout-sep {
-        color: var(--ink-rule);
-    }
-
-    .readout a {
-        color: var(--ink-text-soft);
-    }
-
-    .readout-live {
-        margin-left: auto;
-        color: var(--ink-accent);
-        animation: readout-pulse 2.4s ease-in-out infinite;
-    }
-
-    @keyframes readout-pulse {
-        50% {
-            opacity: 0.45;
-        }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .readout-live {
-            animation: none;
-        }
-    }
-
-    /* ——— board (under way) ——— */
-    .board {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-    }
-
-    .board-row {
-        display: grid;
-        grid-template-columns: 7.5ch 1fr;
-        gap: var(--space-md);
-        padding: var(--space-md) 0;
-        border-top: var(--rule) solid var(--ink-rule-soft);
-    }
-
-    .board-row:last-child {
-        border-bottom: var(--rule) solid var(--ink-rule-soft);
-    }
-
-    .board-row > .flight-status {
-        justify-self: start;
-        align-self: start;
-        margin-top: 0.35em;
-    }
-
-    .board-title {
-        font-family: var(--font-display);
-        font-weight: 400;
-        font-size: var(--type-lg);
-        line-height: 1.3;
-        margin: 0;
-    }
-
-    .board-title a {
+    :global(.cathode-main) .flight-title {
+        grid-area: title;
         color: var(--ink-text);
         text-decoration: none;
+        line-height: 1.35;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .board-title a:hover,
-    .board-title a:focus-visible {
-        color: var(--ink-accent-hover);
-    }
-
-    .board-detail {
-        margin: var(--space-3xs) 0 0;
-        color: var(--ink-text-soft);
-        font-size: 1rem;
-        line-height: 1.55;
-        max-width: var(--measure);
-    }
-
-    .board-meta {
-        margin: var(--space-2xs) 0 0;
+    .flight-where {
+        grid-area: where;
         font-family: var(--font-meta);
-        font-size: var(--type-sm);
+        font-size: var(--type-xs);
         letter-spacing: 0.06em;
         text-transform: lowercase;
         color: var(--ink-muted);
+    }
+
+    /* The row the scope is tracking. */
+    .flight.is-focused {
+        background: linear-gradient(
+            to right,
+            oklch(from var(--ink-accent) l c h / 0.12),
+            transparent 70%
+        );
+    }
+
+    .flight.is-focused .flight-sign {
+        color: var(--ink-accent);
+    }
+
+    :global(.cathode-main) .flight.is-focused .flight-title,
+    :global(.cathode-main) .flight-title:hover,
+    :global(.cathode-main) .flight-title:focus-visible {
+        color: var(--ink-accent-hover);
+    }
+
+    @media (max-width: 56rem) {
+        .hero {
+            grid-template-columns: minmax(0, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .hero-scope {
+            position: static;
+            max-width: 34rem;
+            width: 100%;
+            justify-self: center;
+        }
     }
 
     .board-sep {
@@ -736,10 +714,6 @@
     }
 
     @media (max-width: 40rem) {
-        .board-row {
-            grid-template-columns: 1fr;
-            gap: var(--space-2xs);
-        }
 
         .log-row {
             grid-template-columns: 7ch 1fr auto;

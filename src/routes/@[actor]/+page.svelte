@@ -1,6 +1,7 @@
 <script lang="ts">
   import { lensHref } from '$lib/lens/paths';
   import { shortName } from '$lib/lens/apps';
+  import RepoScope from '$lib/components/lens/RepoScope.svelte';
 
   let { data } = $props();
 
@@ -15,6 +16,7 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
+<div class="lens-hero">
 <section class="lens-intro">
   <p class="page-eyebrow">lens</p>
   <div class="lens-who">
@@ -49,6 +51,17 @@
     </div>
   </form>
 </section>
+
+<div class="lens-scope">
+  <RepoScope
+    did={identity.did}
+    pds={identity.pds}
+    repo={identity.handle || identity.did}
+    collections={data.groups.flatMap((g) => g.collections)}
+    label={`A radar of every record in ${name}'s repo: bearing is the app, distance is age.`}
+  />
+</div>
+</div>
 
 {#snippet drawerList(nsids: string[])}
   <ul class="lens-drawer-list">

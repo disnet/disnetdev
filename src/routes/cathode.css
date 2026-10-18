@@ -1689,3 +1689,94 @@ body {
   color: var(--ink-muted);
   margin-top: var(--space-3xs);
 }
+
+/* ——— repo scope (radar over a repo; front page and lens) ——— */
+
+.scope {
+  margin: 0;
+}
+
+.scope-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.scope-wrap canvas {
+  display: block;
+  width: 100%;
+  touch-action: manipulation;
+}
+
+.scope-tip {
+  position: absolute;
+  transform: translate(12px, -50%);
+  pointer-events: none;
+  display: grid;
+  gap: 1px;
+  padding: var(--space-3xs) var(--space-2xs);
+  background: var(--ink-page);
+  border: var(--rule) solid var(--ink-rule);
+  border-radius: 2px;
+  box-shadow: 0 6px 18px -8px oklch(0.2 0.02 60 / 0.35);
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  white-space: nowrap;
+  z-index: 1;
+}
+
+.scope-tip--left {
+  transform: translate(calc(-100% - 12px), -50%);
+}
+
+.scope-tip-nsid {
+  color: var(--ink-text);
+}
+
+.scope-tip-when {
+  color: var(--ink-muted);
+}
+
+.scope-readout {
+  margin-top: var(--space-2xs);
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 0.8ch;
+}
+
+.scope-prompt {
+  color: var(--ink-accent);
+}
+
+.scope-sep {
+  color: var(--ink-rule);
+}
+
+.lens-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-xl);
+  align-items: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.lens-hero .lens-intro {
+  margin-bottom: 0;
+}
+
+@media (max-width: 56rem) {
+  .lens-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lens-scope {
+    max-width: 34rem;
+    width: 100%;
+    justify-self: center;
+  }
+}
