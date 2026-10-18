@@ -87,3 +87,14 @@ export function shortName(nsid: string) {
   const prefix = known?.prefix ?? nsid.split('.').slice(0, 2).join('.');
   return nsid.slice(prefix.length + 1);
 }
+
+// The app whose home page is at this URL's host, if we know it.
+export function appForHome(url: string | undefined) {
+  if (!url) return undefined;
+  try {
+    const host = new URL(url).host.replace(/^www\./, '');
+    return KNOWN_APPS.find((app) => app.home && new URL(app.home).host.replace(/^www\./, '') === host)?.name;
+  } catch {
+    return undefined;
+  }
+}
