@@ -1,45 +1,49 @@
 <script lang="ts">
-  // The front print: a mountain under a graded sky, a range of hills in front
-  // of it and the sea below. The hills are data: one peak for each of the last
-  // sixteen weeks, as tall as that week's work in the ledger. Colour blocks
-  // sit a hair off the key block, the way a hand-registered print does.
+  // The front print, kept abstract: a graded sky, a large disc, and broad
+  // planes of flat colour laid one over another the way blocks are printed in
+  // turn. The nearest plane is data: a ridge through the last sixteen weeks,
+  // as high as each week's work in the ledger, with this week marked in red.
+  // Colour blocks sit a hair off the key block, the way a hand-registered
+  // print does.
 
   let { range }: { range: { start: string; n: number }[] } = $props();
 
   const W = 1600;
   const H = 760;
-  const HILLS = 590;
-  const SEA = 640;
-  // The peaks run from just inside the left edge to just short of the
-  // cartouche, so this week's flag is never cropped.
-  const FIRST = 90;
-  const LAST = 1330;
+  const RIDGE = 650;
+  const SEA = 690;
+  // The weeks run from just inside the left edge to just short of the
+  // cartouche, so this week's mark is never cropped.
+  const FIRST = 70;
+  const LAST = 1320;
 
   const max = $derived(Math.max(1, ...range.map((r) => r.n)));
 
-  const hills = $derived.by(() => {
+  const points = $derived.by(() => {
     const step = (LAST - FIRST) / Math.max(range.length - 1, 1);
-    let d = `M -60 ${HILLS + 40} L -60 ${HILLS - 12}`;
-    range.forEach((r, i) => {
-      const x = FIRST + i * step;
-      const h = 18 + 150 * Math.sqrt(r.n / max);
-      const top = HILLS - h;
-      // valley, shoulder, peak, shoulder: angular, like a carved line
-      d += ` L ${x - step * 0.5} ${HILLS - 10}`;
-      d += ` L ${x - step * 0.18} ${top + h * 0.35}`;
-      d += ` L ${x - 6} ${top + 4} L ${x} ${top} L ${x + 9} ${top + 6}`;
-      d += ` L ${x + step * 0.22} ${top + h * 0.42}`;
-    });
-    return `${d} L ${W + 60} ${HILLS - 10} L ${W + 60} ${HILLS + 40} Z`;
+    return range.map((r, i) => ({ ...r, x: FIRST + i * step, y: RIDGE - (24 + 150 * Math.sqrt(r.n / max)) }));
   });
 
-  const peaks = $derived.by(() => {
-    const step = (LAST - FIRST) / Math.max(range.length - 1, 1);
-    return range.map((r, i) => ({ ...r, x: FIRST + i * step, y: HILLS - (18 + 150 * Math.sqrt(r.n / max)) }));
+  // A smooth line through the weeks (Catmull-Rom as cubic Béziers), carried
+  // flat out to both edges.
+  const ridgeLine = $derived.by(() => {
+    if (!points.length) return '';
+    const p = [{ x: -40, y: points[0].y }, ...points, { x: W + 40, y: points.at(-1)!.y }];
+    let d = `M ${p[0].x} ${p[0].y}`;
+    for (let i = 0; i < p.length - 1; i++) {
+      const a = p[Math.max(i - 1, 0)];
+      const b = p[i];
+      const c = p[i + 1];
+      const e = p[Math.min(i + 2, p.length - 1)];
+      d += ` C ${b.x + (c.x - a.x) / 6} ${b.y + (c.y - a.y) / 6} ${c.x - (e.x - b.x) / 6} ${c.y - (e.y - b.y) / 6} ${c.x} ${c.y}`;
+    }
+    return d;
   });
+  const ridge = $derived(`${ridgeLine} L ${W + 40} ${H} L -40 ${H} Z`);
 
-  // Seigaiha: rows of overlapping wave scales, each lower row laid over the
-  // one above it.
+  const now = $derived(points.at(-1));
+
+  // Seigaiha along the foot of the print: rows of overlapping wave scales.
   const scales = (() => {
     const out: { x: number; y: number }[] = [];
     const sx = 44;
@@ -51,31 +55,29 @@
   })();
   const arc = (x: number, y: number, r: number) => `M ${x - r} ${y} A ${r} ${r} 0 0 1 ${x + r} ${y} Z`;
 
-  // The crest along the top of the sea: a row of breaking scallops.
-  const crest = (() => {
-    let d = `M 0 ${SEA}`;
-    for (let x = 0; x < W; x += 36) d += ` q 9 -14 22 -6 q 6 4 14 6`;
-    return d;
-  })();
-
   const fmt = (start: string) =>
     new Date(`${start}T00:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
 </script>
 
 <svg class="hero-print" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" role="img" aria-labelledby="hero-print-title">
   <title id="hero-print-title">
-    A woodblock landscape. A snow-capped mountain under a graded blue sky, a range of hills in front
-    of it with one peak for each of the last {range.length} weeks of work, and the sea below.
+    An abstract woodblock print: a graded blue sky, a large disc, and broad planes of colour. The
+    nearest plane is a ridge through the last {range.length} weeks of work, highest where the most
+    got done.
   </title>
   <defs>
     <linearGradient id="wb-sky" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="var(--wb-blue)" />
-      <stop offset="0.12" stop-color="var(--wb-blue)" />
-      <stop offset="0.5" stop-color="var(--wb-blue)" stop-opacity="0" />
+      <stop offset="0.1" stop-color="var(--wb-blue)" />
+      <stop offset="0.48" stop-color="var(--wb-blue)" stop-opacity="0" />
     </linearGradient>
-    <linearGradient id="wb-mountain" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0.15" stop-color="var(--wb-indigo)" />
-      <stop offset="0.85" stop-color="var(--wb-blue-light)" />
+    <linearGradient id="wb-far" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--wb-blue-light)" />
+      <stop offset="0.6" stop-color="var(--wb-blue)" />
+    </linearGradient>
+    <linearGradient id="wb-near" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="var(--wb-green)" />
+      <stop offset="1" stop-color="var(--wb-indigo)" stop-opacity="0.6" />
     </linearGradient>
     <linearGradient id="wb-sea" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="var(--wb-blue)" />
@@ -97,50 +99,41 @@
 
   <!-- sky: ichimonji bokashi, a hard band of blue grading out -->
   <rect width={W} height={H * 0.7} fill="url(#wb-sky)" />
-  <rect width={W} height={H * 0.32} fill="var(--wb-key)" filter="url(#wb-grain)" opacity="0.14" />
+  <rect width={W} height={H * 0.3} fill="var(--wb-key)" filter="url(#wb-grain)" opacity="0.14" />
 
-  <!-- sun, or the moon after dark -->
-  <circle class="hero-sun" cx="1110" cy="190" r="62" />
+  <!-- the disc: sun by day, moon by night, half sunk behind the far plane -->
+  <circle class="hero-sun" cx="1010" cy="330" r="150" />
 
-  <!-- the mountain -->
-  <g transform="translate(2.5 1.5)">
-    <path d="M 250 600 Q 520 330 612 152 L 676 152 Q 770 330 1060 600 Z" fill="url(#wb-mountain)" />
-    <path
-      d="M 612 152 L 676 152 L 716 228 L 698 216 L 686 246 L 668 222 L 652 262 L 636 228 L 618 252 L 604 222 L 586 240 L 572 226 Z"
-      fill="var(--wb-snow)"
-    />
+  <!-- far plane: one long, slow swell -->
+  <g transform="translate(3 1.5)">
+    <path d="M -40 470 C 260 380 560 360 860 420 C 1120 470 1360 420 1640 360 L 1640 760 L -40 760 Z" fill="url(#wb-far)" />
   </g>
-  <path class="key" d="M 250 600 Q 520 330 612 152 L 676 152 Q 770 330 1060 600" fill="none" />
-  <path
-    class="key key--thin"
-    d="M 676 152 L 716 228 L 698 216 L 686 246 L 668 222 L 652 262 L 636 228 L 618 252 L 604 222 L 586 240 L 572 226 L 612 152"
-    fill="none"
-  />
+  <path class="key" d="M -40 470 C 260 380 560 360 860 420 C 1120 470 1360 420 1640 360" fill="none" />
 
-  <!-- kasumi: bands of mist drawn across the middle distance -->
-  <rect x="-40" y="452" width="640" height="34" rx="17" fill="var(--wb-mist)" />
-  <rect x="980" y="430" width="700" height="28" rx="14" fill="var(--wb-mist)" />
+  <!-- kasumi: a band of mist drawn straight across the disc and the swell -->
+  <rect x="640" y="392" width="1040" height="30" rx="15" fill="var(--wb-mist)" />
+  <rect x="-40" y="508" width="700" height="24" rx="12" fill="var(--wb-mist)" opacity="0.9" />
 
-  <!-- the range: sixteen weeks of work -->
-  <path d={hills} fill="var(--wb-green)" transform="translate(2 1.5)" />
-  <path d={hills} class="key" fill="none" />
-  {#each peaks as p, i}
-    {#if i === peaks.length - 1}
-      <!-- this week, marked with a small red flag on its peak -->
-      <g class="hero-flag" transform={`translate(${p.x} ${p.y})`}>
-        <line x1="0" x2="0" y1="0" y2="-26" class="key key--thin" />
-        <path d="M 0 -26 L 16 -21 L 0 -16 Z" fill="var(--wb-red)" />
-      </g>
-    {/if}
-    <rect class="hero-peak-hit" x={p.x - 40} y={p.y} width="80" height={HILLS - p.y}>
+  <!-- middle plane: indigo, cut in a single stroke -->
+  <g transform="translate(-2 2)">
+    <path d="M -40 590 C 280 520 620 500 940 548 C 1220 590 1440 560 1640 520 L 1640 760 L -40 760 Z" fill="var(--wb-indigo)" />
+  </g>
+  <path class="key" d="M -40 590 C 280 520 620 500 940 548 C 1220 590 1440 560 1640 520" fill="none" />
+
+  <!-- near plane: sixteen weeks of work -->
+  <path d={ridge} fill="url(#wb-near)" transform="translate(2.5 1.5)" />
+  <path d={ridgeLine} class="key" fill="none" />
+  {#each points as p}
+    <rect class="hero-week-hit" x={p.x - 40} y={p.y - 20} width="80" height={RIDGE - p.y + 20}>
       <title>Week of {fmt(p.start)}: {p.n} {p.n === 1 ? 'entry' : 'entries'} in the ledger</title>
     </rect>
   {/each}
+  {#if now}
+    <!-- this week -->
+    <circle cx={now.x} cy={now.y} r="11" class="hero-now" />
+  {/if}
 
-  <rect x="-40" y="560" width="520" height="22" rx="11" fill="var(--wb-mist)" opacity="0.9" />
-  <rect x="1180" y="572" width="460" height="20" rx="10" fill="var(--wb-mist)" opacity="0.9" />
-
-  <!-- the sea -->
+  <!-- the sea along the foot -->
   <rect x="0" y={SEA} width={W} height={H - SEA} fill="url(#wb-sea)" />
   <g clip-path="url(#wb-sea-clip)">
     {#each scales as s}
@@ -149,7 +142,6 @@
       <path d={arc(s.x, s.y, 8)} class="scale scale--in" />
     {/each}
   </g>
-  <path d={crest} class="crest" fill="none" />
   <line x1="0" x2={W} y1={SEA} y2={SEA} class="key" />
 
   <rect width={W} height={H} fill="var(--wb-key)" filter="url(#wb-fibre)" opacity="0.06" />
@@ -169,16 +161,18 @@
     stroke-linecap: round;
   }
 
-  .key--thin {
-    stroke-width: 1.5;
-  }
-
-  .hero-peak-hit {
+  .hero-week-hit {
     fill: transparent;
   }
 
   .hero-sun {
     fill: var(--wb-red);
+  }
+
+  .hero-now {
+    fill: var(--wb-red);
+    stroke: var(--wb-key);
+    stroke-width: 2;
   }
 
   .scale {
@@ -189,11 +183,5 @@
 
   .scale--in {
     fill: none;
-  }
-
-  .crest {
-    stroke: var(--wb-snow);
-    stroke-width: 3;
-    stroke-linecap: round;
   }
 </style>

@@ -38,7 +38,7 @@
 <div class="wb">
   <header class="wb-mast">
     <a class="wb-mark" href="/woodblock">
-      <span class="wb-mark-seal" aria-hidden="true">迪</span>
+      <span class="wb-mark-seal" aria-hidden="true">td</span>
       disnetdev
     </a>
     <nav class="wb-nav" aria-label="Primary">
@@ -51,14 +51,14 @@
       <figure class="wb-frame wb-frame--hero">
         <div class="wb-hero-art">
           <HeroPrint range={data.range} />
-          <div class="wb-cartouche" lang="ja">
-            <span class="wb-cartouche-title">大気三十六景</span>
-            <span class="wb-cartouche-en" lang="en">Thirty-six Views of the Atmosphere</span>
+          <div class="wb-cartouche">
+            <span class="wb-cartouche-title">Views of the Atmosphere</span>
+            <span class="wb-cartouche-en">Tim Disney · no. 36</span>
           </div>
         </div>
         <figcaption class="wb-hero-caption">
-          The hills are my last {data.range.length} weeks of work, one peak a week, read from the
-          <a href="/made">ledger</a>. The flag is this week.
+          The nearest ridge is my last {data.range.length} weeks of work, rising with each week's
+          entries in the <a href="/made">ledger</a>. The red mark is this week.
         </figcaption>
       </figure>
 
@@ -82,7 +82,7 @@
     <div class="wb-series">
       <section class="wb-print wb-print--writing" aria-labelledby="wb-writing">
         <header class="wb-label">
-          <span class="wb-label-no" lang="ja" aria-hidden="true">一</span>
+          <span class="wb-label-no" aria-hidden="true">1</span>
           <h2 id="wb-writing">Writing</h2>
         </header>
         <ol class="wb-posts">
@@ -99,7 +99,7 @@
 
       <section class="wb-print wb-print--work" aria-labelledby="wb-work">
         <header class="wb-label">
-          <span class="wb-label-no" lang="ja" aria-hidden="true">二</span>
+          <span class="wb-label-no" aria-hidden="true">2</span>
           <h2 id="wb-work">On the workbench</h2>
         </header>
         <ol class="wb-work">
@@ -117,7 +117,7 @@
       {#if data.families.length}
         <section class="wb-print wb-print--waves" aria-labelledby="wb-waves">
           <header class="wb-label">
-            <span class="wb-label-no" lang="ja" aria-hidden="true">三</span>
+            <span class="wb-label-no" aria-hidden="true">3</span>
             <h2 id="wb-waves">Lexicons at sea</h2>
           </header>
           <p class="wb-print-note">
@@ -141,7 +141,7 @@
       {#if data.photos.length}
         <section class="wb-print wb-print--photos" aria-labelledby="wb-photos">
           <header class="wb-label">
-            <span class="wb-label-no" lang="ja" aria-hidden="true">四</span>
+            <span class="wb-label-no" aria-hidden="true">4</span>
             <h2 id="wb-photos">Seen lately</h2>
           </header>
           <ul class="wb-photos">
@@ -164,7 +164,7 @@
   </main>
 
   <footer class="wb-foot">
-    <span class="wb-mark-seal wb-mark-seal--small" aria-hidden="true">迪</span>
+    <span class="wb-mark-seal wb-mark-seal--small" aria-hidden="true">td</span>
     <span>
       Printed from the records in my repo. A prototype; the
       <a href="/">blue pencil site</a> is still the real one.
@@ -282,7 +282,8 @@
     background: var(--wb-red);
     color: var(--wb-snow);
     font-weight: 800;
-    font-size: 1.15rem;
+    font-size: 1rem;
+    letter-spacing: -0.04em;
     border-radius: 3px;
     /* A seal never lands perfectly square. */
     transform: rotate(-3deg);
@@ -352,8 +353,8 @@
 
   .wb-cartouche-title {
     font-weight: 800;
-    font-size: clamp(1.25rem, 2.6vw, 2rem);
-    letter-spacing: 0.12em;
+    font-size: clamp(1rem, 1.7vw, 1.45rem);
+    letter-spacing: 0.06em;
   }
 
   .wb-cartouche-en {
