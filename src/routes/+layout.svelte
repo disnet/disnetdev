@@ -35,8 +35,11 @@
     }
   ];
 
-  // The admin area owns its own viewport chrome (src/routes/admin/+layout.svelte).
-  const isAdminArea = $derived(page.url.pathname.startsWith('/admin'));
+  // The admin area owns its own viewport chrome (src/routes/admin/+layout.svelte),
+  // and so does the woodblock prototype, which is a whole other identity.
+  const isAdminArea = $derived(
+    page.url.pathname.startsWith('/admin') || page.url.pathname.startsWith('/woodblock')
+  );
   const pathname = $derived(page.url.pathname);
   const subscribed = $derived(Boolean(data?.subscribed));
 

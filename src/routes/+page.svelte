@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from "$app/state";
+    import LedgerRows from "$lib/components/ledger/LedgerRows.svelte";
 
     let { data } = $props();
 
@@ -353,6 +354,35 @@
     </section>
 {/if}
 
+{#if data.workbench.length}
+<section aria-labelledby="workbench-heading" class="band band--workbench">
+    <header class="band-header">
+        <h2 id="workbench-heading" class="band-title">From the workbench</h2>
+        <a href="/made" class="read-more">the whole ledger</a>
+    </header>
+    <p class="band-note">What the work has left in my repo lately.</p>
+    <LedgerRows entries={data.workbench} compact />
+</section>
+{/if}
+
+{#if data.lexicons.length}
+<section aria-labelledby="lexicons-heading" class="band band--lexicons">
+    <header class="band-header">
+        <h2 id="lexicons-heading" class="band-title">Field guide</h2>
+        <a href="/lexicons" class="read-more">all plates</a>
+    </header>
+    <p class="band-note">Record types I've designed, and how many repos on the network carry them.</p>
+    <ul class="lexicon-list">
+        {#each data.lexicons as family}
+            <li class="lexicon-item">
+                <a class="lexicon-name" href={`/lexicons#${family.key}`}>{family.name}</a>
+                <span class="lexicon-repos">{family.repos.toLocaleString()}{family.capped ? "+" : ""} <span class="lexicon-unit">{family.repos === 1 ? "repo" : "repos"}</span></span>
+            </li>
+        {/each}
+    </ul>
+</section>
+{/if}
+
 <section aria-labelledby="workshop-heading" class="band band--workshop">
     <header class="band-header">
         <h2 id="workshop-heading" class="band-title">Workshop</h2>
@@ -496,15 +526,63 @@
 
         .band--posts,
         .band--shares,
+        .band--workbench,
         .band--workshop {
             grid-column: 1 / span 8;
         }
 
         .band--photos,
         .band--filed,
+        .band--lexicons,
         .band--papers {
             grid-column: 9 / span 4;
         }
+    }
+
+    /* ——— the Atmosphere modules ——— */
+    .band-note {
+        margin: 0 0 var(--space-xs);
+        font-size: 1rem;
+        color: var(--ink-text-soft);
+    }
+
+    .lexicon-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .lexicon-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: var(--space-sm);
+        padding: var(--space-2xs) 0;
+        border-bottom: var(--rule) solid var(--ink-rule-soft);
+    }
+
+    .lexicon-name {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: var(--type-sm);
+        color: var(--ink-text);
+        text-decoration: none;
+    }
+
+    .lexicon-name:hover {
+        color: var(--ink-accent);
+    }
+
+    .lexicon-repos {
+        font-family: var(--font-mono);
+        font-size: var(--type-sm);
+        color: var(--ink-accent);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .lexicon-unit {
+        font-size: var(--type-xs);
+        color: var(--ink-muted);
     }
 
     /* Section heads hang off a heavy ink rule. */
