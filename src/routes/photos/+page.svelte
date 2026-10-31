@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { forwardLegacyPageQuery, pageHref } from '$lib/pagination';
+
   let { data } = $props();
 
   function formatDate(iso: string) {
@@ -14,8 +17,10 @@
 
   const hasPrev = $derived(data.page > 1);
   const hasNext = $derived(data.page < data.totalPages);
-  const prevHref = $derived(data.page - 1 <= 1 ? '/photos' : `/photos?page=${data.page - 1}`);
-  const nextHref = $derived(`/photos?page=${data.page + 1}`);
+  const prevHref = $derived(pageHref('/photos', data.page - 1));
+  const nextHref = $derived(pageHref('/photos', data.page + 1));
+
+  onMount(() => forwardLegacyPageQuery('/photos'));
 </script>
 
 <svelte:head>

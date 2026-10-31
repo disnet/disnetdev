@@ -1,9 +1,9 @@
 import { AUTHOR_DID } from '$lib/config';
-import { getSubscriber } from '$lib/server/session';
 
-export async function load({ cookies }) {
+// Nothing here may depend on the visitor: this load feeds every prerendered
+// public page. Per-visitor state (the subscribe control) is read in the browser.
+export function load() {
   return {
-    authorDid: AUTHOR_DID,
-    subscribed: Boolean(await getSubscriber(cookies))
+    authorDid: AUTHOR_DID
   };
 }

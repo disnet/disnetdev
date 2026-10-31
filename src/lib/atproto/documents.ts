@@ -7,6 +7,7 @@ import { getPdsUrlForDid } from '$lib/atproto/service';
 import { getSlugFromPath, normalizePath } from '$lib/atproto/utils';
 import { renderMarkdown } from '$lib/markdown/render';
 import { deleteCache, getCache, invalidateCache, setCache } from '$lib/server/cache';
+import { requestSiteRebuild } from '$lib/server/rebuild';
 import { getPublication } from './publication';
 import type { DocumentSummary, FeedDocument, PostPageData, PublishedDocument } from '$lib/types/blog';
 
@@ -246,6 +247,12 @@ export async function getPublishedDocumentByPath(path: string): Promise<PostPage
   return post;
 }
 
+// `/blog/<slug>` is served by the blog/[slug] route; every other document
+// path falls through to the [...path] catch-all.
+export function isBlogSlugPath(path: string) {
+  return /^\/blog\/[^/]+$/.test(path);
+}
+
 export async function getPublishedDocumentBySlug(slug: string): Promise<PostPageData | null> {
   return getPublishedDocumentByPath(`/blog/${slug}`);
 }
@@ -298,6 +305,7 @@ export async function createPublishedDocument(did: string, record: PublishedDocu
   });
 
   invalidateDocumentCaches(normalizedPath);
+  await requestSiteRebuild(`published ${normalizedPath}`);
   return response.data;
 }
 
@@ -324,6 +332,7 @@ export async function updatePublishedDocument(did: string, rkey: string, record:
   });
 
   invalidateDocumentCaches(normalizedPath);
+  await requestSiteRebuild(`updated ${normalizedPath}`);
   return response.data;
 }
 
@@ -373,6 +382,7 @@ export async function migrateLegacyContentToMarkpub(did: string) {
   } while (cursor);
 
   invalidateDocumentCaches();
+  if (migrated.length > 0) await requestSiteRebuild('migrated legacy content');
   return { migrated, skipped };
 }
 
@@ -387,4 +397,5 @@ export async function deletePublishedDocument(did: string, rkey: string) {
   });
 
   invalidateDocumentCaches(existing?.record.path);
+  await requestSiteRebuild(`deleted ${existing?.record.path ?? rkey}`);
 }

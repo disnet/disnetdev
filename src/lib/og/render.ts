@@ -4,6 +4,7 @@
 // variant defers that until we call init().
 import satori, { init as satoriInit } from 'satori/standalone';
 import { Resvg, initWasm as initResvg } from '@resvg/resvg-wasm';
+import { building } from '$app/environment';
 import { buildOgTree, type OgInputs, OG_WIDTH, OG_HEIGHT } from './template';
 
 // Cloudflare Workers disallow compile-from-bytes at every stage, so we rely on
@@ -13,10 +14,25 @@ import { buildOgTree, type OgInputs, OG_WIDTH, OG_HEIGHT } from './template';
 // We use dynamic import so Node doesn't try to evaluate the .wasm extension
 // during SvelteKit's build-time manifest/prerender pass — the endpoints that
 // call into this file are not prerendered.
+//
+// While prerendering we are in Node, which can compile wasm from bytes, so the
+// cards that are built ahead of time read the wasm and fonts off disk instead.
+async function readSourceFile(relativePath: string) {
+  const { readFile } = await import('node:fs/promises');
+  const bytes = await readFile(relativePath);
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+}
+
+async function compileSourceWasm(name: string) {
+  return WebAssembly.compile(await readSourceFile(`src/lib/og/wasm/${name}`));
+}
+
 function loadYogaModule(): Promise<WebAssembly.Module> {
+  if (building) return compileSourceWasm('yoga.wasm');
   return import('./wasm/yoga.wasm').then((m) => m.default);
 }
 function loadResvgModule(): Promise<WebAssembly.Module> {
+  if (building) return compileSourceWasm('resvg.wasm');
   return import('./wasm/resvg.wasm').then((m) => m.default);
 }
 
@@ -87,6 +103,8 @@ function ensureResvg() {
 }
 
 async function fetchBytes(origin: string, fetcher: typeof fetch, path: string) {
+  if (building) return readSourceFile(`static${path}`);
+
   const res = await fetcher(new URL(path, origin));
   if (!res.ok) throw new Error(`og: failed to load ${path}: ${res.status}`);
   return res.arrayBuffer();

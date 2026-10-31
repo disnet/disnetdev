@@ -6,7 +6,7 @@
 
   const isReading = $derived(data.post.path.startsWith('/reading/'));
   const ogImage = $derived(
-    new URL(`/og/doc${data.post.path}`, page.url.origin).toString()
+    new URL(`/og/doc${data.post.path}/card.png`, page.url.origin).toString()
   );
   const pageUrl = $derived(new URL(data.post.path, page.url.origin).toString());
 </script>

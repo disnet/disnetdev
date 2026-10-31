@@ -1,6 +1,8 @@
 import { getPaperBySlug } from '$lib/papers';
 import { error } from '@sveltejs/kit';
 
+export const prerender = true;
+
 export async function load({ params, setHeaders }) {
   const paper = await getPaperBySlug(params.slug);
 

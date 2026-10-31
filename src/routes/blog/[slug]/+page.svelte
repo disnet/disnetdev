@@ -4,7 +4,7 @@
 
   let { data } = $props();
 
-  const ogImage = $derived(new URL(`/og/blog/${data.post.slug}`, page.url.origin).toString());
+  const ogImage = $derived(new URL(`/og/blog/${data.post.slug}/card.png`, page.url.origin).toString());
   const pageUrl = $derived(new URL(`/blog/${data.post.slug}`, page.url.origin).toString());
 </script>
 

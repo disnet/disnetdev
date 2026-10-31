@@ -2,6 +2,8 @@ import { listLinkblogDocuments, listPublishedDocuments } from '$lib/atproto/docu
 import { getPublication } from '$lib/atproto/publication';
 import { renderSitemap } from '$lib/feeds/sitemap';
 
+export const prerender = true;
+
 export async function GET() {
   const [publication, posts, linkblog] = await Promise.all([
     getPublication(),
