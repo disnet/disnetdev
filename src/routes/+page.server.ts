@@ -4,6 +4,8 @@ import { listReadingEntries } from '$lib/atproto/reading';
 import { listCards, listCollections } from '$lib/atproto/library';
 import { listPhotoPosts } from '$lib/atproto/photos';
 
+export const prerender = true;
+
 export async function load({ setHeaders }) {
   setHeaders({
     'cache-control': 'public, max-age=0, s-maxage=300, stale-while-revalidate=300'

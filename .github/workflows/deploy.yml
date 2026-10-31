@@ -3,6 +3,11 @@ name: Deploy
 on:
   push:
     branches: [main]
+  # Public pages are prerendered from the PDS at build time. Publishing from the
+  # studio dispatches this workflow straight away; the schedule picks up records
+  # other apps write (Skyreader shares, Semble cards, photos).
+  schedule:
+    - cron: '17 * * * *'
   workflow_dispatch:
 
 concurrency:

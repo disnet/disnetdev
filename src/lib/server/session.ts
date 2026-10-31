@@ -116,6 +116,32 @@ export function destroyWebSession(cookies: Cookies) {
 const SUBSCRIBER_COOKIE = 'disnetdev_subscriber';
 const SUBSCRIBER_TTL_SECONDS = 60 * 60 * 24 * 30;
 
+// Public pages are prerendered, so the server can't tell a subscriber apart
+// when it renders the masthead. This readable companion cookie carries no
+// identity, only "show the subscribed state", and the layout reads it in the
+// browser. The signed cookie above stays the source of truth for unsubscribing.
+export const SUBSCRIBED_FLAG_COOKIE = 'disnetdev_subscribed';
+
+function setSubscribedFlag(cookies: Cookies, maxAge: number) {
+  cookies.set(SUBSCRIBED_FLAG_COOKIE, '1', {
+    path: '/',
+    httpOnly: false,
+    sameSite: 'lax',
+    secure: !dev,
+    maxAge
+  });
+}
+
+// Subscribers from before the flag existed only have the signed cookie. Any
+// dynamic request (the subscribe page, the studio) brings the two back in line.
+export function syncSubscribedFlag(cookies: Cookies) {
+  const hasSubscriber = Boolean(cookies.get(SUBSCRIBER_COOKIE));
+  const hasFlag = Boolean(cookies.get(SUBSCRIBED_FLAG_COOKIE));
+
+  if (hasSubscriber && !hasFlag) setSubscribedFlag(cookies, SUBSCRIBER_TTL_SECONDS);
+  if (!hasSubscriber && hasFlag) cookies.delete(SUBSCRIBED_FLAG_COOKIE, { path: '/' });
+}
+
 export async function markSubscriber(cookies: Cookies, did: string) {
   const token = await encodeSession({ did, exp: Date.now() + SUBSCRIBER_TTL_SECONDS * 1000 });
   cookies.set(SUBSCRIBER_COOKIE, token, {
@@ -125,6 +151,7 @@ export async function markSubscriber(cookies: Cookies, did: string) {
     secure: !dev,
     maxAge: SUBSCRIBER_TTL_SECONDS
   });
+  setSubscribedFlag(cookies, SUBSCRIBER_TTL_SECONDS);
 }
 
 export async function getSubscriber(cookies: Cookies): Promise<{ did: string } | null> {
@@ -137,6 +164,7 @@ export async function getSubscriber(cookies: Cookies): Promise<{ did: string } |
 
 export function clearSubscriber(cookies: Cookies) {
   cookies.delete(SUBSCRIBER_COOKIE, { path: '/' });
+  cookies.delete(SUBSCRIBED_FLAG_COOKIE, { path: '/' });
 }
 
 // Only allow same-origin paths through a post-OAuth redirect — never an

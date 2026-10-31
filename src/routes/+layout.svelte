@@ -38,7 +38,13 @@
   // The admin area owns its own viewport chrome (src/routes/admin/+layout.svelte).
   const isAdminArea = $derived(page.url.pathname.startsWith('/admin'));
   const pathname = $derived(page.url.pathname);
-  const subscribed = $derived(Boolean(data?.subscribed));
+  // The page HTML is prerendered, so the subscribed state comes from a
+  // readable flag cookie (see SUBSCRIBED_FLAG_COOKIE in $lib/server/session).
+  let subscribed = $state(false);
+  $effect(() => {
+    void pathname;
+    subscribed = document.cookie.split(/;\s*/).includes('disnetdev_subscribed=1');
+  });
 
   // Native <details> stays open on outside clicks — dismiss it ourselves.
   let subscribeEl = $state<HTMLDetailsElement>();

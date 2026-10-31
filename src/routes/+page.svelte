@@ -3,7 +3,7 @@
 
     let { data } = $props();
 
-    const ogImage = $derived(new URL("/og", page.url.origin).toString());
+    const ogImage = $derived(new URL("/og/card.png", page.url.origin).toString());
     const pageUrl = $derived(new URL("/", page.url.origin).toString());
 
     const socials = [
