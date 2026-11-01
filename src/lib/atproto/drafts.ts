@@ -53,8 +53,12 @@ function invalidateDraftCaches(rkey?: string) {
   }
 }
 
-async function listDraftRecords(): Promise<StoredDraft[]> {
-  const cached = getCache<StoredDraft[]>(DRAFTS_CACHE_KEY);
+// `fresh` skips the per-isolate cache: the MCP tools must see edits made in
+// the studio a moment ago, which may have landed in another isolate.
+type ReadOptions = { fresh?: boolean };
+
+async function listDraftRecords(options?: ReadOptions): Promise<StoredDraft[]> {
+  const cached = options?.fresh ? undefined : getCache<StoredDraft[]>(DRAFTS_CACHE_KEY);
   if (cached) return cached;
 
   const repoDid = getDraftRepoDid();
@@ -89,14 +93,17 @@ async function listDraftRecords(): Promise<StoredDraft[]> {
   return all;
 }
 
-export async function listDrafts(): Promise<Array<{ rkey: string; record: DraftRecord }>> {
-  const drafts = await listDraftRecords();
+export async function listDrafts(options?: ReadOptions): Promise<Array<{ rkey: string; record: DraftRecord }>> {
+  const drafts = await listDraftRecords(options);
   return drafts.map(({ rkey, record }) => ({ rkey, record }));
 }
 
-export async function getDraft(rkey: string): Promise<{ uri: string; rkey: string; record: DraftRecord } | null> {
+export async function getDraft(
+  rkey: string,
+  options?: ReadOptions
+): Promise<{ uri: string; rkey: string; record: DraftRecord } | null> {
   const cacheKey = getDraftCacheKey(rkey);
-  const cached = getCache<StoredDraft | null>(cacheKey);
+  const cached = options?.fresh ? undefined : getCache<StoredDraft | null>(cacheKey);
   if (cached) return cached;
 
   const repoDid = getDraftRepoDid();

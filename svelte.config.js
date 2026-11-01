@@ -57,6 +57,11 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: cloudflareWithStaticRoutes(),
+    // The OAuth token endpoint (/oauth/token) takes form-encoded POSTs from
+    // MCP clients' servers, which SvelteKit's built-in origin check would
+    // reject. The same check is reimplemented in src/hooks.server.ts with
+    // that one path exempted.
+    csrf: { trustedOrigins: ['*'] },
     prerender: {
       // page.url.origin in prerendered HTML (canonical links, og:image).
       origin: 'https://www.disnetdev.com',

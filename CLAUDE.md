@@ -6,32 +6,23 @@ website and the standard.site pub are the same thing. Drafts are
 `DRAFT_COLLECTION_NSID` records on the same PDS, and they show up in the studio
 at `/admin`.
 
-When asked to draft a post:
+The site is its own MCP server at `/mcp` (`src/routes/mcp`,
+`src/lib/server/mcp-tools.ts`). Tim adds `https://www.disnetdev.com/mcp` as a
+connector in Claude and approves it on the studio's consent page
+(`/admin/oauth/authorize`, OAuth in `src/lib/server/mcp-oauth.ts`). The tools
+are `list_drafts`, `get_draft`, `create_draft`, `update_draft` and
+`upload_image`. They write through the author's stored atproto OAuth session,
+the same one the studio uses.
 
-1. Write it as markdown with frontmatter (`title`, `description`, `tags`,
-   optional `slug` and `coverImage`). Keep working copies in
-   `/mnt/project-files/drafts/<slug>.md` when that folder exists, with images
-   in `img/` beside it, not in this repo.
-2. Run `npm run studio:draft -- push <file> --dry-run` to validate it, then
-   push it without `--dry-run`. The draft lands in the studio's drafts list,
-   and the command prints its `/admin/edit/draft/<rkey>` link. Give Tim that
-   link.
-3. Pushing the same file again updates the same draft, because the first push
-   writes `rkey` into the frontmatter. `studio:draft -- pull <rkey> <file>`
-   fetches a draft Tim has edited in the studio, so you work from his
-   version. Run `studio:draft -- list` to see all drafts.
-4. Never publish. Tim publishes from the studio. The script cannot create
-   published documents, and it refuses to overwrite a draft that is already
-   published.
+There is deliberately no publish tool. Drafts are published by Tim from the
+studio. Keep it that way: don't add a publish tool or anything that writes
+`site.standard.document` from `/mcp`.
 
-This needs `ATP_IDENTIFIER` and `ATP_APP_PASSWORD` (an app password) in the
-environment, plus network access to `plc.directory` and Tim's PDS.
-
-Writing it: match the voice of recent posts in `content/blog/` (first person,
-plain, specific, no filler intros or listicle headings). Draft from Tim's
-notes, outline, or thinking. Don't invent opinions or experiences he hasn't
-stated. Mark gaps with `<!-- TODO: ... -->` and list them when you hand over
-the link.
+When drafting through the tools: write in Tim's voice (first person, plain,
+specific, no filler intros or listicle headings; see `content/blog/` for
+examples), draft from his notes and thinking without inventing opinions or
+experiences, mark gaps with `<!-- TODO: ... -->`, and give him the
+`studioUrl`. Before revising, `get_draft` again in case he edited it.
 
 ---
 
