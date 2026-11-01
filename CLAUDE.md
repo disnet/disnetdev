@@ -1,28 +1,37 @@
-## Drafting and publishing posts
+## Drafting posts
 
 Posts are `site.standard.document` records on Tim's PDS, in the publication at
 `PUBLICATION_AT_URI`. The public site prerenders from those records, so the
-website and the standard.site pub are the same thing.
+website and the standard.site pub are the same thing. Drafts are
+`DRAFT_COLLECTION_NSID` records on the same PDS, and they show up in the studio
+at `/admin`.
 
 When asked to draft a post:
 
-1. Write it as `drafts/<slug>.md` on a branch, following `drafts/README.md`
-   (frontmatter `title`, `description`, `tags`; images in `drafts/img/`).
-2. Run `npm run drafts:check` before pushing.
-3. Open a PR. Tim reviews the prose there. Never merge it yourself: merging
-   publishes to the PDS, which is public and outlives the repo.
-4. On merge, `.github/workflows/deploy.yml` publishes the draft, moves it to
-   `content/published/`, and rebuilds the site.
+1. Write it as markdown with frontmatter (`title`, `description`, `tags`,
+   optional `slug` and `coverImage`). Keep working copies in
+   `/mnt/project-files/drafts/<slug>.md` when that folder exists, with images
+   in `img/` beside it, not in this repo.
+2. Run `npm run studio:draft -- push <file> --dry-run` to validate it, then
+   push it without `--dry-run`. The draft lands in the studio's drafts list,
+   and the command prints its `/admin/edit/draft/<rkey>` link. Give Tim that
+   link.
+3. Pushing the same file again updates the same draft, because the first push
+   writes `rkey` into the frontmatter. `studio:draft -- pull <rkey> <file>`
+   fetches a draft Tim has edited in the studio, so you work from his
+   version. Run `studio:draft -- list` to see all drafts.
+4. Never publish. Tim publishes from the studio. The script cannot create
+   published documents, and it refuses to overwrite a draft that is already
+   published.
 
-Writing it: match the voice of recent posts in `content/blog/` and
-`content/published/` (first person, plain, specific, no filler intros or
-listicle headings). Draft from Tim's notes, outline, or thinking; don't invent
-opinions or experiences he hasn't stated. Flag gaps with `<!-- TODO: ... -->`
-rather than papering over them. The check fails while any remain, so a draft
-with open questions can't be merged by accident.
+This needs `ATP_IDENTIFIER` and `ATP_APP_PASSWORD` (an app password) in the
+environment, plus network access to `plc.directory` and Tim's PDS.
 
-Edits to an already-published post go through the studio at `/admin`, not
-this flow.
+Writing it: match the voice of recent posts in `content/blog/` (first person,
+plain, specific, no filler intros or listicle headings). Draft from Tim's
+notes, outline, or thinking. Don't invent opinions or experiences he hasn't
+stated. Mark gaps with `<!-- TODO: ... -->` and list them when you hand over
+the link.
 
 ---
 

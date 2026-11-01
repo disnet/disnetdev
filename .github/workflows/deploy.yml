@@ -21,8 +21,7 @@ jobs:
       name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
       url: ${{ vars.PUBLIC_SITE_URL }}
     permissions:
-      # write: publishing a draft commits it from drafts/ to content/published/
-      contents: write
+      contents: read
       deployments: write
     steps:
       - uses: actions/checkout@v4
@@ -33,26 +32,6 @@ jobs:
           cache: npm
 
       - run: npm ci
-
-      # Merged drafts go to the PDS before the build so the prerender picks
-      # them up. Only on main, and never on the hourly schedule.
-      - name: Publish merged drafts
-        if: github.ref == 'refs/heads/main' && github.event_name != 'schedule'
-        env:
-          ATP_IDENTIFIER: ${{ secrets.ATP_IDENTIFIER }}
-          ATP_APP_PASSWORD: ${{ secrets.ATP_APP_PASSWORD }}
-        run: npm run drafts:publish
-
-      - name: Commit published drafts
-        if: github.ref == 'refs/heads/main' && github.event_name != 'schedule'
-        run: |
-          if [ -n "$(git status --porcelain drafts content/published)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A drafts content/published
-            git commit -m "Publish drafts [skip ci]"
-            git push
-          fi
 
       - run: npm run build
 
