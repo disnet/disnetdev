@@ -10,8 +10,12 @@ import type { PageServerLoad } from './$types';
 export const load: PageServerLoad = async (event) => {
   requireAuthor(event);
 
+  // Drafts can be written by MCP clients, and markdown passes raw HTML
+  // through. Sandboxing the preview keeps any script in a draft from running
+  // in Tim's signed-in session (where it could publish or edit posts).
   event.setHeaders({
-    'cache-control': 'private, no-store'
+    'cache-control': 'private, no-store',
+    'content-security-policy': "sandbox allow-same-origin allow-popups allow-popups-to-escape-sandbox; script-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"
   });
 
   const draft = await getDraft(event.params.rkey);

@@ -30,5 +30,5 @@ export async function GET({ url, cookies }) {
   }
 
   await createWebSession(cookies, result.did);
-  throw redirect(303, result.state.redirectTo || '/admin');
+  throw redirect(303, safeInternalPath(result.state.redirectTo, '/admin'));
 }

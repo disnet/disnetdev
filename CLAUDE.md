@@ -1,3 +1,31 @@
+## Drafting posts
+
+Posts are `site.standard.document` records on Tim's PDS, in the publication at
+`PUBLICATION_AT_URI`. The public site prerenders from those records, so the
+website and the standard.site pub are the same thing. Drafts are
+`DRAFT_COLLECTION_NSID` records on the same PDS, and they show up in the studio
+at `/admin`.
+
+The site is its own MCP server at `/mcp` (`src/routes/mcp`,
+`src/lib/server/mcp-tools.ts`). Tim adds `https://www.disnetdev.com/mcp` as a
+connector in Claude and approves it on the studio's consent page
+(`/admin/oauth/authorize`, OAuth in `src/lib/server/mcp-oauth.ts`). The tools
+are `list_drafts`, `get_draft`, `create_draft`, `update_draft` and
+`upload_image`. They write through the author's stored atproto OAuth session,
+the same one the studio uses.
+
+There is deliberately no publish tool. Drafts are published by Tim from the
+studio. Keep it that way: don't add a publish tool or anything that writes
+`site.standard.document` from `/mcp`.
+
+When drafting through the tools: write in Tim's voice (first person, plain,
+specific, no filler intros or listicle headings; see `content/blog/` for
+examples), draft from his notes and thinking without inventing opinions or
+experiences, mark gaps with `<!-- TODO: ... -->`, and give him the
+`studioUrl`. Before revising, `get_draft` again in case he edited it.
+
+---
+
 ## Design Context
 
 This project has two distinct surfaces with deliberately different aesthetics:
