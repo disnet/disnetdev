@@ -28,6 +28,7 @@ type GetRecordResponse = {
 
 type StoredDraft = {
   uri: string;
+  cid?: string;
   rkey: string;
   record: DraftRecord;
 };
@@ -101,7 +102,7 @@ export async function listDrafts(options?: ReadOptions): Promise<Array<{ rkey: s
 export async function getDraft(
   rkey: string,
   options?: ReadOptions
-): Promise<{ uri: string; rkey: string; record: DraftRecord } | null> {
+): Promise<{ uri: string; cid?: string; rkey: string; record: DraftRecord } | null> {
   const cacheKey = getDraftCacheKey(rkey);
   const cached = options?.fresh ? undefined : getCache<StoredDraft | null>(cacheKey);
   if (cached) return cached;
@@ -124,6 +125,7 @@ export async function getDraft(
 
     const draft = {
       uri: response.uri,
+      cid: response.cid,
       rkey,
       record: record.data
     };
@@ -149,14 +151,22 @@ export async function createDraft(did: string, record: DraftRecord) {
   return created.data;
 }
 
-export async function updateDraft(did: string, rkey: string, record: DraftRecord) {
+// Pass `swapRecord` (the cid the caller read) to fail instead of overwriting
+// a change made since then.
+export async function updateDraft(
+  did: string,
+  rkey: string,
+  record: DraftRecord,
+  options?: { swapRecord?: string }
+) {
   const agent = await restoreOAuthAgent(did);
   const response = await agent.com.atproto.repo.putRecord({
     repo: did,
     collection: DRAFT_COLLECTION,
     rkey,
     validate: false,
-    record
+    record,
+    ...(options?.swapRecord ? { swapRecord: options.swapRecord } : {})
   });
 
   invalidateDraftCaches(rkey);

@@ -1,7 +1,7 @@
 // Consent page for MCP clients (see $lib/server/mcp-oauth). Sits behind the
 // studio sign-in, so only the author can hand out a token.
 
-import { getClient, getIssuer, getResourceUrl, issueCode, MCP_SCOPE } from '$lib/server/mcp-oauth';
+import { getClient, getIssuer, getResourceUrl, isAllowedRedirectUri, issueCode, MCP_SCOPE } from '$lib/server/mcp-oauth';
 import { requireAuthor } from '$lib/server/session';
 import { error, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
@@ -14,7 +14,9 @@ async function readRequest(url: URL) {
   // Without a known client and redirect URI there is nowhere safe to send an
   // error, so show it here instead.
   if (!client) throw error(400, 'Unknown client. Remove the connector and add it again.');
-  if (!client.redirect_uris.includes(redirectUri)) throw error(400, 'Redirect URI is not registered for this client.');
+  if (!client.redirect_uris.includes(redirectUri) || !isAllowedRedirectUri(redirectUri)) {
+    throw error(400, 'Redirect URI is not registered for this client.');
+  }
 
   const state = p.get('state');
   const back = (params: Record<string, string>) => {

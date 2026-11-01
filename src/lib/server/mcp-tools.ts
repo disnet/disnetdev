@@ -20,6 +20,32 @@ const BLOB_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 export class ToolError extends Error {}
 
+// Read a response body without buffering more than `limit` bytes.
+async function readCapped(res: Response, limit: number) {
+  if (Number(res.headers.get('content-length') ?? 0) > limit) throw new ToolError('Image is larger than 4MB');
+  const reader = res.body?.getReader();
+  if (!reader) return new Uint8Array(await res.arrayBuffer());
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > limit) {
+      await reader.cancel();
+      throw new ToolError('Image is larger than 4MB');
+    }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    out.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return out;
+}
+
 type Args = Record<string, unknown>;
 
 type Tool = {
@@ -202,8 +228,9 @@ export const tools: Tool[] = [
       const tags = args.tags !== undefined ? tagList(args) : existing.record.tags;
       const { blobs, missing } = await resolveEmbeddedBlobs(markdown, existing.record.embeddedBlobs);
 
+      if (!existing.cid) throw new ToolError('Could not read the current version of this draft; try again.');
       const { description: _d, tags: _t, embeddedBlobs: _e, ...rest } = existing.record;
-      await updateDraft(did, rkey, {
+      const record: DraftRecord = {
         ...rest,
         $type: DRAFT_COLLECTION_NSID,
         title,
@@ -213,7 +240,16 @@ export const tools: Tool[] = [
         markdown,
         updatedAt: new Date().toISOString(),
         ...(blobs.length ? { embeddedBlobs: blobs } : {})
-      });
+      };
+      try {
+        await updateDraft(did, rkey, record, { swapRecord: existing.cid });
+      } catch (err) {
+        // The draft changed (an edit or a publish in the studio) since it was read.
+        if ((err as { error?: string })?.error === 'InvalidSwap') {
+          throw new ToolError('The draft changed since it was read (Tim may be editing or have published it). Call get_draft and try again.');
+        }
+        throw err;
+      }
       return {
         rkey,
         slug,
@@ -248,7 +284,8 @@ export const tools: Tool[] = [
         const res = await fetch(url);
         if (!res.ok) throw new ToolError(`Fetching the image failed: ${res.status}`);
         mimeType = (res.headers.get('content-type') ?? '').split(';')[0].trim();
-        bytes = new Uint8Array(await res.arrayBuffer());
+        if (!IMAGE_MIME.has(mimeType)) throw new ToolError(`Unsupported image type: ${mimeType || 'unknown'}`);
+        bytes = await readCapped(res, MAX_IMAGE_BYTES);
       } else if (data) {
         mimeType = str(args, 'mime_type', { required: true })!;
         bytes = new Uint8Array(Buffer.from(data, 'base64'));

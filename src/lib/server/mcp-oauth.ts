@@ -48,7 +48,13 @@ type TokenGrant = {
 };
 
 export function getIssuer() {
-  return getSiteUrl().replace(/\/+$/, '');
+  const siteUrl = getSiteUrl().replace(/\/+$/, '');
+  // getSiteUrl falls back to localhost; in production that would hand
+  // clients metadata pointing nowhere.
+  if (!dev && siteUrl.startsWith('http://localhost')) {
+    throw new Error('PUBLIC_SITE_URL must be set for the MCP OAuth endpoints');
+  }
+  return siteUrl;
 }
 
 export function getResourceUrl() {
@@ -139,13 +145,22 @@ async function sha256(value: string) {
   return Buffer.from(new Uint8Array(digest)).toString('base64url');
 }
 
-// Redirect URIs must be https, or loopback http for local clients.
+// Only Tim connects, and only from Claude, so redirect URIs are allowlisted
+// rather than accepting any https URL: otherwise anyone could register a
+// client named "Claude" that sends the code to their own server. Loopback is
+// allowed for local clients (Claude Code). MCP_EXTRA_REDIRECT_URIS (comma
+// separated) adds more.
+const ALLOWED_REDIRECT_URIS = [
+  'https://claude.ai/api/mcp/auth_callback',
+  'https://claude.com/api/mcp/auth_callback'
+];
+
 export function isAllowedRedirectUri(uri: string) {
+  const extra = (env.MCP_EXTRA_REDIRECT_URIS ?? '').split(',').map((u) => u.trim()).filter(Boolean);
+  if ([...ALLOWED_REDIRECT_URIS, ...extra].includes(uri)) return true;
   try {
     const url = new URL(uri);
-    if (url.hash) return false;
-    if (url.protocol === 'https:') return true;
-    return url.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
+    return !url.hash && url.protocol === 'http:' && ['localhost', '127.0.0.1', '[::1]'].includes(url.hostname);
   } catch {
     return false;
   }
@@ -199,9 +214,10 @@ async function issueTokens(grant: TokenGrant) {
 
 type TokenError = { error: string; error_description?: string };
 
-// Codes are signed rather than stored, so they can't be marked used. PKCE
-// still binds a code to the client that started the flow, and it expires in
-// five minutes.
+// Codes are signed rather than stored. Redeemed codes are recorded in KV so a
+// replay is refused; that is best-effort (KV is eventually consistent across
+// locations), and PKCE still binds a code to the client that started the flow
+// within its five-minute life.
 export async function exchangeCode(params: {
   code: string;
   client_id: string;
@@ -211,6 +227,10 @@ export async function exchangeCode(params: {
   const grant = await unsign<CodePayload>(params.code, 'code');
   if (!grant) return { error: 'invalid_grant', error_description: 'Unknown or expired code' };
 
+  const kv = getKeyValueStore();
+  const usedKey = `mcp:used-code:${await sha256(params.code)}`;
+  if (await kv.get(usedKey)) return { error: 'invalid_grant', error_description: 'Code already used' };
+
   if (grant.client_id !== params.client_id || grant.redirect_uri !== params.redirect_uri) {
     return { error: 'invalid_grant', error_description: 'Code was issued to a different client' };
   }
@@ -218,6 +238,7 @@ export async function exchangeCode(params: {
     return { error: 'invalid_grant', error_description: 'PKCE verification failed' };
   }
 
+  await kv.set(usedKey, true, { ttlSeconds: CODE_TTL_SECONDS });
   return issueTokens({ client_id: grant.client_id, did: grant.did });
 }
 

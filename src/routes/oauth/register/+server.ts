@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   if ('error' in result) {
     return new Response(
-      JSON.stringify({ error: result.error, error_description: 'redirect_uris must be https or loopback http' }),
+      JSON.stringify({ error: result.error, error_description: 'redirect_uris must be the Claude connector callback or a loopback URL' }),
       { status: 400, headers }
     );
   }

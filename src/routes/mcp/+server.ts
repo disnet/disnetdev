@@ -97,8 +97,14 @@ export const POST: RequestHandler = async ({ request }) => {
     return json({ jsonrpc: '2.0', id: null, error: { code: -32700, message: 'Parse error' } }, { status: 400 });
   }
 
+  // Batches are only for older clients (2025-06-18 dropped them). Run them in
+  // order so two writes to the same draft can't race.
   const messages = (Array.isArray(body) ? body : [body]) as JsonRpcRequest[];
-  const responses = (await Promise.all(messages.map((m) => handle(m, grant.did)))).filter(Boolean);
+  const responses = [];
+  for (const message of messages) {
+    const response = await handle(message, grant.did);
+    if (response) responses.push(response);
+  }
   if (responses.length === 0) return new Response(null, { status: 202, headers: CORS_HEADERS });
   return json(Array.isArray(body) ? responses : responses[0]);
 };
