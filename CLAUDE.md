@@ -1,3 +1,31 @@
+## Drafting and publishing posts
+
+Posts are `site.standard.document` records on Tim's PDS, in the publication at
+`PUBLICATION_AT_URI`. The public site prerenders from those records, so the
+website and the standard.site pub are the same thing.
+
+When asked to draft a post:
+
+1. Write it as `drafts/<slug>.md` on a branch, following `drafts/README.md`
+   (frontmatter `title`, `description`, `tags`; images in `drafts/img/`).
+2. Run `npm run drafts:check` before pushing.
+3. Open a PR. Tim reviews the prose there. Never merge it yourself: merging
+   publishes to the PDS, which is public and outlives the repo.
+4. On merge, `.github/workflows/deploy.yml` publishes the draft, moves it to
+   `content/published/`, and rebuilds the site.
+
+Writing it: match the voice of recent posts in `content/blog/` and
+`content/published/` (first person, plain, specific, no filler intros or
+listicle headings). Draft from Tim's notes, outline, or thinking; don't invent
+opinions or experiences he hasn't stated. Flag gaps with `<!-- TODO: ... -->`
+rather than papering over them. The check fails while any remain, so a draft
+with open questions can't be merged by accident.
+
+Edits to an already-published post go through the studio at `/admin`, not
+this flow.
+
+---
+
 ## Design Context
 
 This project has two distinct surfaces with deliberately different aesthetics:
