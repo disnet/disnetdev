@@ -27,7 +27,8 @@ experiences, mark gaps with `<!-- TODO: ... -->`, and give him the
 Posts that are mostly AI-generated carry the tag `vibeslop`, which shows a
 label under the title linking to the policy page at `/ai`
 (`src/lib/ai-disclosure.ts`). Tag a draft `vibeslop` when you wrote most of
-its prose; leave it off when you only edited Tim's writing.
+its prose; leave it off when you only edited Tim's writing. Don't add any
+other tags: `vibeslop` is the only tag you set, and Tim adds the rest himself.
 
 ---
 

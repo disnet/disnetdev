@@ -123,7 +123,7 @@ const draftFields = {
     description: 'URL slug: the post publishes at /blog/<slug>. Lowercase words joined by hyphens.'
   },
   description: { type: 'string', description: 'One sentence for feeds, cards and the post header.' },
-  tags: { type: 'array', items: { type: 'string' }, description: 'Tags, e.g. ["atproto", "macros"].' }
+  tags: { type: 'array', items: { type: 'string' }, description: 'Only ["vibeslop"], and only when you wrote most of the prose. Leave out otherwise; Tim adds other tags himself.' }
 };
 
 export const tools: Tool[] = [
