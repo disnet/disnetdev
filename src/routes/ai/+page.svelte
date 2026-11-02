@@ -33,7 +33,6 @@
     <a href="https://contraptions.venkateshrao.com/p/be-slightly-monstrous">“be slightly monstrous”</a>,
     and his account of writing that way in
     <a href="https://contraptions.venkateshrao.com/p/experiments-with-monstrousness">Experiments with Monstrousness</a>.
-    The difference is that I label which posts are which.
   </p>
 </article>
 
