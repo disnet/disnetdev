@@ -12,7 +12,8 @@ const PROTOCOL_VERSIONS = ['2025-06-18', '2025-03-26', '2024-11-05'];
 const INSTRUCTIONS = `Drafts for Tim's blog (disnetdev.com), stored on his PDS and shown in his studio at /admin.
 Write in Tim's voice: first person, plain, specific; no filler intros or listicle headings. Don't invent opinions or experiences he hasn't stated; mark gaps with <!-- TODO: ... -->.
 Nothing here publishes. Hand Tim the studioUrl and he publishes from the studio.
-Before revising a draft, get_draft it again: he may have edited it.`;
+Before revising a draft, get_draft it again: he may have edited it.
+If you wrote most of the prose (not just edited his), add the tag "vibeslop" so the post is labeled as AI-generated.`;
 
 type JsonRpcRequest = { jsonrpc?: string; id?: string | number | null; method?: string; params?: Record<string, unknown> };
 

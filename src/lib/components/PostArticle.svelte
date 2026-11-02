@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PostPageData } from '$lib/types/blog';
+  import { AI_POLICY_PATH, isAiGenerated } from '$lib/ai-disclosure';
 
   let {
     post,
@@ -20,6 +21,7 @@
   } = $props();
 
   const shownDate = $derived(dateIso || post.publishedAt);
+  const aiGenerated = $derived(isAiGenerated(post.tags));
 
   function formatDate(iso: string) {
     const d = new Date(iso);
@@ -39,6 +41,12 @@
       </figure>
     {/if}
     <h1 class="post-title">{post.title}</h1>
+    {#if aiGenerated}
+      <p class="post-ai-label">
+        <a href={AI_POLICY_PATH}>vibeslop</a>
+        <span class="post-ai-label-note">mostly AI-generated, an experiment</span>
+      </p>
+    {/if}
     {#if post.description}
       <p class="post-description">{post.description}</p>
     {/if}
