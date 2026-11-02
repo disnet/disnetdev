@@ -14,7 +14,7 @@
 
   <h2>Hand-written</h2>
   <p>
-    Most posts. I wrote the words and did the thinking. I sometimes use AI as an editor, to
+    I wrote the words and did the thinking. I sometimes use AI as an editor, to
     point out where an argument is thin or a sentence doesn't work, but the prose is mine.
     These posts have no label.
   </p>
