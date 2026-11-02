@@ -24,6 +24,11 @@ examples), draft from his notes and thinking without inventing opinions or
 experiences, mark gaps with `<!-- TODO: ... -->`, and give him the
 `studioUrl`. Before revising, `get_draft` again in case he edited it.
 
+Posts that are mostly AI-generated carry the tag `vibeslop`, which shows a
+label under the title linking to the policy page at `/ai`
+(`src/lib/ai-disclosure.ts`). Tag a draft `vibeslop` when you wrote most of
+its prose; leave it off when you only edited Tim's writing.
+
 ---
 
 ## Design Context

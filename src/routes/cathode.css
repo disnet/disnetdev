@@ -900,6 +900,46 @@ body {
   text-wrap: balance;
 }
 
+.post-ai-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 1ch;
+  margin: 0 0 var(--space-md);
+  font-family: var(--font-meta);
+  font-weight: var(--weight-meta);
+  font-size: var(--type-sm);
+  letter-spacing: 0.02em;
+}
+
+/* Solid accent square as the marker, same as elsewhere on the site. */
+.post-ai-label a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6ch;
+  color: var(--ink-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.post-ai-label a::before {
+  content: '';
+  width: 0.6em;
+  height: 0.6em;
+  background: var(--ink-accent);
+  align-self: center;
+}
+
+.post-ai-label a:hover {
+  color: var(--ink-accent-hover);
+}
+
+.post-ai-label-note {
+  color: var(--ink-muted);
+}
+
 .post-description {
   font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
   line-height: 1.4;
