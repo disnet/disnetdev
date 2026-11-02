@@ -23,12 +23,8 @@
   <p>
     Posts tagged <strong>{AI_GENERATED_TAG}</strong>, with a label under the title, were
     generated mostly by AI. They come from my own notes and journal, and I steer and edit
-    them, but most of the sentences are the model's. They're an experiment in having a
-    steady outlet for working through ideas in public, which I've always found hard to keep
-    up when I write everything by hand.
-  </p>
-  <p>
-    My own thinking still happens by hand, in my journal.
+    them, but most of the sentences are the model's. They're an experiment in how far
+    human/AI collaboration should go.
   </p>
 
   <h2>Where this comes from</h2>
