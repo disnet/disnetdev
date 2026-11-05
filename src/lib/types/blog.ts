@@ -1,3 +1,4 @@
+import type { SelfLabels } from '$lib/ai-disclosure';
 export type BlobRef = {
   $type: 'blob';
   ref: { $link: string };
@@ -53,6 +54,7 @@ export type PublishedDocument = {
   path?: string;
   description?: string;
   tags?: string[];
+  labels?: SelfLabels;
   content?: DocumentContent;
   textContent?: string;
   links?: DocumentLink[];

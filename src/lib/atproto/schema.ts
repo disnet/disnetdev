@@ -63,6 +63,12 @@ export const publishedDocumentSchema = z.object({
   path: z.string().startsWith('/').optional(),
   description: z.string().optional(),
   tags: z.array(z.string()).optional(),
+  labels: z
+    .object({
+      $type: z.literal('com.atproto.label.defs#selfLabels'),
+      values: z.array(z.object({ val: z.string() }))
+    })
+    .optional(),
   content: documentContentSchema.optional(),
   textContent: z.string().optional(),
   links: z.array(documentLinkSchema).optional(),

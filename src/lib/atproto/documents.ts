@@ -1,3 +1,4 @@
+import { documentSelfLabels } from '$lib/ai-disclosure';
 import { restoreOAuthAgent } from '$lib/atproto/auth';
 import { getBlobUrl, resolveInlineBlobUrls } from '$lib/atproto/blobs';
 import { parseAtUri, xrpc } from '$lib/atproto/client';
@@ -283,6 +284,14 @@ export async function publishedPathExists(path: string, options?: { excludeRkey?
   );
 }
 
+// Keep the standard.site `labels` field in step with the tags, so vibeslop
+// posts carry an `ai-generated` self-label wherever the record is read.
+function withSelfLabels(record: PublishedDocument): PublishedDocument {
+  const { labels: existing, ...rest } = record;
+  const labels = documentSelfLabels(record.tags, existing);
+  return labels ? { ...rest, labels } : rest;
+}
+
 export async function createPublishedDocument(did: string, record: PublishedDocument) {
   const publication = await getPublication();
 
@@ -296,12 +305,12 @@ export async function createPublishedDocument(did: string, record: PublishedDocu
     repo: did,
     collection: 'site.standard.document',
     validate: false,
-    record: {
+    record: withSelfLabels({
       ...record,
       $type: 'site.standard.document',
       site: publication.uri,
       path: normalizedPath
-    }
+    })
   });
 
   invalidateDocumentCaches(normalizedPath);
@@ -323,12 +332,12 @@ export async function updatePublishedDocument(did: string, rkey: string, record:
     collection: 'site.standard.document',
     rkey,
     validate: false,
-    record: {
+    record: withSelfLabels({
       ...record,
       $type: 'site.standard.document',
       site: publication.uri,
       path: normalizedPath
-    }
+    })
   });
 
   invalidateDocumentCaches(normalizedPath);
@@ -384,6 +393,55 @@ export async function migrateLegacyContentToMarkpub(did: string) {
   invalidateDocumentCaches();
   if (migrated.length > 0) await requestSiteRebuild('migrated legacy content');
   return { migrated, skipped };
+}
+
+// One-time backfill: give already-published vibeslop posts the `ai-generated`
+// self-label. Works on the raw record value so every other field is kept, and
+// only rewrites records whose labels actually change.
+export async function backfillAiSelfLabels(did: string) {
+  const agent = await restoreOAuthAgent(did);
+  const collection = 'site.standard.document';
+  const updated: string[] = [];
+  let cursor: string | undefined;
+
+  do {
+    const response = await agent.com.atproto.repo.listRecords({
+      repo: did,
+      collection,
+      limit: 100,
+      cursor
+    });
+
+    for (const item of response.data.records) {
+      const value = item.value as Record<string, unknown> & {
+        tags?: string[];
+        labels?: { values?: { val: string }[] };
+      };
+      const rkey = item.uri.split('/').at(-1) ?? '';
+      const labels = documentSelfLabels(value.tags, value.labels);
+      if (JSON.stringify(labels?.values ?? []) === JSON.stringify(value.labels?.values ?? [])) {
+        continue;
+      }
+
+      const { labels: _old, ...rest } = value;
+      await agent.com.atproto.repo.putRecord({
+        repo: did,
+        collection,
+        rkey,
+        validate: false,
+        record: labels ? { ...rest, labels } : rest
+      });
+      updated.push(rkey);
+    }
+
+    cursor = response.data.cursor;
+  } while (cursor);
+
+  if (updated.length > 0) {
+    invalidateDocumentCaches();
+    await requestSiteRebuild('backfilled ai-generated labels');
+  }
+  return { updated };
 }
 
 export async function deletePublishedDocument(did: string, rkey: string) {
